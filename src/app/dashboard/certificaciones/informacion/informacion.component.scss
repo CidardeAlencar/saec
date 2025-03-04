@@ -1,0 +1,20 @@
+.main{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  height: 100vh;
+  background-color: var(--color-background-light);
+
+}
+.table {
+  min-width: 80% !important;
+}
+.data{
+  display: flex;
+  h2{
+    padding-left: 10px;
+  }
+
+}
+

@@ -1,1 +1,42 @@
-<p>login works!</p>
+<div class="main">
+  <mat-card class="card">
+
+    <img mat-card-image src="images/emte.png" alt="Escudo EMTE" class="logo">
+    <mat-card-content>
+      <form style="display: flex; flex-direction: column;">
+        <mat-form-field>
+          <mat-label>Correo electronico</mat-label>
+          <input
+            matInput
+            placeholder="pat@example.com"
+            [formControl]="email"
+            (blur)="updateErrorMessage()"
+            required
+          />
+          @if (email.invalid) {
+            <mat-error>{{errorMessage()}}</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Contraseña</mat-label>
+          <input
+          [formControl]="password"
+          matInput
+          [type]="hide() ? 'password' : 'text'"/>
+          <button
+            mat-icon-button
+            matSuffix
+            (click)="clickEvent($event)"
+            [attr.aria-label]="'Hide password'"
+            [attr.aria-pressed]="hide()"
+          >
+            <mat-icon>{{hide() ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+        </mat-form-field>
+      </form>
+    </mat-card-content>
+    <mat-card-actions style="display: flex; justify-content: center;">
+      <button mat-raised-button class="button-primary" (click)="login()">INGRESAR</button>
+    </mat-card-actions>
+  </mat-card>
+</div>

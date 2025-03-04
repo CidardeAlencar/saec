@@ -1,0 +1,26 @@
+.main{
+  background-color: var(--color-background-dark);
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .card{
+    padding: 30px;
+    width: 600px;
+    max-width: 90vw;
+    border-radius: 50px;
+    box-shadow: 15px 15px 20px 0px rgba(0,0,0,0.4);
+    background-color: var(--color-secondary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .logo{
+    width: 370px;
+  }
+}
+
+.example-card {
+  max-width: 400px;
+}
+

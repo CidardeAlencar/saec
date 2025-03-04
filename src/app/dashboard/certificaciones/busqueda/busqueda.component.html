@@ -1,0 +1,25 @@
+<div class="main">
+  <img src="images/compas.png" alt="Escudo EMTE" class="compas">
+  <div class="container">
+    <form>
+      <mat-form-field>
+        <mat-label>BUSQUEDA</mat-label>
+        <input
+          matInput
+          placeholder="CI A BUSCAR"
+          [formControl]="ci"
+          />
+          <button
+            style="border-radius: 20px; margin: 10px;"
+            mat-icon-button
+            matSuffix
+            (click)="clickEvent($event)"
+            [attr.aria-label]="'search'"
+          >
+            <mat-icon>search</mat-icon>
+          </button>
+      </mat-form-field>
+    </form>
+  </div>
+  <img src="images/libroAzul.png" alt="Escudo EMTE" class="letra">
+</div>
