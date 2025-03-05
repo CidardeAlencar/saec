@@ -1,0 +1,19 @@
+<div>
+<h2 mat-dialog-title>Firmas</h2>
+<mat-dialog-content style="display: flex; flex-direction: column;">
+  <!-- <p>Quienes firmaran?</p> -->
+  <mat-form-field>
+    <mat-label>Jefe de estudios</mat-label>
+    <input matInput [(ngModel)]="jefe" />
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Comandante</mat-label>
+    <input matInput [(ngModel)]="comandante" />
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">Cancelar</button>
+  <!-- <button mat-button [mat-dialog-close]="save()" cdkFocusInitial>Guardar</button> -->
+  <button mat-button (click)="save()" cdkFocusInitial>Guardar</button>
+
+</mat-dialog-actions>
