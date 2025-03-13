@@ -1,9 +1,11 @@
-import { Component, inject, model, signal } from '@angular/core';
+import { Component, inject, signal, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import {MatTableModule} from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 import {
   MAT_DIALOG_DATA,
   MatDialog,
@@ -13,6 +15,8 @@ import {
   MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
+import { EstudianteService } from '../../../shared/services/estudiante.service';
+import { Subscription } from 'rxjs';
 
 export interface PeriodicElement {
   semestre: string;
@@ -46,14 +50,30 @@ export interface DialogData {
   templateUrl: './informacion.component.html',
   styleUrl: './informacion.component.scss'
 })
-export class InformacionComponent {
+export class InformacionComponent implements OnInit, OnDestroy{
+  estudiante: any = null;
+  private subscription!: Subscription;
   readonly jefe = signal('');
   readonly comandante = signal('');
   // readonly name = model('');
   readonly dialog = inject(MatDialog);
   displayedColumns: string[] = ['position', 'semestre', 'promedio', 'literal', 'obs'];
   dataSource = ELEMENT_DATA;
+  @ViewChild('pdfContent', { static: false }) pdfContent!: ElementRef;
+  generandoPDF = false;
 
+  constructor(private estudianteService: EstudianteService) {}
+
+  ngOnInit() {
+    this.subscription = this.estudianteService.estudianteData$.subscribe(data => {
+      this.estudiante = data;
+      console.log("Datos recibidos:", data);
+    });
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe(); // 📌 Evita fugas de memoria
+  }
 
   openDialog(): void {
     const dialogRef = this.dialog.open(DialogOverviewExampleDialog, {
@@ -71,7 +91,21 @@ export class InformacionComponent {
     });
   }
   print(){
-    window.print();
+    // window.print();
+    this.generandoPDF = true;
+    setTimeout(async () => { // ⏳ Espera que el contenido se renderice antes de capturarlo
+      const content = this.pdfContent.nativeElement;
+      const canvas = await html2canvas(content, { scale: 2 });
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'letter');
+      const imgWidth = 216;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+  
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      pdf.save('certificacion.pdf');
+
+      this.generandoPDF = false; // 📌 Ocultar la sección después de generar el PDF
+    }, 500);
   }
 }
 
@@ -92,6 +126,7 @@ export class InformacionComponent {
 export class DialogOverviewExampleDialog {
   readonly dialogRef = inject(MatDialogRef<DialogOverviewExampleDialog>);
   readonly data = inject<DialogData>(MAT_DIALOG_DATA);
+  private estudianteService = inject(EstudianteService);
   // readonly jefe = model(this.data.jefe);
   // readonly comandante = model(this.data.comandante);
   jefe = this.data.jefe;
@@ -101,9 +136,21 @@ export class DialogOverviewExampleDialog {
     this.dialogRef.close();
   }
 
-  save(){
-    console.log(this.jefe);
-    console.log(this.comandante);
-    this.dialogRef.close({ jefe: this.jefe, comandante: this.comandante });
+  // save(){
+  //   console.log(this.jefe);
+  //   console.log(this.comandante);
+  //   this.dialogRef.close({ jefe: this.jefe, comandante: this.comandante });
+  // }
+  async save() {
+    console.log("Guardando en Firebase:", this.jefe, this.comandante);
+    
+    const success = await this.estudianteService.guardarFirmas(this.jefe, this.comandante);
+    
+    if (success) {
+      console.log("Datos guardados correctamente en Firebase");
+      this.dialogRef.close({ jefe: this.jefe, comandante: this.comandante });
+    } else {
+      console.error("Error al guardar en Firebase");
+    }
   }
 }

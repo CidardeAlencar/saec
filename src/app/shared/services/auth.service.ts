@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Auth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from '@angular/fire/auth';
 
 @Injectable({
   providedIn: 'root'
@@ -7,7 +8,19 @@ export class AuthService {
 
   private isAuthenticated : boolean = false;
 
-  constructor() { }
+  constructor(private auth: Auth) { }
+
+  async loginFB(email: string, password: string) {
+    return signInWithEmailAndPassword(this.auth, email, password);
+  }
+
+  async register(email: string, password: string) {
+    return createUserWithEmailAndPassword(this.auth, email, password);
+  }
+
+  async logoutFB() {
+    return signOut(this.auth);
+  }
 
   login(user:string,password:string):boolean{
     if(user==='certificaciones.epsst@gmail.com' && password===  'certificaciones1#'){

@@ -8,10 +8,10 @@
       <h2>GESTION:</h2>
     </div>
     <div>
-      <h2>label</h2>
-      <h2>label</h2>
-      <h2>label</h2>
-      <h2>label</h2>
+      <h2>{{ estudiante.grado || "No definido" }}</h2>
+      <h2>{{ estudiante.nombres || "No definido" }}</h2>
+      <h2>{{ estudiante.apMat || "No definido" }}</h2>
+      <h2>2025</h2>
     </div>
   </div>
 
@@ -45,6 +45,66 @@
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
   </table>
+  <!-- [hidden]="!generandoPDF" -->
+  <div #pdfContent class="pdf-container" [hidden]="!generandoPDF">
+    <div class="title">
+      <div class="encabezado">
+        <span>DEPARTAMENTO VI - EDUCACIÓN</span> 
+        <span>ESCUELA MILITAR DE TOPOGRAFÍA DEL EJ]RCITO</span> 
+        <span>“TCNL. JUAN ORDANZA LARA”</span> 
+        <span class="bolivia">BOLIVIA </span>
+      </div>
+    </div>
+    <p>El suscrito Comandante de La Escuela 
+      Militar de Topografía del Ejército, a solicitud 
+      escrita del interesado. </p>
+    <p class="bold">C E R T I F I C A:</p>
+    <p class="indent">Que previa revisión de la documentación existente en la Sección 
+      Académica de la Escuela de Perfeccionamiento para Sub Oficiales y Sargentos 
+      Topógrafos se evidencia que:</p>
+    <p class="indent">El Sr. <span class="bold">{{ estudiante?.grado }} {{ estudiante?.nombres }} {{ estudiante?.apPat }} {{ estudiante?.apMat }}</span>, 
+      curso como Alumno regular en la Escuela de Perfeccionamiento para Sub Oficiales y 
+      Sargentos Topógrafos, durante la gestión Académica {{ estudiante?.gestionBasico }} obteniendo las siguientes 
+      calificaciones:</p>
+    <p class="bold">CUADRO DE CALIFICACIONES DE LA GESTIÓN ACADÉMICA {{ estudiante?.gestionBasico }}</p>
+  
+    <table class="mat-elevation-z8 table">
+      <tr class="bold">
+        <th>No.</th>
+        <th>Semestre</th>
+        <th>Promedio Final</th>
+        <th>Literal</th>
+        <th>OBS.</th>
+      </tr>
+      <tr *ngFor="let nota of dataSource">
+        <td>{{ nota.position }}</td>
+        <td>{{ nota.semestre }}</td>
+        <td>{{ nota.promedio }}</td>
+        <td>{{ nota.literal }}</td>
+        <td>{{ nota.obs }}</td>
+      </tr>
+    </table>
+  
+    <p><strong>ORDEN DE MÉRITO:</strong> 03/123</p>
+    <!-- <p><strong>Fecha:</strong> {{ fechaHoy | date:'fullDate' }}</p> -->
+    <p class="indent">Es cuanto se tiene a bien certificar para los fines consiguientes.</p>
+    <p><strong> NOTA: </strong> La información solo es válida para el Sistema de Información del Ejercito. </p>
+    <div class="fecha">
+      <p>La Paz, marzo 26 del 2025</p>
+    </div>
+    
+
+    <div class="firmas">
+      <p class="ind">
+      <span>{{ estudiante?.nombres }}</span>
+      <span><strong>JEFE DE ESTUDIOS DE LA E.P.S.S.T.</strong></span>
+      </p>
+      <p><strong>Vo.Bo.</strong></p>
+      <p class="ind"><span>{{ estudiante?.nombres }}</span>
+      <span><strong>COMANDANTE DE LA E.M.T.E. - E.P.S.S.T.</strong></span></p>
+    </div>
+  
+  </div>
 
   <button
     mat-raised-button
