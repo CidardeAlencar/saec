@@ -21,6 +21,8 @@ export class EstudianteService {
         const estudiante = estudianteSnap.data();
         console.log("Estudiante encontrado:", estudiante);
 
+        estudiante['id'] = ci; // 📌 Agregar el ID del documento a los datos del estudiante
+        console.log("Estudiante encontrado:", estudiante);
         // Guardar datos para compartir entre componentes
         this.estudianteData.next(estudiante);
         return true;
@@ -35,11 +37,11 @@ export class EstudianteService {
     }
   }
 
-  // Guardar en Firestore en la colección "firmas" con ID "1"
+
   async guardarFirmas(jefe: string, comandante: string) {
     try {
       const firmaRef = doc(this.firestore, 'firmas/1');
-      await setDoc(firmaRef, { jefe, comandante }, { merge: true }); // 📌 Guarda sin sobrescribir otros datos
+      await setDoc(firmaRef, { jefe, comandante }, { merge: true });
       console.log("Firmas guardadas en Firebase");
       return true;
     } catch (error) {
@@ -47,4 +49,55 @@ export class EstudianteService {
       return false;
     }
   }
+
+  async obtenerFirmas() {
+    try {
+      const firmaRef = doc(this.firestore, 'firmas/1');
+      const firmaSnap = await getDoc(firmaRef);
+  
+      if (firmaSnap.exists()) {
+        const firmas = firmaSnap.data();
+        console.log("Firmas obtenidas:", firmas);
+        return firmas;
+      } else {
+        console.log("No se encontraron firmas en Firebase.");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error al obtener las firmas:", error);
+      return null;
+    }
+  }
+
+  async obtenerNotas(ci: string) {
+    try {
+      const finalPrimeroRef = doc(this.firestore, `estudiante/${ci}/basico/finalPrimero`);
+      const notaPrimeroSnap = await getDoc(finalPrimeroRef);
+      
+      const finalSegundoRef = doc(this.firestore, `estudiante/${ci}/basico/finalSegundo`);
+      const notaSegundoSnap = await getDoc(finalSegundoRef);
+
+      let notas = {
+        notaPrimero: null,
+        notaSegundo: null
+      };
+
+      if (notaPrimeroSnap.exists()) {
+        notas.notaPrimero = notaPrimeroSnap.data()?.['nota'];
+      }
+
+      if (notaSegundoSnap.exists()) {
+        notas.notaSegundo = notaSegundoSnap.data()?.['nota'];
+      }
+
+      console.log("Notas obtenidas:", notas);
+      return notas;
+
+    } catch (error) {
+      console.error("Error al obtener las notas:", error);
+      return { notaPrimero: null, notaSegundo: null };
+    }
+}
+
+
 }

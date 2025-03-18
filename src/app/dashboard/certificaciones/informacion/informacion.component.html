@@ -1,12 +1,13 @@
 <div class="main">
 
   <div class="data">
-    <div>
+    <!-- <div>
       <h2>GRADO:</h2>
       <h2>NOMBRES:</h2>
       <h2>APELLIDOS:</h2>
       <h2>GESTION:</h2>
-    </div>
+      <h2>CURSO:</h2>
+    </div> -->
     <div>
       <h2>{{ estudiante.grado || "No definido" }}</h2>
       <h2>{{ estudiante.nombres || "No definido" }}</h2>
@@ -14,11 +15,18 @@
       <h2>2025</h2>
     </div>
   </div>
-
+  <mat-form-field>
+    <mat-label>Cursos</mat-label>
+    <mat-select>
+      @for (food of foods; track food) {
+        <mat-option [value]="food.value">{{food.viewValue}}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
   <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 table">
 
     <ng-container matColumnDef="position">
-      <th mat-header-cell *matHeaderCellDef> No. </th>
+      <th mat-header-cell *matHeaderCellDef> No1. </th>
       <td mat-cell *matCellDef="let element"> {{element.position}} </td>
     </ng-container>
 
@@ -96,11 +104,12 @@
 
     <div class="firmas">
       <p class="ind">
-      <span>{{ estudiante?.nombres }}</span>
+      <span>{{ jefe() || "No disponible" }}</span>
       <span><strong>JEFE DE ESTUDIOS DE LA E.P.S.S.T.</strong></span>
       </p>
       <p><strong>Vo.Bo.</strong></p>
-      <p class="ind"><span>{{ estudiante?.nombres }}</span>
+      <p class="ind">
+        <span>{{ comandante() || "No disponible" }}</span>
       <span><strong>COMANDANTE DE LA E.M.T.E. - E.P.S.S.T.</strong></span></p>
     </div>
   
