@@ -1,13 +1,13 @@
 <div class="main">
 
   <div class="data">
-    <!-- <div>
+    <div>
       <h2>GRADO:</h2>
       <h2>NOMBRES:</h2>
       <h2>APELLIDOS:</h2>
       <h2>GESTION:</h2>
-      <h2>CURSO:</h2>
-    </div> -->
+      <!-- <h2>CURSO:</h2> -->
+    </div>
     <div>
       <h2>{{ estudiante.grado || "No definido" }}</h2>
       <h2>{{ estudiante.nombres || "No definido" }}</h2>
@@ -17,9 +17,9 @@
   </div>
   <mat-form-field>
     <mat-label>Cursos</mat-label>
-    <mat-select>
-      @for (food of foods; track food) {
-        <mat-option [value]="food.value">{{food.viewValue}}</mat-option>
+    <mat-select [(ngModel)]="nivelSeleccionado" (selectionChange)="obtenerNotas()">
+      @for (option of options; track option) {
+        <mat-option [value]="option.value">{{option.viewValue}}</mat-option>
       }
     </mat-select>
   </mat-form-field>
@@ -57,25 +57,25 @@
   <div #pdfContent class="pdf-container" [hidden]="!generandoPDF">
     <div class="title">
       <div class="encabezado">
-        <span>DEPARTAMENTO VI - EDUCACIÓN</span> 
-        <span>ESCUELA MILITAR DE TOPOGRAFÍA DEL EJ]RCITO</span> 
-        <span>“TCNL. JUAN ORDANZA LARA”</span> 
+        <span>DEPARTAMENTO VI - EDUCACIÓN</span>
+        <span>ESCUELA MILITAR DE TOPOGRAFÍA DEL EJ]RCITO</span>
+        <span>“TCNL. JUAN ORDANZA LARA”</span>
         <span class="bolivia">BOLIVIA </span>
       </div>
     </div>
-    <p>El suscrito Comandante de La Escuela 
-      Militar de Topografía del Ejército, a solicitud 
+    <p>El suscrito Comandante de La Escuela
+      Militar de Topografía del Ejército, a solicitud
       escrita del interesado. </p>
     <p class="bold">C E R T I F I C A:</p>
-    <p class="indent">Que previa revisión de la documentación existente en la Sección 
-      Académica de la Escuela de Perfeccionamiento para Sub Oficiales y Sargentos 
+    <p class="indent">Que previa revisión de la documentación existente en la Sección
+      Académica de la Escuela de Perfeccionamiento para Sub Oficiales y Sargentos
       Topógrafos se evidencia que:</p>
-    <p class="indent">El Sr. <span class="bold">{{ estudiante?.grado }} {{ estudiante?.nombres }} {{ estudiante?.apPat }} {{ estudiante?.apMat }}</span>, 
-      curso como Alumno regular en la Escuela de Perfeccionamiento para Sub Oficiales y 
-      Sargentos Topógrafos, durante la gestión Académica {{ estudiante?.gestionBasico }} obteniendo las siguientes 
+    <p class="indent">El Sr. <span class="bold">{{ estudiante?.grado }} {{ estudiante?.nombres }} {{ estudiante?.apPat }} {{ estudiante?.apMat }}</span>,
+      curso como Alumno regular en la Escuela de Perfeccionamiento para Sub Oficiales y
+      Sargentos Topógrafos, durante la gestión Académica {{ estudiante?.gestionBasico }} obteniendo las siguientes
       calificaciones:</p>
     <p class="bold">CUADRO DE CALIFICACIONES DE LA GESTIÓN ACADÉMICA {{ estudiante?.gestionBasico }}</p>
-  
+
     <table class="mat-elevation-z8 table">
       <tr class="bold">
         <th>No.</th>
@@ -92,15 +92,15 @@
         <td>{{ nota.obs }}</td>
       </tr>
     </table>
-  
-    <p><strong>ORDEN DE MÉRITO:</strong> 03/123</p>
+
+    <p><strong>ORDEN DE MÉRITO:</strong> {{ordenMerito}}/123</p>
     <!-- <p><strong>Fecha:</strong> {{ fechaHoy | date:'fullDate' }}</p> -->
     <p class="indent">Es cuanto se tiene a bien certificar para los fines consiguientes.</p>
     <p><strong> NOTA: </strong> La información solo es válida para el Sistema de Información del Ejercito. </p>
     <div class="fecha">
       <p>La Paz, marzo 26 del 2025</p>
     </div>
-    
+
 
     <div class="firmas">
       <p class="ind">
@@ -112,7 +112,7 @@
         <span>{{ comandante() || "No disponible" }}</span>
       <span><strong>COMANDANTE DE LA E.M.T.E. - E.P.S.S.T.</strong></span></p>
     </div>
-  
+
   </div>
 
   <button
