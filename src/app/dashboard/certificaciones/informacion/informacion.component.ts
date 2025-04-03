@@ -18,8 +18,9 @@ import {
 } from '@angular/material/dialog';
 import { EstudianteService } from '../../../shared/services/estudiante.service';
 import { Subscription } from 'rxjs';
+import { CommonModule } from '@angular/common';
 
-interface Food {
+interface Option {
   value: string;
   viewValue: string;
 }
@@ -56,14 +57,14 @@ export interface DialogData {
 
 @Component({
   selector: 'app-informacion',
-  imports: [MatTableModule,MatButtonModule,MatFormFieldModule, MatInputModule, FormsModule, MatSelectModule],
+  imports: [CommonModule, MatTableModule,MatButtonModule,MatFormFieldModule, MatInputModule, FormsModule, MatSelectModule],
   templateUrl: './informacion.component.html',
   styleUrl: './informacion.component.scss'
 })
 export class InformacionComponent implements OnInit, OnDestroy{
-  foods: Food[] = [
-    {value: 'steak-0', viewValue: 'Básico'},
-    {value: 'pizza-1', viewValue: 'Avanzado'},
+  options: Option[] = [
+    {value: 'basico', viewValue: 'Básico'},
+    {value: 'avanzado', viewValue: 'Avanzado'},
   ];
   estudiante: any = null;
   private subscription!: Subscription;
@@ -75,6 +76,8 @@ export class InformacionComponent implements OnInit, OnDestroy{
   dataSource = ELEMENT_DATA;
   @ViewChild('pdfContent', { static: false }) pdfContent!: ElementRef;
   generandoPDF = false;
+  ordenMerito = null;
+  nivelSeleccionado: string = 'basico';
 
   constructor(private estudianteService: EstudianteService) {}
 
@@ -97,21 +100,26 @@ export class InformacionComponent implements OnInit, OnDestroy{
       nota.literal = this.convertirNumeroALiteral(nota.promedio);
     });
   }
-  
+
   async obtenerNotas() {
     if (!this.estudiante || !this.estudiante.id) {
       console.error("Error: No se encontró el CI del estudiante.");
       return;
     }
-  
+
     const ci = this.estudiante.id;
-    const notas = await this.estudianteService.obtenerNotas(ci);
-  
+    // const notas = await this.estudianteService.obtenerNotas(ci);
+    const notas = await this.estudianteService.obtenerNotas(ci, this.nivelSeleccionado);
+
+    if (notas.ordenMerito !== null) {
+      this.ordenMerito = notas.ordenMerito;
+    }
+
     if (notas.notaPrimero !== null) {
       this.dataSource[0].promedio = notas.notaPrimero;
       this.dataSource[0].literal = this.convertirNumeroALiteral(notas.notaPrimero);
     }
-  
+
     if (notas.notaSegundo !== null) {
       this.dataSource[1].promedio = notas.notaSegundo;
       this.dataSource[1].literal = this.convertirNumeroALiteral(notas.notaSegundo);
@@ -123,9 +131,9 @@ export class InformacionComponent implements OnInit, OnDestroy{
     }
 
   }
-  
-  
-  
+
+
+
 
   openDialog(): void {
     const dialogRef = this.dialog.open(DialogOverviewExampleDialog, {
@@ -152,7 +160,7 @@ export class InformacionComponent implements OnInit, OnDestroy{
       const pdf = new jsPDF('p', 'mm', 'letter');
       const imgWidth = 216;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
-  
+
       pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
       pdf.save('certificacion.pdf');
 
@@ -199,8 +207,8 @@ export class InformacionComponent implements OnInit, OnDestroy{
     return literal.charAt(0).toUpperCase() + literal.slice(1); // Capitalizar primera letra
 }
 
-  
-  
+
+
 }
 
 @Component({
@@ -237,9 +245,9 @@ export class DialogOverviewExampleDialog {
   // }
   async save() {
     console.log("Guardando en Firebase:", this.jefe, this.comandante);
-    
+
     const success = await this.estudianteService.guardarFirmas(this.jefe, this.comandante);
-    
+
     if (success) {
       console.log("Datos guardados correctamente en Firebase");
       this.dialogRef.close({ jefe: this.jefe, comandante: this.comandante });

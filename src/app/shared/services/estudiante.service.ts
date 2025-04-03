@@ -54,7 +54,7 @@ export class EstudianteService {
     try {
       const firmaRef = doc(this.firestore, 'firmas/1');
       const firmaSnap = await getDoc(firmaRef);
-  
+
       if (firmaSnap.exists()) {
         const firmas = firmaSnap.data();
         console.log("Firmas obtenidas:", firmas);
@@ -69,17 +69,21 @@ export class EstudianteService {
     }
   }
 
-  async obtenerNotas(ci: string) {
+  async obtenerNotas(ci: string, nivel: string) {
     try {
-      const finalPrimeroRef = doc(this.firestore, `estudiante/${ci}/basico/finalPrimero`);
+      const finalPrimeroRef = doc(this.firestore, `estudiante/${ci}/${nivel}/finalPrimero`);
       const notaPrimeroSnap = await getDoc(finalPrimeroRef);
-      
-      const finalSegundoRef = doc(this.firestore, `estudiante/${ci}/basico/finalSegundo`);
+
+      const finalSegundoRef = doc(this.firestore, `estudiante/${ci}/${nivel}/finalSegundo`);
       const notaSegundoSnap = await getDoc(finalSegundoRef);
+
+      const ordenMeritoRef = doc(this.firestore, `estudiante/${ci}/${nivel}/ordenMerito`);
+      const ordenMeritoSnap = await getDoc(ordenMeritoRef);
 
       let notas = {
         notaPrimero: null,
-        notaSegundo: null
+        notaSegundo: null,
+        ordenMerito: null
       };
 
       if (notaPrimeroSnap.exists()) {
@@ -90,12 +94,16 @@ export class EstudianteService {
         notas.notaSegundo = notaSegundoSnap.data()?.['nota'];
       }
 
-      console.log("Notas obtenidas:", notas);
+      if (ordenMeritoSnap.exists()) {
+        notas.ordenMerito = ordenMeritoSnap.data()?.['orden'];
+      }
+
+      console.log(`Notas obtenidas para nivel ${nivel}:`, notas);
       return notas;
 
     } catch (error) {
       console.error("Error al obtener las notas:", error);
-      return { notaPrimero: null, notaSegundo: null };
+      return { notaPrimero: null, notaSegundo: null, ordenMerito: null };
     }
 }
 
