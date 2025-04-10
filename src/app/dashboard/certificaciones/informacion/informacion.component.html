@@ -57,8 +57,8 @@
   <div #pdfContent class="pdf-container" [hidden]="!generandoPDF">
     <div class="title">
       <div class="encabezado">
-        <span>DEPARTAMENTO VI - EDUCACIÓN</span>
-        <span>ESCUELA MILITAR DE TOPOGRAFÍA DEL EJ]RCITO</span>
+        <span>COMANDO DE INSTITUTOS MILITARES</span>
+        <span>ESCUELA MILITAR DE TOPOGRAFÍA DEL EJÉRCITO</span>
         <span>“TCNL. JUAN ORDANZA LARA”</span>
         <span class="bolivia">BOLIVIA </span>
       </div>
@@ -67,16 +67,63 @@
       Militar de Topografía del Ejército, a solicitud
       escrita del interesado. </p>
     <p class="bold">C E R T I F I C A:</p>
-    <p class="indent">Que previa revisión de la documentación existente en la Sección
-      Académica de la Escuela de Perfeccionamiento para Sub Oficiales y Sargentos
-      Topógrafos se evidencia que:</p>
+    <p class="indent">Que previa revisión de la documentación existente en la Sección Académica de 
+      la Escuela de Perfeccionamiento de Suboficiales y Sargentos Topógrafos "Sof. My. Juan de la 
+      Cruz Heredia Fuentes" se evidencia que:</p>
+      <!-- correcgur le basico como condicional asi la palabra primer semestre -->
     <p class="indent">El Sr. <span class="bold">{{ estudiante?.grado }} {{ estudiante?.nombres }} {{ estudiante?.apPat }} {{ estudiante?.apMat }}</span>,
-      curso como Alumno regular en la Escuela de Perfeccionamiento para Sub Oficiales y
-      Sargentos Topógrafos, durante la gestión Académica {{ estudiante?.gestionBasico }} obteniendo las siguientes
+      curso como alumno regular del Curso Básico en la Escuela de Perfeccionamiento para Sub Oficiales y
+      Sargentos Topógrafos "Sof. My. Juan de la Cruz Heredia Fuentes", 
+      durante el primer semestre de la gestión Académica {{ estudiante?.gestionBasico }} obteniendo las siguientes
       calificaciones:</p>
-    <p class="bold">CUADRO DE CALIFICACIONES DE LA GESTIÓN ACADÉMICA {{ estudiante?.gestionBasico }}</p>
+    <p class="bold">CUADRO DE CALIFICACIONES</p>
 
     <table class="mat-elevation-z8 table">
+      <tr class="bold">
+        <th>No.</th>
+        <th>UNIDADES DE ENSEÑANZA</th>
+        <th>NOTA</th>
+        <th>ATRIBUTO</th>
+        <!-- <th>OBS.</th> -->
+      </tr>
+      <tr *ngFor="let nota of dataSource">
+        <td>{{ nota.position }}</td>
+        <td>{{ nota.semestre }}</td>
+        <td>{{ nota.promedio }}</td>
+        <td>{{ nota.literal }}</td>
+        <!-- <td>{{ nota.obs }}</td> -->
+      </tr>
+      <tr>
+        <td colspan="2">PROMEDIO ACADÉMICO MILITAR</td>
+        <td> promedio</td>
+        <td>atributo</td>
+      </tr>
+    </table>
+
+    <table class="mat-elevation-z8 table">
+      <tr class="bold">
+        <th colspan="3">PROMEDIOS GENERALES</th>
+        <th>NOTAS</th>
+        <th>ATRIBUTO</th>
+        <!-- <th>Literal</th>
+        <th>OBS.</th> -->
+      </tr>
+      <tr *ngFor="let nota of dataSource">
+        <td colspan="3">PROMEDIO ACADÉMICO MILITAR (80%)</td>
+        <td>{{ nota.promedio }}</td>
+        <td>{{ nota.literal }}</td>
+        <!-- <td>{{ nota.obs }}</td> -->
+      </tr>
+      <tr>
+        <td>O.M</td>
+        <td>{{ordenMerito}}/123</td>
+        <td>NOTA FINAL  (100%)</td>
+        <td>{{ nota.promedio }}</td>
+        <td>{{ nota.literal }}</td>
+      </tr>
+    </table>
+
+    <!-- <table class="mat-elevation-z8 table">
       <tr class="bold">
         <th>No.</th>
         <th>Semestre</th>
@@ -91,7 +138,7 @@
         <td>{{ nota.literal }}</td>
         <td>{{ nota.obs }}</td>
       </tr>
-    </table>
+    </table> -->
 
     <p><strong>ORDEN DE MÉRITO:</strong> {{ordenMerito}}/123</p>
     <!-- <p><strong>Fecha:</strong> {{ fechaHoy | date:'fullDate' }}</p> -->
@@ -105,7 +152,7 @@
     <div class="firmas">
       <p class="ind">
       <span>{{ jefe() || "No disponible" }}</span>
-      <span><strong>JEFE DE ESTUDIOS DE LA E.P.S.S.T.</strong></span>
+      <span><strong>2DO. CMTE. Y JEFE DE ESTUDIOS DE LA E.M.T.E. - E.P.S.S.T.</strong></span>
       </p>
       <p><strong>Vo.Bo.</strong></p>
       <p class="ind">
