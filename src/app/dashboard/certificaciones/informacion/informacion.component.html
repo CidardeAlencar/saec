@@ -31,25 +31,24 @@
     </ng-container>
 
     <ng-container matColumnDef="semestre">
-      <th mat-header-cell *matHeaderCellDef> Semestre </th>
-      <td mat-cell *matCellDef="let element"> {{element.semestre}} </td>
+      <th mat-header-cell *matHeaderCellDef> UNIDADES DE ENSEÑANSA </th>
+      <td mat-cell *matCellDef="let element"> {{element.materia}} </td>
     </ng-container>
 
     <ng-container matColumnDef="promedio">
-      <th mat-header-cell *matHeaderCellDef> Promedio </th>
+      <th mat-header-cell *matHeaderCellDef> NOTA </th>
       <td mat-cell *matCellDef="let element"> {{element.promedio}} </td>
     </ng-container>
 
     <ng-container matColumnDef="literal">
-      <th mat-header-cell *matHeaderCellDef> Literal </th>
+      <th mat-header-cell *matHeaderCellDef> ATRIBUTO </th>
       <td mat-cell *matCellDef="let element"> {{element.literal}} </td>
     </ng-container>
 
-    <ng-container matColumnDef="obs">
+    <!-- <ng-container matColumnDef="obs">
       <th mat-header-cell *matHeaderCellDef> OBS. </th>
       <td mat-cell *matCellDef="let element"> {{element.obs}} </td>
-    </ng-container>
-
+    </ng-container> -->
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
   </table>
@@ -63,20 +62,20 @@
         <span class="bolivia">BOLIVIA </span>
       </div>
     </div>
-    <p>El suscrito Comandante de La Escuela
+    <p class="justificado">El suscrito Comandante de La Escuela
       Militar de Topografía del Ejército, a solicitud
       escrita del interesado. </p>
     <p class="bold">C E R T I F I C A:</p>
-    <p class="indent">Que previa revisión de la documentación existente en la Sección Académica de 
+    <p class="indent justificado">Que previa revisión de la documentación existente en la Sección Académica de 
       la Escuela de Perfeccionamiento de Suboficiales y Sargentos Topógrafos "Sof. My. Juan de la 
       Cruz Heredia Fuentes" se evidencia que:</p>
       <!-- correcgur le basico como condicional asi la palabra primer semestre -->
-    <p class="indent">El Sr. <span class="bold">{{ estudiante?.grado }} {{ estudiante?.nombres }} {{ estudiante?.apPat }} {{ estudiante?.apMat }}</span>,
+    <p class="indent justificado">El Sr. <span class="bold">{{ estudiante?.grado }} {{ estudiante?.nombres }} {{ estudiante?.apPat }} {{ estudiante?.apMat }}</span>,
       curso como alumno regular del Curso Básico en la Escuela de Perfeccionamiento para Sub Oficiales y
       Sargentos Topógrafos "Sof. My. Juan de la Cruz Heredia Fuentes", 
       durante el primer semestre de la gestión Académica {{ estudiante?.gestionBasico }} obteniendo las siguientes
       calificaciones:</p>
-    <p class="bold">CUADRO DE CALIFICACIONES</p>
+    <p class="bold center">CUADRO DE CALIFICACIONES</p>
 
     <table class="mat-elevation-z8 table">
       <tr class="bold">
@@ -88,12 +87,12 @@
       </tr>
       <tr *ngFor="let nota of dataSource">
         <td>{{ nota.position }}</td>
-        <td>{{ nota.semestre }}</td>
+        <td>{{ nota.materia }}</td>
         <td>{{ nota.promedio }}</td>
         <td>{{ nota.literal }}</td>
         <!-- <td>{{ nota.obs }}</td> -->
       </tr>
-      <tr>
+      <tr class="bold">
         <td colspan="2">PROMEDIO ACADÉMICO MILITAR</td>
         <td> promedio</td>
         <td>atributo</td>
@@ -118,8 +117,9 @@
         <td>O.M</td>
         <td>{{ordenMerito}}/123</td>
         <td>NOTA FINAL  (100%)</td>
-        <td>{{ nota.promedio }}</td>
-        <td>{{ nota.literal }}</td>
+        <!-- cambiar formulas -->
+        <td>100</td>
+        <td> Muy Bueno</td>
       </tr>
     </table>
 
@@ -140,12 +140,12 @@
       </tr>
     </table> -->
 
-    <p><strong>ORDEN DE MÉRITO:</strong> {{ordenMerito}}/123</p>
-    <!-- <p><strong>Fecha:</strong> {{ fechaHoy | date:'fullDate' }}</p> -->
+    <!-- <p><strong>ORDEN DE MÉRITO:</strong> {{ordenMerito}}/123</p>
+    <p><strong>Fecha:</strong> {{ fechaHoy | date:'fullDate' }}</p>
     <p class="indent">Es cuanto se tiene a bien certificar para los fines consiguientes.</p>
-    <p><strong> NOTA: </strong> La información solo es válida para el Sistema de Información del Ejercito. </p>
+    <p><strong> NOTA: </strong> La información solo es válida para el Sistema de Información del Ejercito. </p> -->
     <div class="fecha">
-      <p>La Paz, marzo 26 del 2025</p>
+      <p> Huarina, 11 de abril del 2025</p>
     </div>
 
 

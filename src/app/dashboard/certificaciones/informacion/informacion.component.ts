@@ -26,25 +26,50 @@ interface Option {
 }
 
 export interface PeriodicElement {
-  semestre: string;
+  materia: string;
   position: number;
   promedio: number;
   literal: string;
-  obs: string;
+  // obs: string;
+  codigo: string;
 }
 
+// const ELEMENT_DATA: PeriodicElement[] = [
+//   {position: 1, materia: 'GEOPROCESAMIENTO Y ANÁLISIS ESPACIAL', promedio: 0, literal: ''},
+//   {position: 2, materia: 'REDES GEODÉSICAS', promedio: 0, literal: ''},
+//   {position: 3, materia: 'MODELAMIENTO DIGITAL DEL TERRENO Y SIMULACIÓN', promedio: 82.10, literal: ''},
+//   {position: 4, materia: 'TOPOGRAFÍA AUTOMATIZADA', promedio: 0, literal: ''},
+//   {position: 5, materia: 'PROGRAMACIÓN SIG', promedio: 0, literal: ''},
+//   {position: 6, materia: 'PROYECTOS I Y II', promedio: 0, literal: ''},
+//   {position: 7, materia: 'TOPOGRAFÍA VIAL', promedio: 0, literal: ''},
+//   {position: 8, materia: 'CORRESPONDENCIA MILITAR', promedio: 0, literal: ''},
+//   {position: 9, materia: 'ESTUDIO DEL TERRENO', promedio: 0, literal: ''},
+//   {position: 10, materia: 'NORMATIVA DE GENERO', promedio: 0, literal: ''},
+//   {position: 11, materia: 'DOC. DEL PRIMERO DE COMP. EDRON. O BAT', promedio: 0, literal: ''},
+//   {position: 12, materia: 'PLANEAMIENTO (PCT)', promedio: 0, literal: ''},
+//   {position: 13, materia: 'DOCTRINA DE OPERACIONES URBANAS', promedio: 0, literal: ''},
+//   {position: 14, materia: 'LIDERAZGO', promedio: 0, literal: ''},
+// ];
 const ELEMENT_DATA: PeriodicElement[] = [
-  {position: 1, semestre: 'Primer', promedio: 0, literal: '', obs:''},
-  {position: 2, semestre: 'Segundo', promedio: 0, literal: '', obs:''},
-  {position: 3, semestre: 'Final', promedio: 82.10, literal: '', obs:''},
-  // {position: 4, semestre: 'Beryllium', promedio: 9.0122, literal: 'Be', obs:''},
-  // {position: 5, semestre: 'Boron', promedio: 10.811, literal: 'B', obs:''},
-  // {position: 6, semestre: 'Carbon', promedio: 12.0107, literal: 'C', obs:''},
-  // {position: 7, semestre: 'Nitrogen', promedio: 14.0067, literal: 'N', obs:''},
-  // {position: 8, semestre: 'Oxygen', promedio: 15.9994, literal: 'O', obs:''},
-  // {position: 9, semestre: 'Fluorine', promedio: 18.9984, literal: 'F', obs:''},
-  // {position: 10, semestre: 'Neon', promedio: 20.1797, literal: 'Ne', obs:''},
+  { position: 1, materia: '', promedio: 0, literal: '', codigo: 'BAS-CMI-01-02' },
+  { position: 2, materia: '', promedio: 0, literal: '', codigo: 'BAS-DCO-01-04' },
+  { position: 3, materia: '', promedio: 0, literal: '', codigo: 'BAS-DOU-01-07' },
+  { position: 4, materia: '', promedio: 0, literal: '', codigo: 'BAS-EFM-01-01' },
+  { position: 5, materia: '', promedio: 0, literal: '', codigo: 'BAS-EST-01-05' },
+  { position: 6, materia: '', promedio: 0, literal: '', codigo: 'BAS-PLA-01-06' },
+  { position: 7, materia: '', promedio: 0, literal: '', codigo: 'BAS-RMI-01-01' },
+  { position: 8, materia: '', promedio: 0, literal: '', codigo: 'COM-GEN-01-03' },
+  { position: 9, materia: '', promedio: 0, literal: '', codigo: 'COM-LID-01-02' },
+  { position: 10, materia: '', promedio: 0, literal: '', codigo: 'PROY-I-II' },
+  { position: 11, materia: '', promedio: 0, literal: '', codigo: 'TEC-GAE-01-02' },
+  { position: 12, materia: '', promedio: 0, literal: '', codigo: 'TEC-MDT-01-04' },
+  { position: 13, materia: '', promedio: 0, literal: '', codigo: 'TEC-PRS-01-05' },
+  { position: 14, materia: '', promedio: 0, literal: '', codigo: 'TEC-RGE-01-03' },
+  { position: 15, materia: '', promedio: 0, literal: '', codigo: 'TEC-TOA-01-01' },
+  { position: 16, materia: '', promedio: 0, literal: '', codigo: 'TEC-TOV-01-06' }
 ];
+
+
 
 // ELEMENT_DATA.forEach(nota => {
 //   nota.literal = this.convertirNumeroALiteral(nota.promedio);
@@ -72,7 +97,7 @@ export class InformacionComponent implements OnInit, OnDestroy{
   readonly comandante = signal('');
   // readonly name = model('');
   readonly dialog = inject(MatDialog);
-  displayedColumns: string[] = ['position', 'semestre', 'promedio', 'literal', 'obs'];
+  displayedColumns: string[] = ['position', 'semestre', 'promedio', 'literal'];
   dataSource = ELEMENT_DATA;
   @ViewChild('pdfContent', { static: false }) pdfContent!: ElementRef;
   generandoPDF = false;
@@ -92,7 +117,7 @@ export class InformacionComponent implements OnInit, OnDestroy{
   }
 
   ngOnDestroy() {
-    this.subscription.unsubscribe(); // 📌 Evita fugas de memoria
+    this.subscription.unsubscribe();
   }
 
   convertirNotasLiterales() {
@@ -114,21 +139,43 @@ export class InformacionComponent implements OnInit, OnDestroy{
     if (notas.ordenMerito !== null) {
       this.ordenMerito = notas.ordenMerito;
     }
+    
+    // if (notas.BASCMI0102 !== null) {
+    //   this.dataSource[0].promedio = notas.BASCMI0102;
+    //   this.dataSource[0].materia = notas.BASCMI0102name ?? '';
+    //   this.dataSource[0].literal = this.dataSource[0].promedio > 50 ? "APROBADO" : "REPROBADO";
+    //   // this.dataSource[0].literal = this.convertirNumeroALiteral(notas.notaPrimero);
+    // }
 
-    if (notas.notaPrimero !== null) {
-      this.dataSource[0].promedio = notas.notaPrimero;
-      this.dataSource[0].literal = this.convertirNumeroALiteral(notas.notaPrimero);
-    }
+    // if (notas.BASDCO0104 !== null) {
+    //   this.dataSource[1].promedio = notas.BASDCO0104;
+    //   this.dataSource[1].materia = notas.BASDCO0104name ?? '';
+    //   this.dataSource[1].literal = this.dataSource[1].promedio > 50 ? "APROBADO" : "REPROBADO";
+    //   // this.dataSource[0].literal = this.convertirNumeroALiteral(notas.notaPrimero);
+    // }
+    this.dataSource.forEach((item: any) => {
+      const datosMateria = notas[item.codigo]; // item.codigo debe ser como 'BAS-CMI-01-02'
+      if (datosMateria && datosMateria.nota !== null) {
+        item.promedio = datosMateria.nota;
+        item.materia = datosMateria.nombre ?? '';
+        item.literal = item.promedio > 50 ? 'APROBADO' : 'REPROBADO';
+      }
+    });
 
-    if (notas.notaSegundo !== null) {
-      this.dataSource[1].promedio = notas.notaSegundo;
-      this.dataSource[1].literal = this.convertirNumeroALiteral(notas.notaSegundo);
-    }
+    // if (notas.notaPrimero !== null) {
+    //   this.dataSource[0].promedio = notas.notaPrimero;
+    //   this.dataSource[0].literal = this.convertirNumeroALiteral(notas.notaPrimero);
+    // }
 
-    if(notas.notaPrimero !== null && notas.notaSegundo !== null){
-      this.dataSource[2].promedio = (notas.notaPrimero + notas.notaSegundo)/2;
-      this.dataSource[2].literal = this.convertirNumeroALiteral(this.dataSource[2].promedio);
-    }
+    // if (notas.notaSegundo !== null) {
+    //   this.dataSource[1].promedio = notas.notaSegundo;
+    //   this.dataSource[1].literal = this.convertirNumeroALiteral(notas.notaSegundo);
+    // }
+    //PROMEDIO
+    // if(notas.notaPrimero !== null && notas.notaSegundo !== null){
+    //   this.dataSource[2].promedio = (notas.notaPrimero + notas.notaSegundo)/2;
+    //   this.dataSource[2].literal = this.convertirNumeroALiteral(this.dataSource[2].promedio);
+    // }
 
   }
 

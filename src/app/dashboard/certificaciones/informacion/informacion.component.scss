@@ -70,6 +70,12 @@
     font-weight: bold;
   }
 
+  .center{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
   .indent {
     text-indent: 120px;
   }
@@ -84,5 +90,9 @@
     justify-content: end;
   }
     
+  .justificado {
+    text-align: justify;
+  }
+  
 }
 
