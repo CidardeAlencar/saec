@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import {MatSelectModule} from '@angular/material/select';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import {
   MAT_DIALOG_DATA,
   MatDialog,
@@ -82,7 +83,7 @@ export interface DialogData {
 
 @Component({
   selector: 'app-informacion',
-  imports: [CommonModule, MatTableModule,MatButtonModule,MatFormFieldModule, MatInputModule, FormsModule, MatSelectModule],
+  imports: [CommonModule, MatTableModule,MatButtonModule,MatFormFieldModule, MatInputModule, FormsModule, MatSelectModule, MatProgressSpinnerModule],
   templateUrl: './informacion.component.html',
   styleUrl: './informacion.component.scss'
 })
@@ -102,7 +103,15 @@ export class InformacionComponent implements OnInit, OnDestroy{
   @ViewChild('pdfContent', { static: false }) pdfContent!: ElementRef;
   generandoPDF = false;
   ordenMerito = null;
+  ordenTotal = null;
+  promedioDisciplina = null;
+  promedioFisico = null;
   nivelSeleccionado: string = 'basico';
+  promedioAcademico: number = 0;
+  fechaHoy: Date = new Date();
+  cargandoNotas: boolean = false;
+
+
 
   constructor(private estudianteService: EstudianteService) {}
 
@@ -126,60 +135,119 @@ export class InformacionComponent implements OnInit, OnDestroy{
     });
   }
 
+  // async obtenerNotas() {
+  //   if (!this.estudiante || !this.estudiante.id) {
+  //     console.error("Error: No se encontró el CI del estudiante.");
+  //     return;
+  //   }
+
+  //   const ci = this.estudiante.id;
+  //   // const notas = await this.estudianteService.obtenerNotas(ci);
+  //   const notas = await this.estudianteService.obtenerNotas(ci, this.nivelSeleccionado);
+
+  //   if (notas.ordenMerito !== null) {
+  //     this.ordenMerito = notas.ordenMerito;
+  //   }
+  //   if (notas.ordenTotal !== null) {
+  //     this.ordenTotal = notas.ordenTotal;
+  //   }
+  //   if (notas.promedioDisciplina !== null) {
+  //     this.promedioDisciplina = notas.promedioDisciplina;
+  //   }
+  //   if (notas.promedioFisico !== null) {
+  //     this.promedioFisico = notas.promedioFisico;
+  //   }
+    
+  //   // if (notas.BASCMI0102 !== null) {
+  //   //   this.dataSource[0].promedio = notas.BASCMI0102;
+  //   //   this.dataSource[0].materia = notas.BASCMI0102name ?? '';
+  //   //   this.dataSource[0].literal = this.dataSource[0].promedio > 50 ? "APROBADO" : "REPROBADO";
+  //   //   // this.dataSource[0].literal = this.convertirNumeroALiteral(notas.notaPrimero);
+  //   // }
+
+  //   // if (notas.BASDCO0104 !== null) {
+  //   //   this.dataSource[1].promedio = notas.BASDCO0104;
+  //   //   this.dataSource[1].materia = notas.BASDCO0104name ?? '';
+  //   //   this.dataSource[1].literal = this.dataSource[1].promedio > 50 ? "APROBADO" : "REPROBADO";
+  //   //   // this.dataSource[0].literal = this.convertirNumeroALiteral(notas.notaPrimero);
+  //   // }
+  //   this.dataSource.forEach((item: any) => {
+  //     const datosMateria = notas[item.codigo]; // item.codigo debe ser como 'BAS-CMI-01-02'
+  //     if (datosMateria && datosMateria.nota !== null) {
+  //       item.promedio = datosMateria.nota;
+  //       item.materia = datosMateria.nombre ?? '';
+  //       item.literal = item.promedio > 50 ? 'APROBADO' : 'REPROBADO';
+  //     }
+  //   });
+
+  //   const promediosValidos = this.dataSource
+  // .map((item: any) => item.promedio)
+  // .filter((p: number) => typeof p === 'number' && !isNaN(p));
+
+  //   const sumaPromedios = promediosValidos.reduce((acc: number, val: number) => acc + val, 0);
+  //   const promedioGeneral = promediosValidos.length > 0 ? sumaPromedios / promediosValidos.length : 0;
+
+  //   // Puedes almacenarlo en una variable general o en el objeto nota como "promedioacademico"
+  //   this.promedioAcademico = promedioGeneral;
+
+  //   // if (notas.notaPrimero !== null) {
+  //   //   this.dataSource[0].promedio = notas.notaPrimero;
+  //   //   this.dataSource[0].literal = this.convertirNumeroALiteral(notas.notaPrimero);
+  //   // }
+
+  //   // if (notas.notaSegundo !== null) {
+  //   //   this.dataSource[1].promedio = notas.notaSegundo;
+  //   //   this.dataSource[1].literal = this.convertirNumeroALiteral(notas.notaSegundo);
+  //   // }
+  //   //PROMEDIO
+  //   // if(notas.notaPrimero !== null && notas.notaSegundo !== null){
+  //   //   this.dataSource[2].promedio = (notas.notaPrimero + notas.notaSegundo)/2;
+  //   //   this.dataSource[2].literal = this.convertirNumeroALiteral(this.dataSource[2].promedio);
+  //   // }
+
+  // }
+
   async obtenerNotas() {
     if (!this.estudiante || !this.estudiante.id) {
       console.error("Error: No se encontró el CI del estudiante.");
       return;
     }
-
-    const ci = this.estudiante.id;
-    // const notas = await this.estudianteService.obtenerNotas(ci);
-    const notas = await this.estudianteService.obtenerNotas(ci, this.nivelSeleccionado);
-
-    if (notas.ordenMerito !== null) {
-      this.ordenMerito = notas.ordenMerito;
+  
+    this.cargandoNotas = true; // 🔄 Mostrar loader
+  
+    try {
+      const ci = this.estudiante.id;
+      const notas = await this.estudianteService.obtenerNotas(ci, this.nivelSeleccionado);
+  
+      if (notas.ordenMerito !== null) this.ordenMerito = notas.ordenMerito;
+      if (notas.ordenTotal !== null) this.ordenTotal = notas.ordenTotal;
+      if (notas.promedioDisciplina !== null) this.promedioDisciplina = notas.promedioDisciplina;
+      if (notas.promedioFisico !== null) this.promedioFisico = notas.promedioFisico;
+  
+      this.dataSource.forEach((item: any) => {
+        const datosMateria = notas[item.codigo];
+        if (datosMateria && datosMateria.nota !== null) {
+          item.promedio = datosMateria.nota;
+          item.materia = datosMateria.nombre ?? '';
+          item.literal = item.promedio > 50 ? 'APROBADO' : 'REPROBADO';
+        }
+      });
+  
+      const promediosValidos = this.dataSource
+        .map((item: any) => item.promedio)
+        .filter((p: number) => typeof p === 'number' && !isNaN(p));
+  
+      const sumaPromedios = promediosValidos.reduce((acc: number, val: number) => acc + val, 0);
+      const promedioGeneral = promediosValidos.length > 0 ? sumaPromedios / promediosValidos.length : 0;
+  
+      this.promedioAcademico = promedioGeneral;
+    } catch (error) {
+      console.error('Error al obtener las notas:', error);
+    } finally {
+      this.cargandoNotas = false; // ✅ Ocultar loader
     }
-    
-    // if (notas.BASCMI0102 !== null) {
-    //   this.dataSource[0].promedio = notas.BASCMI0102;
-    //   this.dataSource[0].materia = notas.BASCMI0102name ?? '';
-    //   this.dataSource[0].literal = this.dataSource[0].promedio > 50 ? "APROBADO" : "REPROBADO";
-    //   // this.dataSource[0].literal = this.convertirNumeroALiteral(notas.notaPrimero);
-    // }
-
-    // if (notas.BASDCO0104 !== null) {
-    //   this.dataSource[1].promedio = notas.BASDCO0104;
-    //   this.dataSource[1].materia = notas.BASDCO0104name ?? '';
-    //   this.dataSource[1].literal = this.dataSource[1].promedio > 50 ? "APROBADO" : "REPROBADO";
-    //   // this.dataSource[0].literal = this.convertirNumeroALiteral(notas.notaPrimero);
-    // }
-    this.dataSource.forEach((item: any) => {
-      const datosMateria = notas[item.codigo]; // item.codigo debe ser como 'BAS-CMI-01-02'
-      if (datosMateria && datosMateria.nota !== null) {
-        item.promedio = datosMateria.nota;
-        item.materia = datosMateria.nombre ?? '';
-        item.literal = item.promedio > 50 ? 'APROBADO' : 'REPROBADO';
-      }
-    });
-
-    // if (notas.notaPrimero !== null) {
-    //   this.dataSource[0].promedio = notas.notaPrimero;
-    //   this.dataSource[0].literal = this.convertirNumeroALiteral(notas.notaPrimero);
-    // }
-
-    // if (notas.notaSegundo !== null) {
-    //   this.dataSource[1].promedio = notas.notaSegundo;
-    //   this.dataSource[1].literal = this.convertirNumeroALiteral(notas.notaSegundo);
-    // }
-    //PROMEDIO
-    // if(notas.notaPrimero !== null && notas.notaSegundo !== null){
-    //   this.dataSource[2].promedio = (notas.notaPrimero + notas.notaSegundo)/2;
-    //   this.dataSource[2].literal = this.convertirNumeroALiteral(this.dataSource[2].promedio);
-    // }
-
   }
-
-
+  
 
 
   openDialog(): void {
@@ -202,13 +270,18 @@ export class InformacionComponent implements OnInit, OnDestroy{
     this.generandoPDF = true;
     setTimeout(async () => {
       const content = this.pdfContent.nativeElement;
-      const canvas = await html2canvas(content, { scale: 2 });
+      const canvas = await html2canvas(content, { scale: 2, backgroundColor: '#FFFFFF',
+        useCORS: true });
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'letter');
-      const imgWidth = 216;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      // const imgWidth = 216;
+      const pageWidth = 215.9; // Ancho en mm para tamaño carta (8.5 pulgadas * 25.4)
+      const pageHeight = 279.4;
+      // const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const imgHeight = (canvas.height * pageWidth) / canvas.width;
 
-      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      // pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, imgHeight);
       pdf.save('certificacion.pdf');
 
       this.generandoPDF = false;

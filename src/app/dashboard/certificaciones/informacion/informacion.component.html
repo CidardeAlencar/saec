@@ -23,7 +23,12 @@
       }
     </mat-select>
   </mat-form-field>
-  <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 table">
+  <div *ngIf="cargandoNotas" class="loader-container">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Cargando notas...</p>
+  </div>
+  <div *ngIf="!cargandoNotas">  
+  <!-- <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 table">
 
     <ng-container matColumnDef="position">
       <th mat-header-cell *matHeaderCellDef> No. </th>
@@ -45,13 +50,45 @@
       <td mat-cell *matCellDef="let element"> {{element.literal}} </td>
     </ng-container>
 
-    <!-- <ng-container matColumnDef="obs">
-      <th mat-header-cell *matHeaderCellDef> OBS. </th>
-      <td mat-cell *matCellDef="let element"> {{element.obs}} </td>
-    </ng-container> -->
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table> -->
+  <table class="mat-elevation-z8 table mt-4">
+    <tr class="bold">
+      <th colspan="3">PROMEDIOS GENERALES</th>
+      <th>NOTAS</th>
+      <th>ATRIBUTO</th>
+    </tr>
+    <tr>
+      <td colspan="3">PROMEDIO ACADÉMICO MILITAR (80%)</td>
+      <td>{{ promedioAcademico | number:'1.2-2' }}</td>
+      <td>{{ promedioAcademico > 50 ? 'APROBADO' : 'REPROBADO' }}</td>
+    </tr>
+    <tr>
+      <td colspan="3">ENTRENAMIENTO FÍSICO MILITAR (10%)</td>
+      <td>{{ promedioFisico | number:'1.2-2' }}</td>
+      <td>{{ promedioFisico ?? 0 > 50 ? 'APROBADO' : 'REPROBADO' }}</td>
+    </tr>
+    <tr>
+      <td colspan="3">DISCIPLINA (10%)</td>
+      <td>{{ promedioDisciplina | number:'1.2-2' }}</td>
+      <td>{{ promedioDisciplina ?? 0 > 50 ? 'APROBADO' : 'REPROBADO' }}</td>
+    </tr>
+    <tr>
+      <td>O.M</td>
+      <td>{{ordenMerito}}/{{ordenTotal}}</td>
+      <td>NOTA FINAL (100%)</td>
+      <td>
+        {{
+          (((promedioAcademico != null ? promedioAcademico : 0) +
+          (promedioFisico != null ? promedioFisico : 0) +
+          (promedioDisciplina != null ? promedioDisciplina : 0)) / 3) | number:'1.2-2'
+        }}
+      </td>
+      <td>Muy Bueno</td>
+    </tr>
   </table>
+</div>
   <!-- [hidden]="!generandoPDF" -->
   <div #pdfContent class="pdf-container" [hidden]="!generandoPDF">
     <div class="title">
@@ -94,8 +131,8 @@
       </tr>
       <tr class="bold">
         <td colspan="2">PROMEDIO ACADÉMICO MILITAR</td>
-        <td> promedio</td>
-        <td>atributo</td>
+        <td>{{ promedioAcademico | number:'1.2-2' }}</td>
+        <td>{{ promedioAcademico > 50 ? 'APROBADO' : 'REPROBADO' }}</td>
       </tr>
     </table>
 
@@ -107,18 +144,42 @@
         <!-- <th>Literal</th>
         <th>OBS.</th> -->
       </tr>
-      <tr *ngFor="let nota of dataSource">
+      <!-- <tr *ngFor="let nota of dataSource"> -->
+      <tr>
         <td colspan="3">PROMEDIO ACADÉMICO MILITAR (80%)</td>
-        <td>{{ nota.promedio }}</td>
-        <td>{{ nota.literal }}</td>
+        <!-- <td>{{ promedioAcademico }}</td> -->
+        <td>{{ promedioAcademico | number:'1.2-2' }}</td>
+        <td>{{ promedioAcademico > 50 ? 'APROBADO' : 'REPROBADO' }}</td>
+        <!-- <td>{{ nota.obs }}</td> -->
+      </tr>
+      <tr>
+        <td colspan="3">ENTRENAMIENTO FÍSICO MILITAR (10%)</td>
+        <!-- <td>{{ promedioAcademico }}</td> -->
+        <td>{{ promedioFisico | number:'1.2-2' }}</td>
+        <td>{{ promedioFisico ?? 0 > 50 ? 'APROBADO' : 'REPROBADO' }}</td>
+        <!-- <td>{{ nota.obs }}</td> -->
+      </tr>
+      <tr>
+        <td colspan="3">DISCIPLINA (10%)</td>
+        <!-- <td>{{ promedioAcademico }}</td> -->
+        <td>{{ promedioDisciplina | number:'1.2-2' }}</td>
+        <td>{{ promedioDisciplina ?? 0 > 50 ? 'APROBADO' : 'REPROBADO' }}</td>
         <!-- <td>{{ nota.obs }}</td> -->
       </tr>
       <tr>
         <td>O.M</td>
-        <td>{{ordenMerito}}/123</td>
+        <td>{{ordenMerito}}/{{ordenTotal}}</td>
         <td>NOTA FINAL  (100%)</td>
         <!-- cambiar formulas -->
-        <td>100</td>
+        <td>
+          {{
+            (((promedioAcademico != null ? promedioAcademico : 0) +
+            (promedioFisico != null ? promedioFisico : 0) +
+            (promedioDisciplina != null ? promedioDisciplina : 0)) / 3) | number:'1.2-2'
+          }}
+        </td>
+        
+        <!-- cambiar segun lo anterior -->
         <td> Muy Bueno</td>
       </tr>
     </table>
@@ -144,8 +205,12 @@
     <p><strong>Fecha:</strong> {{ fechaHoy | date:'fullDate' }}</p>
     <p class="indent">Es cuanto se tiene a bien certificar para los fines consiguientes.</p>
     <p><strong> NOTA: </strong> La información solo es válida para el Sistema de Información del Ejercito. </p> -->
-    <div class="fecha">
+    <!-- <p><strong>Fecha:</strong> {{ fechaHoy | date:'fullDate' }}</p> -->
+    <!-- <div class="fecha">
       <p> Huarina, 11 de abril del 2025</p>
+    </div> -->
+    <div class="fecha">
+      <p>Huarina, {{ fechaHoy | date:'d \'de\' MMMM \'del\' y' }}</p>
     </div>
 
 
