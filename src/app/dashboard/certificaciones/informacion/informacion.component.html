@@ -1,33 +1,34 @@
 <div class="main">
-
+  <div class="group">
   <div class="data">
-    <div>
-      <h2>GRADO:</h2>
-      <h2>NOMBRES:</h2>
-      <h2>APELLIDOS:</h2>
-      <h2>GESTION:</h2>
+    <div style="margin-right: 20px;">
+      <p>GRADO:</p>
+      <p>NOMBRES:</p>
+      <p>APELLIDOS:</p>
+      <p>GESTION:</p>
       <!-- <h2>CURSO:</h2> -->
     </div>
     <div>
-      <h2>{{ estudiante.grado || "No definido" }}</h2>
-      <h2>{{ estudiante.nombres || "No definido" }}</h2>
-      <h2>{{ estudiante.apMat || "No definido" }}</h2>
-      <h2>2025</h2>
+      <p>{{ estudiante.grado || "No definido" }}</p>
+      <p>{{ estudiante.nombres || "No definido" }}</p>
+      <p>{{ estudiante.apMat || "No definido" }}</p>
+      <p>2025</p>
     </div>
   </div>
-  <mat-form-field>
-    <mat-label>Cursos</mat-label>
-    <mat-select [(ngModel)]="nivelSeleccionado" (selectionChange)="obtenerNotas()">
-      @for (option of options; track option) {
-        <mat-option [value]="option.value">{{option.viewValue}}</mat-option>
-      }
-    </mat-select>
-  </mat-form-field>
-  <div *ngIf="cargandoNotas" class="loader-container">
-    <mat-spinner diameter="40"></mat-spinner>
-    <p>Cargando notas...</p>
-  </div>
-  <div *ngIf="!cargandoNotas">  
+
+    <mat-form-field class="nivel">
+      <mat-label>Cursos</mat-label>
+      <mat-select [(ngModel)]="nivelSeleccionado" (selectionChange)="obtenerNotas()">
+        @for (option of options; track option) {
+          <mat-option [value]="option.value">{{option.viewValue}}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <div *ngIf="cargandoNotas" class="loader-container">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p style="font-weight: bold;">Cargando notas...</p>
+    </div>
+
   <!-- <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 table">
 
     <ng-container matColumnDef="position">
@@ -53,42 +54,44 @@
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
   </table> -->
-  <table class="mat-elevation-z8 table mt-4">
-    <tr class="bold">
-      <th colspan="3">PROMEDIOS GENERALES</th>
-      <th>NOTAS</th>
-      <th>ATRIBUTO</th>
-    </tr>
-    <tr>
-      <td colspan="3">PROMEDIO ACADÉMICO MILITAR (80%)</td>
-      <td>{{ promedioAcademico | number:'1.2-2' }}</td>
-      <td>{{ promedioAcademico > 50 ? 'APROBADO' : 'REPROBADO' }}</td>
-    </tr>
-    <tr>
-      <td colspan="3">ENTRENAMIENTO FÍSICO MILITAR (10%)</td>
-      <td>{{ promedioFisico | number:'1.2-2' }}</td>
-      <td>{{ promedioFisico ?? 0 > 50 ? 'APROBADO' : 'REPROBADO' }}</td>
-    </tr>
-    <tr>
-      <td colspan="3">DISCIPLINA (10%)</td>
-      <td>{{ promedioDisciplina | number:'1.2-2' }}</td>
-      <td>{{ promedioDisciplina ?? 0 > 50 ? 'APROBADO' : 'REPROBADO' }}</td>
-    </tr>
-    <tr>
-      <td>O.M</td>
-      <td>{{ordenMerito}}/{{ordenTotal}}</td>
-      <td>NOTA FINAL (100%)</td>
-      <td>
-        {{
-          (((promedioAcademico != null ? promedioAcademico : 0) +
-          (promedioFisico != null ? promedioFisico : 0) +
-          (promedioDisciplina != null ? promedioDisciplina : 0)) / 3) | number:'1.2-2'
-        }}
-      </td>
-      <td>Muy Bueno</td>
-    </tr>
-  </table>
-</div>
+    <div *ngIf="!cargandoNotas">
+      <table class="mat-elevation-z8 table mt-4">
+        <tr class="bold">
+          <th colspan="3">PROMEDIOS GENERALES</th>
+          <th>NOTAS</th>
+          <th>ATRIBUTO</th>
+        </tr>
+        <tr>
+          <td colspan="3">PROMEDIO ACADÉMICO MILITAR (80%)</td>
+          <td>{{ promedioAcademico | number:'1.2-2' }}</td>
+          <td>{{ promedioAcademico > 50 ? 'APROBADO' : 'REPROBADO' }}</td>
+        </tr>
+        <tr>
+          <td colspan="3">ENTRENAMIENTO FÍSICO MILITAR (10%)</td>
+          <td>{{ promedioFisico | number:'1.2-2' }}</td>
+          <td>{{ promedioFisico ?? 0 > 50 ? 'APROBADO' : 'REPROBADO' }}</td>
+        </tr>
+        <tr>
+          <td colspan="3">DISCIPLINA (10%)</td>
+          <td>{{ promedioDisciplina | number:'1.2-2' }}</td>
+          <td>{{ promedioDisciplina ?? 0 > 50 ? 'APROBADO' : 'REPROBADO' }}</td>
+        </tr>
+        <tr>
+          <td>O.M</td>
+          <td>{{ordenMerito}}/{{ordenTotal}}</td>
+          <td>NOTA FINAL (100%)</td>
+          <td>
+            {{
+              (((promedioAcademico != null ? promedioAcademico : 0) +
+              (promedioFisico != null ? promedioFisico : 0) +
+              (promedioDisciplina != null ? promedioDisciplina : 0)) / 3) | number:'1.2-2'
+            }}
+          </td>
+          <td>Muy Bueno</td>
+        </tr>
+      </table>
+    </div>
+  <!-- </div> -->
   <!-- [hidden]="!generandoPDF" -->
   <div #pdfContent class="pdf-container" [hidden]="!generandoPDF">
     <div class="title">
@@ -103,13 +106,13 @@
       Militar de Topografía del Ejército, a solicitud
       escrita del interesado. </p>
     <p class="bold">C E R T I F I C A:</p>
-    <p class="indent justificado">Que previa revisión de la documentación existente en la Sección Académica de 
-      la Escuela de Perfeccionamiento de Suboficiales y Sargentos Topógrafos "Sof. My. Juan de la 
+    <p class="indent justificado">Que previa revisión de la documentación existente en la Sección Académica de
+      la Escuela de Perfeccionamiento de Suboficiales y Sargentos Topógrafos "Sof. My. Juan de la
       Cruz Heredia Fuentes" se evidencia que:</p>
       <!-- correcgur le basico como condicional asi la palabra primer semestre -->
     <p class="indent justificado">El Sr. <span class="bold">{{ estudiante?.grado }} {{ estudiante?.nombres }} {{ estudiante?.apPat }} {{ estudiante?.apMat }}</span>,
       curso como alumno regular del Curso Básico en la Escuela de Perfeccionamiento para Sub Oficiales y
-      Sargentos Topógrafos "Sof. My. Juan de la Cruz Heredia Fuentes", 
+      Sargentos Topógrafos "Sof. My. Juan de la Cruz Heredia Fuentes",
       durante el primer semestre de la gestión Académica {{ estudiante?.gestionBasico }} obteniendo las siguientes
       calificaciones:</p>
     <p class="bold center">CUADRO DE CALIFICACIONES</p>
@@ -124,7 +127,7 @@
       </tr>
       <tr *ngFor="let nota of dataSource">
         <td>{{ nota.position }}</td>
-        <td>{{ nota.materia }}</td>
+        <td style="text-align: left;">{{ nota.materia }}</td>
         <td>{{ nota.promedio }}</td>
         <td>{{ nota.literal }}</td>
         <!-- <td>{{ nota.obs }}</td> -->
@@ -178,7 +181,7 @@
             (promedioDisciplina != null ? promedioDisciplina : 0)) / 3) | number:'1.2-2'
           }}
         </td>
-        
+
         <!-- cambiar segun lo anterior -->
         <td> Muy Bueno</td>
       </tr>
@@ -226,18 +229,20 @@
     </div>
 
   </div>
-
-  <button
-    mat-raised-button
-    class="button-primary"
-    (click)="print()">
-    IMPRIMIR
-  </button>
-  <button
-    mat-raised-button
-    class="button-primary"
-    (click)="openDialog()">
-    EDITAR FIRMAS
-  </button>
+  <div class="buttons">
+    <button
+      mat-raised-button
+      class="button-primary"
+      (click)="print()">
+      IMPRIMIR
+    </button>
+    <button
+      mat-raised-button
+      class="button-primary"
+      (click)="openDialog()">
+      EDITAR FIRMAS
+    </button>
+  </div>
+</div>
 
 </div>
