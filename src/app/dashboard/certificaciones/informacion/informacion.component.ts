@@ -127,6 +127,7 @@ export class InformacionComponent implements OnInit, OnDestroy{
   promedioAcademico: number = 0;
   fechaHoy: Date = new Date();
   cargandoNotas: boolean = false;
+  atributoPromedio: string = '';
 
 
 
@@ -139,7 +140,7 @@ export class InformacionComponent implements OnInit, OnDestroy{
     });
     this.obtenerFirmas();
     // this.convertirNotasLiterales();
-    // this.obtenerNotas();
+    this.obtenerNotas();
   }
 
   ngOnDestroy() {
@@ -227,6 +228,45 @@ export class InformacionComponent implements OnInit, OnDestroy{
     return this.nivelSeleccionado === 'basico' ? this.dataSourceBasico : this.dataSourceAvanzado;
   }
 
+  // atributoPromedioFinal(){
+  //   let promAux = (((this.promedioAcademico != null ? this.promedioAcademico : 0) +
+  //           (this.promedioFisico != null ? this.promedioFisico : 0) +
+  //           (this.promedioDisciplina != null ? this.promedioDisciplina : 0)) / 3);
+  //   console.log(promAux);
+  //   if(promAux >= 0 && promAux < 51){
+  //     this.atributoPromedio = 'Malo';
+  //   }else if(promAux >= 51 && promAux < 71){
+  //     this.atributoPromedio = 'Insuficiente';
+  //   }else if(promAux >= 71 && promAux < 80){
+  //     this.atributoPromedio = 'Regular';
+  //   }else if(promAux >= 80 && promAux < 85){
+  //     this.atributoPromedio = 'Bueno';
+  //   }else if(promAux >= 85 && promAux < 100){
+  //     this.atributoPromedio = 'Muy bueno';
+  //   }else if(promAux == 100){
+  //     this.atributoPromedio = 'Excelente';
+  //   }
+  //   return this.atributoPromedio;
+  // }
+
+  get atributoPromedioFinal(): string {
+    const promAcademico = this.promedioAcademico ?? 0;
+    const promFisico = this.promedioFisico ?? 0;
+    const promDisciplina = this.promedioDisciplina ?? 0;
+
+    const promAux = (promAcademico + promFisico + promDisciplina) / 3;
+
+    if (promAux >= 0 && promAux < 51) return 'Malo';
+    if (promAux >= 51 && promAux < 71) return 'Insuficiente';
+    if (promAux >= 71 && promAux < 80) return 'Regular';
+    if (promAux >= 80 && promAux < 85) return 'Bueno';
+    if (promAux >= 85 && promAux < 100) return 'Muy bueno';
+    if (promAux === 100) return 'Excelente';
+
+    return '-'; // En caso de datos inválidos
+  }
+
+
   async obtenerNotas() {
     if (!this.estudiante || !this.estudiante.id) {
       console.error("Error: No se encontró el CI del estudiante.");
@@ -243,7 +283,7 @@ export class InformacionComponent implements OnInit, OnDestroy{
       if (notas.ordenTotal !== null) this.ordenTotal = notas.ordenTotal;
       if (notas.promedioDisciplina !== null) this.promedioDisciplina = notas.promedioDisciplina;
       if (notas.promedioFisico !== null) this.promedioFisico = notas.promedioFisico;
-      if(this.nivelSeleccionado = 'basico'){
+      if(this.nivelSeleccionado == 'basico'){
         this.dataSourceBasico.forEach((item: any) => {
           const datosMateria = notas[item.codigo];
           if (datosMateria && datosMateria.nota !== null) {
@@ -262,7 +302,7 @@ export class InformacionComponent implements OnInit, OnDestroy{
 
         this.promedioAcademico = promedioGeneral;
       }
-      if(this.nivelSeleccionado = 'avanzado'){
+      if(this.nivelSeleccionado == 'avanzado'){
         this.dataSourceAvanzado.forEach((item: any) => {
           const datosMateria = notas[item.codigo];
           if (datosMateria && datosMateria.nota !== null) {
