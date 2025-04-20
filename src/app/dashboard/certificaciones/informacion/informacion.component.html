@@ -1,19 +1,19 @@
 <div class="main">
   <div class="group">
   <div class="data">
-    <div style="margin-right: 20px;">
-      <p>GRADO:</p>
-      <p>NOMBRES:</p>
-      <p>APELLIDOS:</p>
-      <p>GESTION:</p>
+    <!-- <div style="margin-right: 20px;"> -->
+      <span><b>GRADO:</b> {{ estudiante.grado || "No definido" }}</span>
+      <span><b>NOMBRES:</b> {{ estudiante.nombres || "No definido" }}</span>
+      <span><b>APELLIDOS:</b> {{ estudiante.apMat || "No definido" }}</span>
+      <span><b>GESTION:</b> {{fechaHoy.getFullYear()}}</span>
       <!-- <h2>CURSO:</h2> -->
-    </div>
-    <div>
+    <!-- </div> -->
+    <!-- <div>
       <p>{{ estudiante.grado || "No definido" }}</p>
       <p>{{ estudiante.nombres || "No definido" }}</p>
       <p>{{ estudiante.apMat || "No definido" }}</p>
       <p>2025</p>
-    </div>
+    </div> -->
   </div>
 
     <mat-form-field class="nivel">

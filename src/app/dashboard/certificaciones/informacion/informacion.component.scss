@@ -12,10 +12,10 @@
 }
 .data{
   background-color: #587471;
-  width: 90%;
-  margin-bottom: 100px;
+  width: 100%;
+  margin-bottom: 30px;
   padding: 15px;
-  font-weight: bold;
+  // font-weight: bold;
   font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   box-shadow: 5px 5px 10px gray;
   border-radius: 20px;
@@ -24,11 +24,21 @@
   // padding-left: 10px;
   justify-content: center;
   font-size: 20px;
-  h2{
-    padding-left: 10px;
-  }
+  span{
+    padding-left: 20px;
 
+  }
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+    width: 80%;
+    span {
+      padding-left: 0;
+      margin-top: 10px;
+    }
+  }
 }
+
 .pdf-container {
   // text-align: center;
   font-size: 24px;

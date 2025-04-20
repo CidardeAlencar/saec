@@ -70,6 +70,22 @@ const ELEMENT_DATA: PeriodicElement[] = [
   { position: 16, materia: '', promedio: 0, literal: '', codigo: 'TEC-TOV-01-06' }
 ];
 
+const ELEMENT_DATA2: PeriodicElement[] = [
+  { position: 1, materia: '', promedio: 0, literal: '', codigo: 'BAS-ASI-01-02' },
+  { position: 2, materia: '', promedio: 0, literal: '', codigo: 'BAS-ASO-01-03' },
+  { position: 3, materia: '', promedio: 0, literal: '', codigo: 'BAS-ASP-01-01' },
+  { position: 4, materia: '', promedio: 0, literal: '', codigo: 'BAS-PICB-01-07' },
+  { position: 5, materia: '', promedio: 0, literal: '', codigo: 'COM-CPM-01-01' },
+  { position: 6, materia: '', promedio: 0, literal: '', codigo: 'EJT-AEM-01-01' },
+  { position: 7, materia: '', promedio: 0, literal: '', codigo: 'PFD-EFM-01-01' },
+  { position: 8, materia: '', promedio: 0, literal: '', codigo: 'TEC-BDG-01-06' },
+  { position: 9, materia: '', promedio: 0, literal: '', codigo: 'TEC-CTE-01-09' },
+  { position: 10, materia: '', promedio: 0, literal: '', codigo: 'TEC-GPR-01-04' },
+  { position: 11, materia: '', promedio: 0, literal: '', codigo: 'TEC-SCT-01-08' },
+  { position: 12, materia: '', promedio: 0, literal: '', codigo: 'TEC-TIN-01-07' }
+];
+
+
 
 
 // ELEMENT_DATA.forEach(nota => {
@@ -99,7 +115,8 @@ export class InformacionComponent implements OnInit, OnDestroy{
   // readonly name = model('');
   readonly dialog = inject(MatDialog);
   displayedColumns: string[] = ['position', 'semestre', 'promedio', 'literal'];
-  dataSource = ELEMENT_DATA;
+  dataSourceBasico = ELEMENT_DATA;
+  dataSourceAvanzado = ELEMENT_DATA2;
   @ViewChild('pdfContent', { static: false }) pdfContent!: ElementRef;
   generandoPDF = false;
   ordenMerito = null;
@@ -122,18 +139,18 @@ export class InformacionComponent implements OnInit, OnDestroy{
     });
     this.obtenerFirmas();
     // this.convertirNotasLiterales();
-    this.obtenerNotas();
+    // this.obtenerNotas();
   }
 
   ngOnDestroy() {
     this.subscription.unsubscribe();
   }
 
-  convertirNotasLiterales() {
-    this.dataSource.forEach(nota => {
-      nota.literal = this.convertirNumeroALiteral(nota.promedio);
-    });
-  }
+  // convertirNotasLiterales() {
+  //   this.dataSource.forEach(nota => {
+  //     nota.literal = this.convertirNumeroALiteral(nota.promedio);
+  //   });
+  // }
 
   // async obtenerNotas() {
   //   if (!this.estudiante || !this.estudiante.id) {
@@ -157,7 +174,7 @@ export class InformacionComponent implements OnInit, OnDestroy{
   //   if (notas.promedioFisico !== null) {
   //     this.promedioFisico = notas.promedioFisico;
   //   }
-    
+
   //   // if (notas.BASCMI0102 !== null) {
   //   //   this.dataSource[0].promedio = notas.BASCMI0102;
   //   //   this.dataSource[0].materia = notas.BASCMI0102name ?? '';
@@ -206,48 +223,71 @@ export class InformacionComponent implements OnInit, OnDestroy{
   //   // }
 
   // }
+  get dataSource(): PeriodicElement[] {
+    return this.nivelSeleccionado === 'basico' ? this.dataSourceBasico : this.dataSourceAvanzado;
+  }
 
   async obtenerNotas() {
     if (!this.estudiante || !this.estudiante.id) {
       console.error("Error: No se encontró el CI del estudiante.");
       return;
     }
-  
+
     this.cargandoNotas = true; // 🔄 Mostrar loader
-  
+
     try {
       const ci = this.estudiante.id;
       const notas = await this.estudianteService.obtenerNotas(ci, this.nivelSeleccionado);
-  
+
       if (notas.ordenMerito !== null) this.ordenMerito = notas.ordenMerito;
       if (notas.ordenTotal !== null) this.ordenTotal = notas.ordenTotal;
       if (notas.promedioDisciplina !== null) this.promedioDisciplina = notas.promedioDisciplina;
       if (notas.promedioFisico !== null) this.promedioFisico = notas.promedioFisico;
-  
-      this.dataSource.forEach((item: any) => {
-        const datosMateria = notas[item.codigo];
-        if (datosMateria && datosMateria.nota !== null) {
-          item.promedio = datosMateria.nota;
-          item.materia = datosMateria.nombre ?? '';
-          item.literal = item.promedio > 50 ? 'APROBADO' : 'REPROBADO';
-        }
-      });
-  
-      const promediosValidos = this.dataSource
-        .map((item: any) => item.promedio)
-        .filter((p: number) => typeof p === 'number' && !isNaN(p));
-  
-      const sumaPromedios = promediosValidos.reduce((acc: number, val: number) => acc + val, 0);
-      const promedioGeneral = promediosValidos.length > 0 ? sumaPromedios / promediosValidos.length : 0;
-  
-      this.promedioAcademico = promedioGeneral;
+      if(this.nivelSeleccionado = 'basico'){
+        this.dataSourceBasico.forEach((item: any) => {
+          const datosMateria = notas[item.codigo];
+          if (datosMateria && datosMateria.nota !== null) {
+            item.promedio = datosMateria.nota;
+            item.materia = datosMateria.nombre ?? '';
+            item.literal = item.promedio > 50 ? 'APROBADO' : 'REPROBADO';
+          }
+        });
+
+        const promediosValidos = this.dataSourceBasico
+          .map((item: any) => item.promedio)
+          .filter((p: number) => typeof p === 'number' && !isNaN(p));
+
+        const sumaPromedios = promediosValidos.reduce((acc: number, val: number) => acc + val, 0);
+        const promedioGeneral = promediosValidos.length > 0 ? sumaPromedios / promediosValidos.length : 0;
+
+        this.promedioAcademico = promedioGeneral;
+      }
+      if(this.nivelSeleccionado = 'avanzado'){
+        this.dataSourceAvanzado.forEach((item: any) => {
+          const datosMateria = notas[item.codigo];
+          if (datosMateria && datosMateria.nota !== null) {
+            item.promedio = datosMateria.nota;
+            item.materia = datosMateria.nombre ?? '';
+            item.literal = item.promedio > 50 ? 'APROBADO' : 'REPROBADO';
+          }
+        });
+
+        const promediosValidos = this.dataSourceAvanzado
+          .map((item: any) => item.promedio)
+          .filter((p: number) => typeof p === 'number' && !isNaN(p));
+
+        const sumaPromedios = promediosValidos.reduce((acc: number, val: number) => acc + val, 0);
+        const promedioGeneral = promediosValidos.length > 0 ? sumaPromedios / promediosValidos.length : 0;
+
+        this.promedioAcademico = promedioGeneral;
+      }
     } catch (error) {
       console.error('Error al obtener las notas:', error);
     } finally {
       this.cargandoNotas = false; // ✅ Ocultar loader
     }
   }
-  
+
 
 
   openDialog(): void {
@@ -341,8 +381,8 @@ export class InformacionComponent implements OnInit, OnDestroy{
     MatButtonModule,
     MatDialogTitle,
     MatDialogContent,
-    MatDialogActions,
-    MatDialogClose,
+    MatDialogActions
+    // MatDialogClose,
   ],
 })
 export class DialogOverviewExampleDialog {
