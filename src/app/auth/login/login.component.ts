@@ -48,7 +48,7 @@ constructor(
 
     const email = this.email.value?.trim() ?? '';
     const password = this.password.value?.trim() ?? '';
-  
+
     if (!email || !password) {
       Swal.fire({
         icon: 'warning',
@@ -59,13 +59,24 @@ constructor(
       });
       return;
     }
-  
+
     try {
-      const loginSuccess = await this.authService.loginFB(email, password);
-  
-      if (loginSuccess) {
-        console.log("Inicio de sesión exitoso");
-        this.router.navigate(['/dashboard/certificaciones/busqueda']);
+      const userCredential  = await this.authService.loginFB(email, password);
+
+      if (userCredential) {
+        const loggedEmail = userCredential.user.email;
+        console.log("Inicio de sesión exitoso como:", loggedEmail);
+        if (loggedEmail === 'certificaciones.epsst@gmail.com') {
+          this.router.navigate(['/dashboard/certificaciones/busqueda']);
+        } else if (loggedEmail === 'perfil.emte@gmail.com') {
+          this.router.navigate(['/dashboard/admin/profile']);
+        }
+        else {
+          this.router.navigate(['/dashboard/estudiante/information']);
+        }
+
+
+        // this.router.navigate(['/dashboard/certificaciones/busqueda']);
       } else {
         this.showErrorMessage('Credenciales incorrectas. Verifica tu correo y contraseña.');
       }
@@ -74,7 +85,7 @@ constructor(
       this.showErrorMessage(this.getAuthErrorMessage(error));
     }
   }
-  
+
   showErrorMessage(message: string) {
     Swal.fire({
       icon: 'error',
@@ -84,7 +95,7 @@ constructor(
       confirmButtonColor: '#3085d6'
     });
   }
-  
+
   getAuthErrorMessage(error: any): string {
     switch (error.code) {
       case 'auth/user-not-found':
@@ -109,7 +120,7 @@ constructor(
       this.errorMessage.set('');
     }
   }
-  
+
   clickEvent(event: MouseEvent) {
     this.hide.set(!this.hide());
     event.stopPropagation();

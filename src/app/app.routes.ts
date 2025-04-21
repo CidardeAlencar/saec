@@ -9,6 +9,14 @@ export const routes: Routes = [
       {
         path: 'certificaciones',
         loadChildren: () => import('./dashboard/certificaciones/certificaciones.module').then(m => m.CertificacionesModule)
+      },
+      {
+        path: 'admin',
+        loadChildren: () => import('./dashboard/admin/admin.module').then(m => m.AdminModule)
+      },
+      {
+        path: 'estudiante',
+        loadChildren: () => import('./dashboard/estudiante/estudiante.module').then(m => m.EstudianteModule)
       }
     ]
   },

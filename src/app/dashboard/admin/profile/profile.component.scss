@@ -1,0 +1,38 @@
+.main{
+  .container{
+    width: 600px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    // height: 0px;
+    mat-form-field{
+      width: 100%;
+      height: 70px;
+    }
+    h1{
+      font-family:  'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      text-align: center;
+    }
+    .button-register{
+      padding: 25px;
+    }
+  }
+  background-color: var(--color-secondary);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+
+
+  @media (max-width: 768px) {
+    .container{
+      width: 80%;
+    }
+  }
+}
