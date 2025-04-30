@@ -17,6 +17,10 @@ export const routes: Routes = [
       {
         path: 'estudiante',
         loadChildren: () => import('./dashboard/estudiante/estudiante.module').then(m => m.EstudianteModule)
+      },
+      {
+        path: 'docente',
+        loadChildren: () => import('./dashboard/docente/docente.module').then(m => m.DocenteModule)
       }
     ]
   },

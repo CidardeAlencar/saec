@@ -1,0 +1,74 @@
+<div class="main">
+
+  <div class="data">
+    <!-- <div style="margin-right: 20px;"> -->
+      <span><b>GRADO:</b> {{ estudiante.grado || "No definido" }}</span>
+      <span><b>NOMBRES:</b> {{ estudiante.nombres || "No definido" }}</span>
+      <span><b>APELLIDOS:</b> {{ estudiante.apPat || "No definido" }} {{ estudiante.apMat || "No definido" }}</span>
+      <!-- <span><b>GESTIÓN:</b> {{fechaHoy.getFullYear()}}</span> -->
+      <!-- <h2>CURSO:</h2> -->
+    <!-- </div> -->
+    <!-- <div>
+      <p>{{ estudiante.grado || "No definido" }}</p>
+      <p>{{ estudiante.nombres || "No definido" }}</p>
+      <p>{{ estudiante.apMat || "No definido" }}</p>
+      <p>2025</p>
+    </div> -->
+  </div>
+  <div class="group">
+
+  <!-- </div> -->
+
+  <mat-form-field class="nivel">
+    <mat-label>Seleccione el curso</mat-label>
+    <mat-select [(ngModel)]="nivelSeleccionado" (selectionChange)="obtenerNotas()">
+      <!-- <mat-select [(ngModel)]="nivelSeleccionado"> -->
+
+      <!-- @for (option of options; track option) {
+        <mat-option [value]="option.value">{{option.viewValue}}</mat-option>
+      } -->
+      <mat-option *ngFor="let option of options" [value]="option.value">
+        {{ option.viewValue }}
+      </mat-option>
+
+    </mat-select>
+  </mat-form-field>
+    <!-- <div *ngIf="cargandoNotas" class="loader-container">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p style="font-weight: bold;">Cargando notas...</p>
+    </div> -->
+
+    <h1 *ngIf="nivelSeleccionado === 'basico'">Básico</h1>
+    <p *ngIf="nivelSeleccionado === 'basico'">
+      <mat-form-field appearance="outline">
+        <mat-label>BAS-CMI-01-02</mat-label>
+        <input matInput  type="number" min="0" max="100" placeholder="Ingresa la nota">
+        <!-- <mat-icon matSuffix>sentiment_very_satisfied</mat-icon> -->
+        <mat-hint>Correspondencia Militar</mat-hint>
+      </mat-form-field>
+    </p>
+<h1 *ngIf="nivelSeleccionado === 'avanzado'">Avanzado</h1>
+<h1 *ngIf="nivelSeleccionado === 'primerSemestre'">Primer Semestre</h1>
+<h1 *ngIf="nivelSeleccionado === 'segundoSemestre'">Segundo Semestre</h1>
+<h1 *ngIf="nivelSeleccionado === 'tercerSemestre'">Tercer Semestre</h1>
+<h1 *ngIf="nivelSeleccionado === 'cuartoSemestre'">Cuarto Semestre</h1>
+<h1 *ngIf="nivelSeleccionado === 'quintoSemestre'">Quinto Semestre</h1>
+<h1 *ngIf="nivelSeleccionado === 'sextoSemestre'">Sexto Semestre</h1>
+  <div class="buttons">
+    <button
+      mat-raised-button
+      class="button-primary"
+      (click)="save()">
+      GUARDAR
+    </button>
+    <button
+      mat-raised-button
+      class="button-primary"
+      (click)="edit()">
+      EDITAR
+    </button>
+  </div>
+</div>
+
+</div>
+
