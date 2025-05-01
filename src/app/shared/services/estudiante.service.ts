@@ -149,5 +149,18 @@ export class EstudianteService {
     }
 }
 
+  async registrarEstudiante(ci: string, data: any) {
+    try {
+      const estudianteRef = doc(this.firestore, `estudiante/${ci}`);
+      await setDoc(estudianteRef, data, { merge: true });
+      console.log('Estudiante registrado exitosamente');
+      return true;
+    } catch (error) {
+      console.error('Error al registrar estudiante:', error);
+      return false;
+    }
+  }
+
+
 
 }
