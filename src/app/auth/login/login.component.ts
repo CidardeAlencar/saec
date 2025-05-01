@@ -44,23 +44,62 @@ constructor(
   // });
   };
 
-    login(){
+   async login(){
 
-      if(this.authService.login(this.email.value ?? '', this.password.value ?? '')){
-        console.log("entra");
-        this.router.navigate(['/dashboard/certificaciones/busqueda']);
-      } else{
-        Swal.fire({
-          icon: 'error',
-          title: 'Credenciales Incorrectas',
-          text: 'Por favor, verifica tu correo y contraseña.',
-          confirmButtonText: 'OK',
-          // timer: 2000,
-          // showConfirmButton: false,
-          confirmButtonColor: '#3085d6'
-        });
-      }
+    const email = this.email.value?.trim() ?? '';
+    const password = this.password.value?.trim() ?? '';
+  
+    if (!email || !password) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Campos Vacíos',
+        text: 'Por favor, ingresa tu correo y contraseña.',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#3085d6'
+      });
+      return;
     }
+  
+    try {
+      const loginSuccess = await this.authService.loginFB(email, password);
+  
+      if (loginSuccess) {
+        console.log("Inicio de sesión exitoso");
+        this.router.navigate(['/dashboard/certificaciones/busqueda']);
+      } else {
+        this.showErrorMessage('Credenciales incorrectas. Verifica tu correo y contraseña.');
+      }
+    } catch (error) {
+      console.error('Error en el inicio de sesión:', error);
+      this.showErrorMessage(this.getAuthErrorMessage(error));
+    }
+  }
+  
+  showErrorMessage(message: string) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error de Autenticación',
+      text: message,
+      confirmButtonText: 'OK',
+      confirmButtonColor: '#3085d6'
+    });
+  }
+  
+  getAuthErrorMessage(error: any): string {
+    switch (error.code) {
+      case 'auth/user-not-found':
+        return 'Usuario no encontrado. Verifica tu correo.';
+      case 'auth/wrong-password':
+        return 'Contraseña incorrecta. Inténtalo de nuevo.';
+      case 'auth/too-many-requests':
+        return 'Demasiados intentos. Intenta más tarde.';
+      case 'auth/invalid-email':
+        return 'El correo no es válido.';
+      default:
+        return 'Error al iniciar sesión. Intenta nuevamente.';
+    }
+  }
+
   updateErrorMessage() {
     if (this.email.hasError('required')) {
       this.errorMessage.set('Debes ingresar el correo');
@@ -70,6 +109,7 @@ constructor(
       this.errorMessage.set('');
     }
   }
+  
   clickEvent(event: MouseEvent) {
     this.hide.set(!this.hide());
     event.stopPropagation();

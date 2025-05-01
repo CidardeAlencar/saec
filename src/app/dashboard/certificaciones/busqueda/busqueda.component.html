@@ -8,12 +8,14 @@
           matInput
           placeholder="CI A BUSCAR"
           [formControl]="ci"
+          (keydown.enter)="preventSubmit($event)"
           />
           <button
             style="border-radius: 20px; margin: 10px;"
             mat-icon-button
             matSuffix
-            (click)="clickEvent($event)"
+            type="button"
+            (click)="buscar()"
             [attr.aria-label]="'search'"
           >
             <mat-icon>search</mat-icon>
