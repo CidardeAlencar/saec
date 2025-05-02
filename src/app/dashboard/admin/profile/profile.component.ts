@@ -90,19 +90,22 @@ export class ProfileComponent {
       }
 
       const ci = this.ci.value!;
-      const estudianteData = {
-        nombres: this.nombres.value,
-        apPat: this.apellidoPaterno.value,
-        apMat: this.apellidoMaterno.value,
-        celular: this.celular.value,
-        grado: this.grado.value,
-        email: this.correo.value,
-        contrasenia: this.contrasena.value
-      };
 
       try{
           const userCreated  = await this.authService.register(this.correo.value!, this.contrasena.value!);
+          const uid = userCreated.user.uid;
           console.log(userCreated);
+
+          const estudianteData = {
+            nombres: this.nombres.value,
+            apPat: this.apellidoPaterno.value,
+            apMat: this.apellidoMaterno.value,
+            celular: this.celular.value,
+            grado: this.grado.value,
+            email: this.correo.value,
+            contrasenia: this.contrasena.value,
+            uid: uid
+          };
 
           const registrado = await this.estudianteService.registrarEstudiante(ci, estudianteData);
 

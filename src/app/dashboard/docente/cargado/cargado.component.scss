@@ -159,7 +159,7 @@ table.table th {
   font-weight: bold;
 }
 .buttons{
-  margin-top: 20px;
+  margin-bottom: 20px;
   display: flex;
   // flex-direction: column;
   .button-primary{
@@ -168,7 +168,7 @@ table.table th {
 }
 
 .nivel{
-  width: 100%;
+  width: 300px;
 }
 .group{
   display: flex;
@@ -177,3 +177,15 @@ table.table th {
 }
 
 
+.notas{
+  display: flex;
+  flex-wrap: wrap;
+  padding: 30px;
+  justify-content: center;
+  gap: 10px;
+}
+
+.validar{
+  display: flex;
+  flex-direction: column;
+}

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Firestore, doc, getDoc, setDoc } from '@angular/fire/firestore';
+import { Firestore, doc, getDoc, setDoc, collection, query, where, getDocs } from '@angular/fire/firestore';
 import { BehaviorSubject } from 'rxjs';
+import { Auth } from '@angular/fire/auth';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,7 @@ export class EstudianteService {
   private estudianteData = new BehaviorSubject<any>(null);
   estudianteData$ = this.estudianteData.asObservable();
 
-  constructor(private firestore: Firestore) {}
+  constructor(private firestore: Firestore, private auth: Auth) {}
 
   // Buscar en Firestore por CI
   async buscarEstudiantePorCI(ci: string) {
@@ -88,7 +89,8 @@ export class EstudianteService {
           'TEC-PRS-01-05',
           'TEC-RGE-01-03',
           'TEC-TOA-01-01',
-          'TEC-TOV-01-06'
+          'TEC-TOV-01-06',
+          'promedioFisico'
         ],
         avanzado: [
           'BAS-ASI-01-02',
@@ -147,7 +149,7 @@ export class EstudianteService {
       console.error("Error al obtener las notas:", error);
       return {};
     }
-}
+  }
 
   async registrarEstudiante(ci: string, data: any) {
     try {
@@ -158,6 +160,29 @@ export class EstudianteService {
     } catch (error) {
       console.error('Error al registrar estudiante:', error);
       return false;
+    }
+  }
+
+  async cargarEstudianteDesdeAuth() {
+    const user = await this.auth.currentUser;
+
+    if (!user) {
+      console.warn('No hay usuario autenticado');
+      return;
+    }
+
+    const estudiantesRef = collection(this.firestore, 'estudiante');
+    const q = query(estudiantesRef, where('uid', '==', user.uid));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      const docSnap = querySnapshot.docs[0];
+      const estudiante = docSnap.data();
+      estudiante['id'] = docSnap.id; // el CI
+      this.estudianteData.next(estudiante);
+    } else {
+      console.warn('No se encontró un estudiante con este UID');
+      this.estudianteData.next(null);
     }
   }
 
