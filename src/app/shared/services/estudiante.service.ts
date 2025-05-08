@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Firestore, doc, getDoc, setDoc } from '@angular/fire/firestore';
+import { Firestore, doc, getDoc, setDoc, collection, query, where, getDocs } from '@angular/fire/firestore';
 import { BehaviorSubject } from 'rxjs';
+import { Auth } from '@angular/fire/auth';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,7 @@ export class EstudianteService {
   private estudianteData = new BehaviorSubject<any>(null);
   estudianteData$ = this.estudianteData.asObservable();
 
-  constructor(private firestore: Firestore) {}
+  constructor(private firestore: Firestore, private auth: Auth) {}
 
   // Buscar en Firestore por CI
   async buscarEstudiantePorCI(ci: string) {
@@ -132,14 +133,16 @@ export class EstudianteService {
       const promedioFisicoSnap = await getDoc(doc(this.firestore, `estudiante/${ci}/${nivel}/promedioFisico`));
       const promedioDisciplinaSnap = await getDoc(doc(this.firestore, `estudiante/${ci}/${nivel}/promedioDisciplina`));
       // const ordenTotalSnap = await getDoc(doc(this.firestore, `estudiante/${ci}/${nivel}/ordenMerito`));
-
+      const gestionAvanzadoSnap = await getDoc(doc(this.firestore, `estudiante/${ci}/${nivel}/gestionAvanzado`));
+      const gestionBasicoSnap = await getDoc(doc(this.firestore, `estudiante/${ci}/${nivel}/gestionBasico`));
       // notas.notaPrimero = finalPrimeroSnap.exists() ? finalPrimeroSnap.data()?.['nota'] ?? null : null;
       // notas.notaSegundo = finalSegundoSnap.exists() ? finalSegundoSnap.data()?.['nota'] ?? null : null;
       notas.ordenMerito = ordenMeritoSnap.exists() ? ordenMeritoSnap.data()?.['orden'] ?? null : null;
       notas.ordenTotal = ordenMeritoSnap.exists() ? ordenMeritoSnap.data()?.['total'] ?? null : null;
       notas.promedioFisico = promedioFisicoSnap.exists() ? promedioFisicoSnap.data()?.['nota1'] ?? null : null;
       notas.promedioDisciplina = promedioDisciplinaSnap.exists() ? promedioDisciplinaSnap.data()?.['nota1'] ?? null : null;
-
+      notas.gestionAvanzado = gestionAvanzadoSnap.exists() ? gestionAvanzadoSnap.data()?.['gestion'] ?? null : null;
+      notas.gestionBasico = gestionBasicoSnap.exists() ? gestionBasicoSnap.data()?.['gestion'] ?? null : null;
       console.log("Notas:", notas);
       return notas;
 
@@ -147,7 +150,7 @@ export class EstudianteService {
       console.error("Error al obtener las notas:", error);
       return {};
     }
-}
+  }
 
   async registrarEstudiante(ci: string, data: any) {
     try {
@@ -158,6 +161,29 @@ export class EstudianteService {
     } catch (error) {
       console.error('Error al registrar estudiante:', error);
       return false;
+    }
+  }
+
+  async cargarEstudianteDesdeAuth() {
+    const user = await this.auth.currentUser;
+
+    if (!user) {
+      console.warn('No hay usuario autenticado');
+      return;
+    }
+
+    const estudiantesRef = collection(this.firestore, 'estudiante');
+    const q = query(estudiantesRef, where('uid', '==', user.uid));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      const docSnap = querySnapshot.docs[0];
+      const estudiante = docSnap.data();
+      estudiante['id'] = docSnap.id; // el CI
+      this.estudianteData.next(estudiante);
+    } else {
+      console.warn('No se encontró un estudiante con este UID');
+      this.estudianteData.next(null);
     }
   }
 

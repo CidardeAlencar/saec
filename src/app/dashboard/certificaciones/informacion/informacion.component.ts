@@ -254,7 +254,8 @@ export class InformacionComponent implements OnInit, OnDestroy{
     const promFisico = this.promedioFisico ?? 0;
     const promDisciplina = this.promedioDisciplina ?? 0;
 
-    const promAux = (promAcademico + promFisico + promDisciplina) / 3;
+    // const promAux = (promAcademico + promFisico + promDisciplina) / 3;
+    const promAux = promAcademico * 0.8 + promFisico * 0.1 + promDisciplina * 0.1;
 
     if (promAux >= 0 && promAux < 51) return 'Malo';
     if (promAux >= 51 && promAux < 71) return 'Insuficiente';

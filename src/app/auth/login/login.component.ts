@@ -70,6 +70,8 @@ constructor(
           this.router.navigate(['/dashboard/certificaciones/busqueda']);
         } else if (loggedEmail === 'perfil.emte@gmail.com') {
           this.router.navigate(['/dashboard/admin/profile']);
+        } else if(loggedEmail === 'notas.epsst@gmail.com'){
+          this.router.navigate(['/dashboard/docente/notas']);
         }
         else {
           this.router.navigate(['/dashboard/estudiante/information']);

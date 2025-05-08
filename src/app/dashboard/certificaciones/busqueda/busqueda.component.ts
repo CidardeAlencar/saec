@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -14,6 +14,7 @@ import Swal from 'sweetalert2';
   styleUrl: './busqueda.component.scss'
 })
 export class BusquedaComponent {
+  @Input() origen: string = '';
   readonly ci = new FormControl('', [Validators.required]);
 
   constructor(
@@ -35,7 +36,11 @@ export class BusquedaComponent {
     const encontrado = await this.estudianteService.buscarEstudiantePorCI(ciValue);
     console.log(encontrado);
     if (encontrado) {
-      this.router.navigate(['/dashboard/certificaciones/informacion']);
+      if (this.origen === 'notas') {
+        this.router.navigate(['/dashboard/docente/cargado']);
+      } else {
+        this.router.navigate(['/dashboard/certificaciones/informacion']);
+      }
     } else {
       Swal.fire("Error", "No se encontró un estudiante con ese CI.", "error");
     }
@@ -45,6 +50,6 @@ export class BusquedaComponent {
     event.preventDefault();
     event.stopPropagation();
   }
-  
+
 
 }

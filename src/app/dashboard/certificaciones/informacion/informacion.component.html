@@ -5,7 +5,7 @@
       <span><b>GRADO:</b> {{ estudiante.grado || "No definido" }}</span>
       <span><b>NOMBRES:</b> {{ estudiante.nombres || "No definido" }}</span>
       <span><b>APELLIDOS:</b> {{ estudiante.apPat || "No definido" }} {{ estudiante.apMat || "No definido" }}</span>
-      <span><b>GESTIÓN:</b> {{fechaHoy.getFullYear()}}</span>
+      <!-- <span><b>GESTIÓN:</b> {{fechaHoy.getFullYear()}}</span> -->
       <!-- <h2>CURSO:</h2> -->
     <!-- </div> -->
     <!-- <div>
@@ -85,9 +85,9 @@
           <td>NOTA FINAL (100%)</td>
           <td>
             {{
-              (((promedioAcademico != null ? promedioAcademico : 0) +
-              (promedioFisico != null ? promedioFisico : 0) +
-              (promedioDisciplina != null ? promedioDisciplina : 0)) / 3) | number:'1.2-2'
+              (((promedioAcademico != null ? promedioAcademico * 0.8 : 0) +
+              (promedioFisico != null ? promedioFisico * 0.1 : 0) +
+              (promedioDisciplina != null ? promedioDisciplina * 0.1 : 0))) | number:'1.2-2'
             }}
           </td>
           <!-- <td>Muy Bueno</td> -->
@@ -115,7 +115,7 @@
       Cruz Heredia Fuentes" se evidencia que:</p>
       <!-- correcgur le basico como condicional asi la palabra primer semestre -->
     <p class="indent justificado">El Sr. <span class="bold">{{ estudiante?.grado }} {{ estudiante?.nombres }} {{ estudiante?.apPat }} {{ estudiante?.apMat }}</span>,
-      curso como alumno regular del Curso Básico en la Escuela de Perfeccionamiento para Sub Oficiales y
+      curso como alumno regular del Curso {{nivelSeleccionado}} en la Escuela de Perfeccionamiento para Sub Oficiales y
       Sargentos Topógrafos "Sof. My. Juan de la Cruz Heredia Fuentes",
       durante el primer semestre de la gestión Académica {{ estudiante?.gestionBasico }} obteniendo las siguientes
       calificaciones:</p>
@@ -132,13 +132,13 @@
       <tr *ngFor="let nota of dataSource">
         <td>{{ nota.position }}</td>
         <td style="text-align: left;">{{ nota.materia }}</td>
-        <td>{{ nota.promedio }}</td>
+        <td>{{ nota.promedio | number:'1.4-4' }}</td>
         <td>{{ nota.literal }}</td>
         <!-- <td>{{ nota.obs }}</td> -->
       </tr>
       <tr class="bold">
         <td colspan="2">PROMEDIO ACADÉMICO MILITAR</td>
-        <td>{{ promedioAcademico | number:'1.2-2' }}</td>
+        <td>{{ promedioAcademico | number:'1.4-4' }}</td>
         <td>{{ promedioAcademico > 50 ? 'APROBADO' : 'REPROBADO' }}</td>
       </tr>
     </table>
@@ -155,21 +155,21 @@
       <tr>
         <td colspan="3">PROMEDIO ACADÉMICO MILITAR (80%)</td>
         <!-- <td>{{ promedioAcademico }}</td> -->
-        <td>{{ promedioAcademico | number:'1.2-2' }}</td>
+        <td>{{ promedioAcademico | number:'1.4-4' }}</td>
         <td>{{ promedioAcademico > 50 ? 'APROBADO' : 'REPROBADO' }}</td>
         <!-- <td>{{ nota.obs }}</td> -->
       </tr>
       <tr>
         <td colspan="3">ENTRENAMIENTO FÍSICO MILITAR (10%)</td>
         <!-- <td>{{ promedioAcademico }}</td> -->
-        <td>{{ promedioFisico | number:'1.2-2' }}</td>
+        <td>{{ promedioFisico | number:'1.4-4' }}</td>
         <td>{{ promedioFisico ?? 0 > 50 ? 'APROBADO' : 'REPROBADO' }}</td>
         <!-- <td>{{ nota.obs }}</td> -->
       </tr>
       <tr>
         <td colspan="3">DISCIPLINA (10%)</td>
         <!-- <td>{{ promedioAcademico }}</td> -->
-        <td>{{ promedioDisciplina | number:'1.2-2' }}</td>
+        <td>{{ promedioDisciplina | number:'1.4-4' }}</td>
         <td>{{ promedioDisciplina ?? 0 > 50 ? 'APROBADO' : 'REPROBADO' }}</td>
         <!-- <td>{{ nota.obs }}</td> -->
       </tr>
