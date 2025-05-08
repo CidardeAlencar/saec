@@ -101,6 +101,15 @@ export class CargadoComponent implements OnInit, OnDestroy {
   }
 
   edit(){
+    if (!this.estudiante?.id || !this.nivelSeleccionado) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Faltan datos',
+        text: 'Debes seleccionar un nivel antes de continuar.'
+      });
+      return;
+    }
+
     this.editarNotas = !this.editarNotas;
     this.codigo1Generado = Math.floor(100000 + Math.random() * 900000).toString();
     this.codigo2Generado = Math.floor(100000 + Math.random() * 900000).toString();

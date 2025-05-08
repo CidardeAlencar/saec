@@ -5,7 +5,7 @@
       <span><b>GRADO:</b> {{ estudiante.grado || "No definido" }}</span>
       <span><b>NOMBRES:</b> {{ estudiante.nombres || "No definido" }}</span>
       <span><b>APELLIDOS:</b> {{ estudiante.apPat || "No definido" }} {{ estudiante.apMat || "No definido" }}</span>
-      <span><b>GESTIÓN:</b> {{fechaHoy.getFullYear()}}</span>
+      <!-- <span><b>GESTIÓN:</b> {{fechaHoy.getFullYear()}}</span> -->
       <!-- <h2>CURSO:</h2> -->
     <!-- </div> -->
     <!-- <div>
@@ -85,9 +85,9 @@
           <td>NOTA FINAL (100%)</td>
           <td>
             {{
-              (((promedioAcademico != null ? promedioAcademico : 0) +
-              (promedioFisico != null ? promedioFisico : 0) +
-              (promedioDisciplina != null ? promedioDisciplina : 0)) / 3) | number:'1.2-2'
+              (((promedioAcademico != null ? promedioAcademico * 0.8 : 0) +
+              (promedioFisico != null ? promedioFisico * 0.1 : 0) +
+              (promedioDisciplina != null ? promedioDisciplina * 0.1 : 0))) | number:'1.2-2'
             }}
           </td>
           <!-- <td>Muy Bueno</td> -->

@@ -69,7 +69,7 @@ export class InformationComponent implements OnInit {
   }
 
   print(){
-
+    window.print();
   }
   onNivelChange() {
     if (this.estudiante?.id && this.nivelSeleccionado) {
