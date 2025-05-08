@@ -53,7 +53,10 @@ export class CargadoComponent implements OnInit, OnDestroy {
     { codigo: 'TEC-TOA-01-01', nombre: 'Topografía Automatizada' },
     { codigo: 'TEC-TOV-01-06', nombre: 'Topografía Vial' },
     { codigo: 'promedioDisciplina', nombre: 'Promedio disciplina' },
-    { codigo: 'promedioFisico', nombre: 'Promedio fisico' }
+    { codigo: 'promedioFisico', nombre: 'Promedio fisico' },
+    { codigo: 'ordenMerito', nombre: 'Orden de Merito' },
+    { codigo: 'ordenTotal', nombre: 'Total Efectivo' },
+    { codigo: 'gestionBasico', nombre: 'Gestión Basico' }
   ];
   materiasAvanzado = [
     { codigo: 'BAS-ASI-01-02', nombre: 'Asignatura Militar I' },
@@ -71,7 +74,10 @@ export class CargadoComponent implements OnInit, OnDestroy {
     { codigo: 'TEC-TIN-01-07', nombre: 'Tecnología de Información' },
     { codigo: 'TIT-TTE-01-01', nombre: 'Trabajo de Titulación' },
     { codigo: 'promedioDisciplina', nombre: 'Promedio disciplina' },
-    { codigo: 'promedioFisico', nombre: 'Promedio fisico' }
+    { codigo: 'promedioFisico', nombre: 'Promedio fisico' },
+    { codigo: 'ordenMerito', nombre: 'Orden de Merito' },
+    { codigo: 'ordenTotal', nombre: 'Total Efectivo' },
+    { codigo: 'gestionAvanzado', nombre: 'Gestión Avanzado' }
   ];
 
   notasRegistradas: { [codigo: string]: number | null } = {};
@@ -195,7 +201,10 @@ export class CargadoComponent implements OnInit, OnDestroy {
         'TEC-TIN-01-07',
         'TIT-TTE-01-01',
         'promedioDisciplina',
-        'promedioFisico'
+        'promedioFisico',
+        'ordenMerito',
+        'ordenTotal',
+        'gestionAvanzado'
       ]
       // Puedes agregar aquí otros niveles como 'avanzado', 'primerSemestre', etc.
     };
@@ -215,16 +224,35 @@ export class CargadoComponent implements OnInit, OnDestroy {
           continue;
         }
 
-        const nota = parseFloat(inputEl.value);
+        const valor  = parseFloat(inputEl.value);
         const nombre = hintEl.innerText.trim();
 
-        if (!isNaN(nota)) {
-          const ref = doc(this.firestore, `estudiante/${ci}/${nivel}/${codigo}`);
-          await setDoc(ref, {
-            nota1: nota,
-            nombre: nombre
-          });
-          console.log(`Guardado ${codigo}: nota=${nota}, nombre=${nombre}`);
+        if (!isNaN(valor )) {
+          let ref;
+          let data: any = {};
+          if (codigo === 'ordenMerito') {
+            ref = doc(this.firestore, `estudiante/${ci}/${nivel}/ordenMerito`);
+            data = { orden: valor };
+          } else if (codigo === 'ordenTotal') {
+            ref = doc(this.firestore, `estudiante/${ci}/${nivel}/ordenMerito`);
+            data = { total: valor };
+          } else if (codigo === 'gestionAvanzado') {
+            ref = doc(this.firestore, `estudiante/${ci}/${nivel}/gestionAvanzado`);
+            data = { gestion: valor };
+          } else {
+            ref = doc(this.firestore, `estudiante/${ci}/${nivel}/${codigo}`);
+            data = {
+              nota1: valor,
+              nombre: nombre
+            };
+          }
+          await setDoc(ref, data, { merge: true });
+          // const ref = doc(this.firestore, `estudiante/${ci}/${nivel}/${codigo}`);
+          // await setDoc(ref, {
+          //   nota1: nota,
+          //   nombre: nombre
+          // });
+          console.log(`Guardado ${codigo}:`, data);
         } else {
           console.warn(`Nota inválida para ${codigo}`);
         }
@@ -246,13 +274,18 @@ export class CargadoComponent implements OnInit, OnDestroy {
   }
 
   async obtenerNotas() {
+    const extras = ['promedioDisciplina', 'promedioFisico', 'ordenMerito', 'ordenTotal', 'gestionAvanzado'];
     this.cargandoNotas = true;
     try {
       const notas = await this.estudianteService.obtenerNotas(this.estudiante.id, this.nivelSeleccionado);
       this.notasRegistradas = {};
       console.log(notas);
       for (const codigo in notas) {
-        this.notasRegistradas[codigo] = notas[codigo]?.nota ?? null;
+        if(extras.includes(codigo) ){
+          this.notasRegistradas[codigo] = notas[codigo] ?? null;
+        }else{
+          this.notasRegistradas[codigo] = notas[codigo]?.nota ?? null;
+        }
       }
     } finally {
       this.cargandoNotas = false;
@@ -276,5 +309,11 @@ export class CargadoComponent implements OnInit, OnDestroy {
       input.value = '100';
     }
   }
+
+  debeValidarRango(codigo: string): boolean {
+    const excepciones = ['ordenTotal', 'ordenMerito', 'gestionAvanzado'];
+    return !excepciones.includes(codigo);
+  }
+
 
 }

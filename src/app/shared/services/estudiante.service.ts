@@ -89,8 +89,7 @@ export class EstudianteService {
           'TEC-PRS-01-05',
           'TEC-RGE-01-03',
           'TEC-TOA-01-01',
-          'TEC-TOV-01-06',
-          'promedioFisico'
+          'TEC-TOV-01-06'
         ],
         avanzado: [
           'BAS-ASI-01-02',
@@ -134,14 +133,16 @@ export class EstudianteService {
       const promedioFisicoSnap = await getDoc(doc(this.firestore, `estudiante/${ci}/${nivel}/promedioFisico`));
       const promedioDisciplinaSnap = await getDoc(doc(this.firestore, `estudiante/${ci}/${nivel}/promedioDisciplina`));
       // const ordenTotalSnap = await getDoc(doc(this.firestore, `estudiante/${ci}/${nivel}/ordenMerito`));
-
+      const gestionAvanzadoSnap = await getDoc(doc(this.firestore, `estudiante/${ci}/${nivel}/gestionAvanzado`));
+      const gestionBasicoSnap = await getDoc(doc(this.firestore, `estudiante/${ci}/${nivel}/gestionBasico`));
       // notas.notaPrimero = finalPrimeroSnap.exists() ? finalPrimeroSnap.data()?.['nota'] ?? null : null;
       // notas.notaSegundo = finalSegundoSnap.exists() ? finalSegundoSnap.data()?.['nota'] ?? null : null;
       notas.ordenMerito = ordenMeritoSnap.exists() ? ordenMeritoSnap.data()?.['orden'] ?? null : null;
       notas.ordenTotal = ordenMeritoSnap.exists() ? ordenMeritoSnap.data()?.['total'] ?? null : null;
       notas.promedioFisico = promedioFisicoSnap.exists() ? promedioFisicoSnap.data()?.['nota1'] ?? null : null;
       notas.promedioDisciplina = promedioDisciplinaSnap.exists() ? promedioDisciplinaSnap.data()?.['nota1'] ?? null : null;
-
+      notas.gestionAvanzado = gestionAvanzadoSnap.exists() ? gestionAvanzadoSnap.data()?.['gestion'] ?? null : null;
+      notas.gestionBasico = gestionBasicoSnap.exists() ? gestionBasicoSnap.data()?.['gestion'] ?? null : null;
       console.log("Notas:", notas);
       return notas;
 

@@ -48,7 +48,7 @@
     </div> -->
 
     <div class="notas" *ngIf="nivelSeleccionado === 'basico' && !cargandoNotas">
-      <table>
+      <table class="mat-elevation-z8 table">
         <thead>
           <tr>
             <th style="text-align: left;">Nº</th>
@@ -58,6 +58,24 @@
         </thead>
         <tbody>
           <tr *ngFor="let materia of materiasBasico; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ materia.nombre }}</td>
+            <td>{{ notasRegistradas[materia.codigo] ?? '—' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="notas" *ngIf="nivelSeleccionado === 'avanzado' && !cargandoNotas">
+      <table class="mat-elevation-z8 table">
+        <thead>
+          <tr>
+            <th style="text-align: left;">Nº</th>
+            <th style="text-align: left;">Unidad de Enseñanza</th>
+            <th style="text-align: left;">Nota</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let materia of materiasAvanzado; let i = index">
             <td>{{ i + 1 }}</td>
             <td>{{ materia.nombre }}</td>
             <td>{{ notasRegistradas[materia.codigo] ?? '—' }}</td>

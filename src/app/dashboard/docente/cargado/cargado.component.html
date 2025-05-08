@@ -224,8 +224,8 @@
               max="100"
               placeholder="Ingresa la nota"
               [value]="notasRegistradas[materia.codigo] ?? ''"
-              [disabled]="(notasRegistradas[materia.codigo] != null && notasRegistradas[materia.codigo]! >= 0 && notasRegistradas[materia.codigo]! <= 100) && !puedeEditarTodo"
-              (input)="validarRango($event)">
+              [disabled]="(notasRegistradas[materia.codigo] != null) && !puedeEditarTodo"
+              (input)="debeValidarRango(materia.codigo) && validarRango($event)">
             <mat-hint [id]="getHintId(materia.codigo)">
               {{ materia.nombre }}
             </mat-hint>

@@ -8,7 +8,7 @@
           matInput
           placeholder="CI A BUSCAR"
           [formControl]="ci"
-          (keydown.enter)="preventSubmit($event)"
+          (keydown.enter)="buscar(); $event.preventDefault()"
           />
           <button
             style="border-radius: 20px; margin: 10px;"
