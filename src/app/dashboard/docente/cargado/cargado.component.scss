@@ -88,6 +88,9 @@
   width: 100%;
   box-sizing: border-box;
 }
+  .logo{
+    max-width: 70px;
+  }
 .table {
   min-width: 80% !important;
 }
@@ -102,8 +105,9 @@
   // border-radius: 20px;
   color: white;
   display: flex;
+  align-items: center;
   // padding-left: 10px;
-  justify-content: center;
+  justify-content: space-around;
   font-size: 20px;
   box-sizing: border-box;
   span{

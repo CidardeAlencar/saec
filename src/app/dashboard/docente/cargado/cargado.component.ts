@@ -18,10 +18,11 @@ interface Option {
 
 
 import { MatIconModule } from '@angular/material/icon';
+import { AdminRoutingModule } from "../../admin/admin-routing.module";
 
 @Component({
   selector: 'app-cargado',
-  imports: [MatProgressSpinnerModule, MatInputModule, MatFormFieldModule, MatSelectModule, FormsModule, MatButtonModule, CommonModule, MatIconModule],
+  imports: [MatProgressSpinnerModule, MatInputModule, MatFormFieldModule, MatSelectModule, FormsModule, MatButtonModule, CommonModule, MatIconModule, AdminRoutingModule],
   templateUrl: './cargado.component.html',
   styleUrl: './cargado.component.scss'
 })
@@ -37,6 +38,18 @@ export class CargadoComponent implements OnInit, OnDestroy {
     { value: 'sextoSemestre', viewValue: 'Sexto Semestre' },
     { value: 'basico', viewValue: 'Básico' },
     { value: 'avanzado', viewValue: 'Avanzado' }
+  ];
+
+    pruebasFisicas = [
+    { codigo: 'EFM', nombre: 'Flexiones' },
+    { codigo: 'EFM', nombre: 'Abdominales' },
+    { codigo: 'EFM', nombre: 'Flexiones en barra' },
+    { codigo: 'EFM', nombre: 'Marcha rapida' },
+    { codigo: 'EFM', nombre: 'Ascenso a la cuerda' },
+    { codigo: 'EFM', nombre: 'Cruce de obstaculos' },
+    { codigo: 'EFM', nombre: 'Aerobica' },
+    { codigo: 'EFM', nombre: 'Natacion estilo crol' },
+    { codigo: 'EFM', nombre: 'Contextura Fisica' }
   ];
 
   materiasBasico = [
@@ -109,7 +122,9 @@ export class CargadoComponent implements OnInit, OnDestroy {
   notasRegistradas: { [codigo: string]: number | null } = {};
   estudiante: any = null;
   nivelSeleccionado: string = '';
+  nivelSeleccionado2: string = '';
   cargandoNotas: boolean = false;
+  cargandoNotas2: boolean = false;
   editarNotas: boolean = false;
   codigo1Generado = '';
   codigo2Generado = '';
@@ -318,10 +333,31 @@ export class CargadoComponent implements OnInit, OnDestroy {
     }
   }
 
+  async obtenerNotasFisico(){
+    this.cargandoNotas2 = true;
+    try {
+      // const notas = await this.estudianteService.obtenerNotas(this.estudiante.id, this.nivelSeleccionado);
+      // this.notasRegistradas = {};
+      // console.log(notas);
+      // for (const codigo in notas) {
+      //   if (codigo === 'promedioFisico') {
+      //     this.notasRegistradas[codigo] = notas[codigo]?.nota ?? null;
+      //   }
+      // }
+    } finally {
+      this.cargandoNotas2 = false;
+    }
+  }
+
   onNivelChange() {
     if (this.estudiante?.id && this.nivelSeleccionado) {
       this.obtenerNotas();
-      console.log("entra");
+    }
+  }
+
+  onNivelChangePhysicist() {
+    if (this.estudiante?.id && this.nivelSeleccionado) {
+      this.obtenerNotasFisico();
     }
   }
 

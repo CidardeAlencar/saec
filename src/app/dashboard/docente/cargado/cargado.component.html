@@ -1,9 +1,15 @@
 
 <div class="main">
   <div class="data">
+    <ng-container >
+      <img mat-card-image src="images/emte.png" alt="Escudo EMTE" class="logo">
+    </ng-container>
+    <ng-container>
       <span><b>GRADO:</b> {{ estudiante.grado || "No definido" }}</span>
+      <span><b>GENERO:</b> {{ estudiante.genero || "No definido" }}</span>
       <span><b>NOMBRES:</b> {{ estudiante.nombres || "No definido" }}</span>
       <span><b>APELLIDOS:</b> {{ estudiante.apPat || "No definido" }} {{ estudiante.apMat || "No definido" }}</span>
+    </ng-container>
   </div>
   <div style="display: flex; width: 100%; min-height: 600px;">
     <!-- Sidebar -->
@@ -154,7 +160,47 @@
           </div>
         </div>
         <div *ngSwitchCase="'fisico'">
-          <h2>Esta es la vista física</h2>
+          <div class="group">
+            <!-- <h2>Entrenamiento Fisico Militar</h2> -->
+            <mat-form-field class="nivel">
+              <mat-label>Seleccione el curso</mat-label>
+              <mat-select [(ngModel)]="nivelSeleccionado2" (selectionChange)="onNivelChangePhysicist()">
+                <mat-option *ngFor="let option of options.slice(0, 6)" [value]="option.value">
+                  {{ option.viewValue }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <div *ngIf="cargandoNotas2" class="loader-container">
+              <mat-spinner diameter="40"></mat-spinner>
+              <p style="font-weight: bold;">Cargando notas...</p>
+            </div>
+            <div class="notas" *ngIf="nivelSeleccionado2 != '' && !cargandoNotas2">
+              <ng-container *ngFor="let materia of pruebasFisicas">
+                <p>
+                  <mat-form-field appearance="outline">
+                    <mat-label>{{ materia.nombre }}</mat-label>
+                    <input
+                      [id]="getInputId(materia.codigo)"
+                      [value]="notasRegistradas[materia.codigo]"
+                      matInput
+                      type="number"
+                      min="0"
+                      max="100"
+                      placeholder="Ingresa el registro"
+                      [value]="notasRegistradas[materia.codigo] ?? ''"
+                      [disabled]="notasRegistradas[materia.codigo] != null && notasRegistradas[materia.codigo]! >= 0 && notasRegistradas[materia.codigo]! <= 100"
+                      (input)="validarRango($event)">
+                    <!-- <mat-hint [id]="getHintId(materia.codigo)">
+                      {{ materia.nombre }}
+                    </mat-hint> -->
+                    <!-- agregar boton de guardado y guardar en solo un documento toda las notas del semestre en fisico -->
+                  </mat-form-field>
+                </p>
+              </ng-container>
+            </div>
+
+          </div>
+
         </div>
         <div *ngSwitchCase="'disciplinario'">
           <h2>Esta es la vista disciplinario</h2>
