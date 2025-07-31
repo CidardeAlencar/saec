@@ -16,14 +16,18 @@ interface Option {
   viewValue: string;
 }
 
+
+import { MatIconModule } from '@angular/material/icon';
+
 @Component({
   selector: 'app-cargado',
-  imports: [MatProgressSpinnerModule, MatInputModule, MatFormFieldModule, MatSelectModule, FormsModule, MatButtonModule, CommonModule],
+  imports: [MatProgressSpinnerModule, MatInputModule, MatFormFieldModule, MatSelectModule, FormsModule, MatButtonModule, CommonModule, MatIconModule],
   templateUrl: './cargado.component.html',
   styleUrl: './cargado.component.scss'
 })
 
 export class CargadoComponent implements OnInit, OnDestroy {
+  vistaSeleccionada: string = 'academico';
   options: Option[] = [
     { value: 'primerSemestre', viewValue: 'Primer Semestre' },
     { value: 'segundoSemestre', viewValue: 'Segundo Semestre' },
@@ -59,6 +63,28 @@ export class CargadoComponent implements OnInit, OnDestroy {
     { codigo: 'gestionBasico', nombre: 'Gestión Basico' }
   ];
   materiasAvanzado = [
+    { codigo: 'BAS-ASI-01-02', nombre: 'Asignatura Militar I' },
+    { codigo: 'BAS-ASO-01-03', nombre: 'Asignatura Operativa' },
+    { codigo: 'BAS-ASP-01-01', nombre: 'Asignatura Profesional' },
+    { codigo: 'BAS-PICB-01-07', nombre: 'Plan Integral de Capacitación Básica' },
+    { codigo: 'COM-CPM-01-01', nombre: 'Comunicación para el Mando' },
+    { codigo: 'COM-SSU-01-02', nombre: 'Seguridad y Soporte de Unidades' },
+    { codigo: 'EJT-AEM-01-01', nombre: 'Ejercicio de Aplicación Militar' },
+    { codigo: 'PFD-EFM-01-01', nombre: 'Educación Física Militar' },
+    { codigo: 'TEC-BDG-01-06', nombre: 'Base de Datos Geográficos' },
+    { codigo: 'TEC-CTE-01-09', nombre: 'Cartografía Temática' },
+    { codigo: 'TEC-GPR-01-04', nombre: 'Gestión de Proyectos' },
+    { codigo: 'TEC-SCT-01-08', nombre: 'Sistemas de Control Topográfico' },
+    { codigo: 'TEC-TIN-01-07', nombre: 'Tecnología de Información' },
+    { codigo: 'TIT-TTE-01-01', nombre: 'Trabajo de Titulación' },
+    { codigo: 'promedioDisciplina', nombre: 'Promedio disciplina' },
+    { codigo: 'promedioFisico', nombre: 'Promedio fisico' },
+    { codigo: 'ordenMerito', nombre: 'Orden de Merito' },
+    { codigo: 'ordenTotal', nombre: 'Total Efectivo' },
+    { codigo: 'gestionAvanzado', nombre: 'Gestión Avanzado' }
+  ];
+
+  materiasPrimerSemestre = [
     { codigo: 'BAS-ASI-01-02', nombre: 'Asignatura Militar I' },
     { codigo: 'BAS-ASO-01-03', nombre: 'Asignatura Operativa' },
     { codigo: 'BAS-ASP-01-01', nombre: 'Asignatura Profesional' },

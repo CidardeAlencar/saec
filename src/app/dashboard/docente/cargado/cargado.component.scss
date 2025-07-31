@@ -1,11 +1,92 @@
+.sidebar-container {
+  width: 220px;
+  background: #587471;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 20px 0;
+  min-height: calc(100vh - 60px);
+  // height: 100%;
+  transition: width 0.3s;
+}
+
+.sidebar-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white !important;
+  height: 100px;
+  text-align: center;
+  padding: 28px 16px;
+  font-size: 22px;
+  background: none;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  width: 100%;
+  border-radius: 0;
+  transition: background 0.2s;
+}
+
+.sidebar-btn-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.sidebar-btn-content mat-icon {
+  font-size: 36px;
+  margin-bottom: 8px;
+  overflow: visible;
+}
+
+.sidebar-btn-text {
+  font-size: 16px;
+  font-weight: 500;
+  transition: opacity 0.3s;
+  padding-top: 10px;
+}
+
+.sidebar-btn.active,
+.sidebar-btn:hover {
+  background: #46605d;
+}
+
+/* Responsive para móviles */
+@media (max-width: 600px) {
+  .sidebar-container {
+    width: 70px;
+    padding: 10px 0;
+  }
+
+  .sidebar-btn {
+    padding: 18px 0;
+    font-size: 0;
+  }
+
+  .sidebar-btn-content mat-icon {
+    font-size: 28px;
+    margin-bottom: 0;
+  }
+
+  .sidebar-btn-text {
+    display: none;
+  }
+}
+
 .main{
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
   background-color: var(--color-background-light);
-
+  width: 100%;
+  box-sizing: border-box;
 }
 .table {
   min-width: 80% !important;
@@ -13,7 +94,7 @@
 .data{
   background-color: #587471;
   width: 100%;
-  margin-bottom: 50px;
+  // margin-bottom: 50px;
   padding: 40px;
   // font-weight: bold;
   font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -32,7 +113,7 @@
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: center;
-    width: 80%;
+    width: 100%;
     span {
       padding-left: 0;
       margin-top: 10px;
