@@ -16,6 +16,13 @@ interface Option {
   viewValue: string;
 }
 
+interface TablaFlexiones {
+  [nota: number]: {
+    "3ER_AM": number;
+    "2DO_AM": number;
+    "1ER_AM": number;
+  };
+}
 
 import { MatIconModule } from '@angular/material/icon';
 import { AdminRoutingModule } from "../../admin/admin-routing.module";
@@ -39,6 +46,114 @@ export class CargadoComponent implements OnInit, OnDestroy {
     { value: 'basico', viewValue: 'Básico' },
     { value: 'avanzado', viewValue: 'Avanzado' }
   ];
+
+  tablaFlexionesM: TablaFlexiones = {
+    100: { "3ER_AM": 69, "2DO_AM": 68, "1ER_AM": 67 },
+    98:  { "3ER_AM": 68, "2DO_AM": 67, "1ER_AM": 66 },
+    96:  { "3ER_AM": 67, "2DO_AM": 66, "1ER_AM": 65 },
+    94:  { "3ER_AM": 66, "2DO_AM": 65, "1ER_AM": 64 },
+    92:  { "3ER_AM": 65, "2DO_AM": 64, "1ER_AM": 63 },
+    90:  { "3ER_AM": 64, "2DO_AM": 63, "1ER_AM": 62 },
+    88:  { "3ER_AM": 63, "2DO_AM": 62, "1ER_AM": 61 },
+    86:  { "3ER_AM": 62, "2DO_AM": 61, "1ER_AM": 60 },
+    84:  { "3ER_AM": 61, "2DO_AM": 60, "1ER_AM": 59 },
+    82:  { "3ER_AM": 60, "2DO_AM": 59, "1ER_AM": 58 },
+    80:  { "3ER_AM": 59, "2DO_AM": 58, "1ER_AM": 57 },
+    78:  { "3ER_AM": 58, "2DO_AM": 57, "1ER_AM": 56 },
+    76:  { "3ER_AM": 57, "2DO_AM": 56, "1ER_AM": 55 },
+    74:  { "3ER_AM": 56, "2DO_AM": 55, "1ER_AM": 54 },
+    72:  { "3ER_AM": 55, "2DO_AM": 54, "1ER_AM": 53 },
+    70:  { "3ER_AM": 54, "2DO_AM": 53, "1ER_AM": 52 },
+    68:  { "3ER_AM": 53, "2DO_AM": 52, "1ER_AM": 51 },
+    66:  { "3ER_AM": 52, "2DO_AM": 51, "1ER_AM": 50 },
+    64:  { "3ER_AM": 51, "2DO_AM": 50, "1ER_AM": 49 },
+    62:  { "3ER_AM": 50, "2DO_AM": 49, "1ER_AM": 48 },
+    60:  { "3ER_AM": 49, "2DO_AM": 48, "1ER_AM": 47 },
+    58:  { "3ER_AM": 48, "2DO_AM": 47, "1ER_AM": 46 },
+    56:  { "3ER_AM": 47, "2DO_AM": 46, "1ER_AM": 45 },
+    54:  { "3ER_AM": 46, "2DO_AM": 45, "1ER_AM": 44 },
+    52:  { "3ER_AM": 45, "2DO_AM": 44, "1ER_AM": 43 },
+    50:  { "3ER_AM": 44, "2DO_AM": 43, "1ER_AM": 42 },
+    48:  { "3ER_AM": 43, "2DO_AM": 42, "1ER_AM": 41 },
+    46:  { "3ER_AM": 42, "2DO_AM": 41, "1ER_AM": 40 },
+    44:  { "3ER_AM": 41, "2DO_AM": 40, "1ER_AM": 38 },
+    42:  { "3ER_AM": 40, "2DO_AM": 38, "1ER_AM": 36 },
+    40:  { "3ER_AM": 38, "2DO_AM": 36, "1ER_AM": 34 },
+    38:  { "3ER_AM": 36, "2DO_AM": 34, "1ER_AM": 32 },
+    36:  { "3ER_AM": 34, "2DO_AM": 32, "1ER_AM": 30 },
+    34:  { "3ER_AM": 32, "2DO_AM": 30, "1ER_AM": 28 },
+    32:  { "3ER_AM": 30, "2DO_AM": 28, "1ER_AM": 26 },
+    30:  { "3ER_AM": 28, "2DO_AM": 26, "1ER_AM": 24 },
+    28:  { "3ER_AM": 26, "2DO_AM": 24, "1ER_AM": 22 },
+    26:  { "3ER_AM": 24, "2DO_AM": 22, "1ER_AM": 20 },
+    24:  { "3ER_AM": 22, "2DO_AM": 20, "1ER_AM": 18 },
+    22:  { "3ER_AM": 20, "2DO_AM": 18, "1ER_AM": 16 },
+    20:  { "3ER_AM": 18, "2DO_AM": 16, "1ER_AM": 14 },
+    18:  { "3ER_AM": 16, "2DO_AM": 14, "1ER_AM": 12 },
+    16:  { "3ER_AM": 14, "2DO_AM": 12, "1ER_AM": 10 },
+    14:  { "3ER_AM": 12, "2DO_AM": 10, "1ER_AM": 9 },
+    12:  { "3ER_AM": 10, "2DO_AM": 9,  "1ER_AM": 8 },
+    10:  { "3ER_AM": 9,  "2DO_AM": 8,  "1ER_AM": 7 },
+    8:   { "3ER_AM": 8,  "2DO_AM": 7,  "1ER_AM": 6 },
+    6:   { "3ER_AM": 7,  "2DO_AM": 6,  "1ER_AM": 5 },
+    4:   { "3ER_AM": 6,  "2DO_AM": 5,  "1ER_AM": 4 },
+    2:   { "3ER_AM": 5,  "2DO_AM": 4,  "1ER_AM": 3 },
+    0:   { "3ER_AM": 0,  "2DO_AM": 0,  "1ER_AM": 0 }
+  };
+
+  tablaFlexionesF: TablaFlexiones = {
+    100: { "3ER_AM": 69, "2DO_AM": 68, "1ER_AM": 67 },
+    98:  { "3ER_AM": 68, "2DO_AM": 67, "1ER_AM": 66 },
+    96:  { "3ER_AM": 67, "2DO_AM": 66, "1ER_AM": 65 },
+    94:  { "3ER_AM": 66, "2DO_AM": 65, "1ER_AM": 64 },
+    92:  { "3ER_AM": 65, "2DO_AM": 64, "1ER_AM": 63 },
+    90:  { "3ER_AM": 64, "2DO_AM": 63, "1ER_AM": 62 },
+    88:  { "3ER_AM": 63, "2DO_AM": 62, "1ER_AM": 61 },
+    86:  { "3ER_AM": 62, "2DO_AM": 61, "1ER_AM": 60 },
+    84:  { "3ER_AM": 61, "2DO_AM": 60, "1ER_AM": 59 },
+    82:  { "3ER_AM": 60, "2DO_AM": 59, "1ER_AM": 58 },
+    80:  { "3ER_AM": 59, "2DO_AM": 58, "1ER_AM": 57 },
+    78:  { "3ER_AM": 58, "2DO_AM": 57, "1ER_AM": 56 },
+    76:  { "3ER_AM": 57, "2DO_AM": 56, "1ER_AM": 55 },
+    74:  { "3ER_AM": 56, "2DO_AM": 55, "1ER_AM": 54 },
+    72:  { "3ER_AM": 55, "2DO_AM": 54, "1ER_AM": 53 },
+    70:  { "3ER_AM": 54, "2DO_AM": 53, "1ER_AM": 52 },
+    68:  { "3ER_AM": 53, "2DO_AM": 52, "1ER_AM": 51 },
+    66:  { "3ER_AM": 52, "2DO_AM": 51, "1ER_AM": 50 },
+    64:  { "3ER_AM": 51, "2DO_AM": 50, "1ER_AM": 49 },
+    62:  { "3ER_AM": 50, "2DO_AM": 49, "1ER_AM": 48 },
+    60:  { "3ER_AM": 49, "2DO_AM": 48, "1ER_AM": 47 },
+    58:  { "3ER_AM": 48, "2DO_AM": 47, "1ER_AM": 46 },
+    56:  { "3ER_AM": 47, "2DO_AM": 46, "1ER_AM": 45 },
+    54:  { "3ER_AM": 46, "2DO_AM": 45, "1ER_AM": 44 },
+    52:  { "3ER_AM": 45, "2DO_AM": 44, "1ER_AM": 43 },
+    50:  { "3ER_AM": 44, "2DO_AM": 43, "1ER_AM": 42 },
+    48:  { "3ER_AM": 43, "2DO_AM": 42, "1ER_AM": 41 },
+    46:  { "3ER_AM": 42, "2DO_AM": 41, "1ER_AM": 40 },
+    44:  { "3ER_AM": 41, "2DO_AM": 40, "1ER_AM": 39 },
+    42:  { "3ER_AM": 40, "2DO_AM": 39, "1ER_AM": 38 },
+    40:  { "3ER_AM": 38, "2DO_AM": 36, "1ER_AM": 34 },
+    38:  { "3ER_AM": 36, "2DO_AM": 34, "1ER_AM": 32 },
+    36:  { "3ER_AM": 34, "2DO_AM": 32, "1ER_AM": 30 },
+    34:  { "3ER_AM": 32, "2DO_AM": 30, "1ER_AM": 28 },
+    32:  { "3ER_AM": 30, "2DO_AM": 28, "1ER_AM": 26 },
+    30:  { "3ER_AM": 28, "2DO_AM": 26, "1ER_AM": 24 },
+    28:  { "3ER_AM": 26, "2DO_AM": 24, "1ER_AM": 22 },
+    26:  { "3ER_AM": 24, "2DO_AM": 22, "1ER_AM": 20 },
+    24:  { "3ER_AM": 22, "2DO_AM": 20, "1ER_AM": 18 },
+    22:  { "3ER_AM": 20, "2DO_AM": 18, "1ER_AM": 16 },
+    20:  { "3ER_AM": 18, "2DO_AM": 16, "1ER_AM": 14 },
+    18:  { "3ER_AM": 16, "2DO_AM": 14, "1ER_AM": 12 },
+    16:  { "3ER_AM": 14, "2DO_AM": 12, "1ER_AM": 10 },
+    14:  { "3ER_AM": 12, "2DO_AM": 10, "1ER_AM": 9 },
+    12:  { "3ER_AM": 10, "2DO_AM": 9,  "1ER_AM": 8 },
+    10:  { "3ER_AM": 9,  "2DO_AM": 8,  "1ER_AM": 7 },
+    8:   { "3ER_AM": 7,  "2DO_AM": 6,  "1ER_AM": 5 },
+    6:   { "3ER_AM": 5,  "2DO_AM": 4,  "1ER_AM": 3 },
+    4:   { "3ER_AM": 3,  "2DO_AM": 2,  "1ER_AM": 1 },
+    2:   { "3ER_AM": 1,  "2DO_AM": 0,  "1ER_AM": 0 },
+    0:   { "3ER_AM": 0,  "2DO_AM": 0,  "1ER_AM": 0 }
+  };
 
     pruebasFisicas = [
     { codigo: 'EFM', nombre: 'Flexiones' },
@@ -146,6 +261,35 @@ export class CargadoComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     // this.subscription.unsubscribe();
   }
+
+  calcularNotaFlexiones(repeticiones: number, grado: string, genero: string): number {
+  let tabla: TablaFlexiones;
+
+  const gradosValidos = ["3ER_AM", "2DO_AM", "1ER_AM"] as const;
+
+  if (!gradosValidos.includes(grado as any)) {
+    console.warn("Grado inválido:", grado);
+    return 0;
+  }
+
+  if (genero === 'Masculino') {
+    tabla = this.tablaFlexionesM;
+  } else if (genero === 'Femenino') {
+    tabla = this.tablaFlexionesF; // Asegúrate de tener esta tabla también
+  } else {
+    console.warn("Género no reconocido:", genero);
+    return 0;
+  }
+
+  for (let nota = 100; nota >= 0; nota--) {
+    const valorRequerido = tabla[nota]?.[grado as typeof gradosValidos[number]];
+    if (valorRequerido !== undefined && repeticiones >= valorRequerido) {
+      return nota;
+    }
+  }
+
+  return 0; // No alcanzó ningún valor mínimo
+}
 
   edit(){
     if (!this.estudiante?.id || !this.nivelSeleccionado) {
@@ -314,6 +458,89 @@ export class CargadoComponent implements OnInit, OnDestroy {
     });
   }
 
+async savePhysicist() {
+  if (!this.estudiante?.id || !this.nivelSeleccionado2) {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Faltan datos',
+      text: 'Debes seleccionar un nivel antes de continuar.'
+    });
+    return;
+  }
+
+  const ci = this.estudiante.id;
+  const nivel = this.nivelSeleccionado2;
+  let gradoStudent = this.estudiante.grado;
+  // const grado = nivel.toUpperCase() as '3ER_AM' | '2DO_AM' | '1ER_AM';
+  let grado: '1ER_AM' | '2DO_AM' | '3ER_AM';
+
+  switch (gradoStudent) {
+    case 'Al. 1er. AM.':
+      grado = '1ER_AM';
+      break;
+    case 'Al. 2do. AM.':
+      grado = '2DO_AM';
+      break;
+    case 'Al. 3er. AM.':
+      grado = '3ER_AM';
+      break;
+    default:
+      console.warn('Nivel no reconocido:', nivel);
+      return;
+  }
+
+  const genero = this.estudiante.genero as 'Masculino' | 'Femenino';
+
+  const datosEFM: any = {};
+
+  for (const materia of this.pruebasFisicas) {
+    const nombre = materia.nombre;
+    const inputId = `nota_${nombre.replace(/\s+/g, '_')}`;
+    const inputEl = document.getElementById(inputId) as HTMLInputElement;
+
+    if (!inputEl) {
+      console.warn(`Input no encontrado para ${nombre}`);
+      continue;
+    }
+
+    const valor = parseFloat(inputEl.value);
+    if (isNaN(valor)) {
+      console.warn(`Valor inválido para ${nombre}`);
+      continue;
+    }
+
+    if (nombre.toLowerCase().includes('flexiones')) {
+      datosEFM[nombre] = this.calcularNotaFlexiones(valor, grado, genero);
+    } else {
+      datosEFM[nombre] = valor; // otras pruebas aún sin lógica personalizada
+    }
+  }
+
+  try {
+    const ref = doc(this.firestore, `estudiante/${ci}/${nivel}/EFM`);
+    await setDoc(ref, datosEFM, { merge: true });
+
+    Swal.fire({
+      icon: 'success',
+      title: '¡Éxito!',
+      text: 'Pruebas físicas guardadas correctamente.',
+      timer: 2000,
+      showConfirmButton: false
+    });
+
+    this.nivelSeleccionado2 = '';
+    this.puedeEditarTodo = false;
+  } catch (error) {
+    console.error('Error al guardar pruebas físicas:', error);
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'Hubo un problema al guardar las pruebas físicas.'
+    });
+  }
+}
+
+
   async obtenerNotas() {
     const extras = ['promedioDisciplina', 'promedioFisico', 'ordenMerito', 'ordenTotal', 'gestionAvanzado'];
     this.cargandoNotas = true;
@@ -333,17 +560,30 @@ export class CargadoComponent implements OnInit, OnDestroy {
     }
   }
 
-  async obtenerNotasFisico(){
-    this.cargandoNotas2 = true;
-    try {
-      // const notas = await this.estudianteService.obtenerNotas(this.estudiante.id, this.nivelSeleccionado);
-      // this.notasRegistradas = {};
-      // console.log(notas);
-      // for (const codigo in notas) {
-      //   if (codigo === 'promedioFisico') {
-      //     this.notasRegistradas[codigo] = notas[codigo]?.nota ?? null;
-      //   }
-      // }
+async obtenerNotasFisico() {
+  this.cargandoNotas2 = true;
+
+  try {
+    if (!this.estudiante?.id || !this.nivelSeleccionado2) {
+      console.warn("Faltan datos para obtener notas físicas.");
+      return;
+    }
+
+    const datos = await this.estudianteService.obtenerNotasFisicas(
+      this.estudiante.id,
+      this.nivelSeleccionado2
+    );
+
+    this.notasRegistradas = {};
+
+    for (const prueba of this.pruebasFisicas) {
+      const nombre = prueba.nombre;
+      this.notasRegistradas[nombre] = datos[nombre] ?? null;
+    }
+    console.log("Notas físicas obtenidas:", this.notasRegistradas);
+    } catch (error) {
+      console.error("Error al procesar notas físicas:", error);
+      this.notasRegistradas = {};
     } finally {
       this.cargandoNotas2 = false;
     }
@@ -356,7 +596,7 @@ export class CargadoComponent implements OnInit, OnDestroy {
   }
 
   onNivelChangePhysicist() {
-    if (this.estudiante?.id && this.nivelSeleccionado) {
+    if (this.estudiante?.id && this.nivelSeleccionado2) {
       this.obtenerNotasFisico();
     }
   }

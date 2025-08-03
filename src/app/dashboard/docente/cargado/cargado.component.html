@@ -176,29 +176,41 @@
             </div>
             <div class="notas" *ngIf="nivelSeleccionado2 != '' && !cargandoNotas2">
               <ng-container *ngFor="let materia of pruebasFisicas">
-                <p>
+                <!-- <p> -->
                   <mat-form-field appearance="outline">
                     <mat-label>{{ materia.nombre }}</mat-label>
                     <input
-                      [id]="getInputId(materia.codigo)"
-                      [value]="notasRegistradas[materia.codigo]"
+                      [id]="'nota_' + materia.nombre.split(' ').join('_')"
                       matInput
                       type="number"
                       min="0"
                       max="100"
                       placeholder="Ingresa el registro"
-                      [value]="notasRegistradas[materia.codigo] ?? ''"
-                      [disabled]="notasRegistradas[materia.codigo] != null && notasRegistradas[materia.codigo]! >= 0 && notasRegistradas[materia.codigo]! <= 100"
+                      [value]="notasRegistradas[materia.nombre] ?? ''"
+                      [disabled]="notasRegistradas[materia.nombre] != null && notasRegistradas[materia.nombre]! >= 0 && notasRegistradas[materia.nombre]! <= 100"
                       (input)="validarRango($event)">
                     <!-- <mat-hint [id]="getHintId(materia.codigo)">
                       {{ materia.nombre }}
                     </mat-hint> -->
                     <!-- agregar boton de guardado y guardar en solo un documento toda las notas del semestre en fisico -->
                   </mat-form-field>
-                </p>
+                <!-- </p> -->
               </ng-container>
             </div>
-
+            <div class="buttons">
+              <button
+                mat-raised-button
+                class="button-primary"
+                (click)="savePhysicist()">
+                GUARDAR
+              </button>
+              <!-- <button
+                mat-raised-button
+                class="button-primary"
+                (click)="edit()">
+                EDITAR
+              </button> -->
+            </div>
           </div>
 
         </div>

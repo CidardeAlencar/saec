@@ -69,6 +69,24 @@ export class EstudianteService {
       return null;
     }
   }
+  async obtenerNotasFisicas(ci: string, nivel: string): Promise<any> {
+  try {
+    const ref = doc(this.firestore, `estudiante/${ci}/${nivel}/EFM`);
+    const snap = await getDoc(ref);
+
+    if (snap.exists()) {
+      const datos = snap.data();
+      console.log("Datos físicos obtenidos:", datos);
+      return datos;
+    } else {
+      console.log("No existen datos físicos en EFM.");
+      return {};
+    }
+  } catch (error) {
+    console.error("Error al obtener notas físicas:", error);
+    return {};
+  }
+}
 
   async obtenerNotas(ci: string, nivel: string) {
     try {

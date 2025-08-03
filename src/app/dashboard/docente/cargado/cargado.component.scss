@@ -265,9 +265,13 @@ table.table th {
 .notas{
   display: flex;
   flex-wrap: wrap;
-  padding: 30px;
+  padding: 20px;
   justify-content: center;
   gap: 10px;
+  background-color: #f7f9fa; // tono suave de fondo
+  border-radius: 10px;
+  width: 60%;
+  margin-bottom: 20px;
 }
 
 .validar{
