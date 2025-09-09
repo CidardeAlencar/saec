@@ -3,6 +3,7 @@
     width: 600px;
     background-color: white;
     padding: 20px;
+    margin: 20px;
     border-radius: 20px;
     display: flex;
     flex-direction: column;
@@ -22,7 +23,8 @@
     }
   }
   background-color: var(--color-secondary);
-  height: 100vh;
+  min-height: 100vh;
+
   display: flex;
   flex-direction: column;
   justify-content: center;
