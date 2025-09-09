@@ -8,7 +8,7 @@
         <mat-label>C.I.</mat-label>
         <input
           matInput
-          placeholder="6147015"
+          placeholder="Ingresa tu C.I."
           [formControl]="ci"
           (keydown.enter)="preventSubmit($event)"
           />
@@ -17,7 +17,7 @@
         <mat-label>Nombres</mat-label>
         <input
           matInput
-          placeholder="Ruddy Gerardo"
+          placeholder="Ingresa tu nombre"
           [formControl]="nombres"
           (keydown.enter)="preventSubmit($event)"
           />
@@ -36,7 +36,7 @@
         <mat-label>Apellido paterno</mat-label>
         <input
           matInput
-          placeholder="Flores"
+          placeholder="Ingresa tu apellido paterno"
           [formControl]="apellidoPaterno"
           (keydown.enter)="preventSubmit($event)"
           />
@@ -45,7 +45,7 @@
         <mat-label>Apellido materno</mat-label>
         <input
           matInput
-          placeholder="Herrera"
+          placeholder="Ingresa tu apellido materno"
           [formControl]="apellidoMaterno"
           (keydown.enter)="preventSubmit($event)"
           />
@@ -81,10 +81,17 @@
         </mat-select>
       </mat-form-field>
       <mat-form-field appearance="outline">
+        <mat-label>Genero</mat-label>
+        <mat-select [formControl]="genero">
+          <mat-option value="Masculino">Masculino</mat-option>
+          <mat-option value="Femenino">Femenino</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
         <mat-label>Correo electronico</mat-label>
         <input
           matInput
-          placeholder="ninjaneja@gmail.com"
+          placeholder="Ingresa tu correo"
           [formControl]="correo"
           (keydown.enter)="preventSubmit($event)"
           />
@@ -93,7 +100,7 @@
         <mat-label>Contraseña</mat-label>
         <input
           matInput
-          placeholder="1234pdPD"
+          placeholder="Ingresa tu contraseña"
           [formControl]="contrasena"
           (keydown.enter)="preventSubmit($event)"
           />

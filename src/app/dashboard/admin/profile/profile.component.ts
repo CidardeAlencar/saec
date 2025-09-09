@@ -21,6 +21,7 @@ export class ProfileComponent {
   apellidoMaterno = new FormControl('', [Validators.required]);
   celular = new FormControl('', [Validators.required]);
   grado = new FormControl('', [Validators.required]);
+  genero = new FormControl('', [Validators.required]);
   correo = new FormControl('', [Validators.required, Validators.email]);
   contrasena = new FormControl('', [Validators.required, Validators.minLength(6)]);
 
@@ -60,6 +61,7 @@ export class ProfileComponent {
         this.apellidoMaterno.invalid ||
         this.celular.invalid ||
         this.grado.invalid ||
+        this.genero.invalid ||
         this.correo.invalid ||
         this.contrasena.invalid
       );
@@ -72,6 +74,7 @@ export class ProfileComponent {
       this.apellidoMaterno.reset();
       this.celular.reset();
       this.grado.reset();
+      this.genero.reset();
       this.correo.reset();
       this.contrasena.reset();
     }
@@ -102,6 +105,7 @@ export class ProfileComponent {
             apMat: this.apellidoMaterno.value,
             celular: this.celular.value,
             grado: this.grado.value,
+            genero: this.genero.value,
             email: this.correo.value,
             contrasenia: this.contrasena.value,
             uid: uid

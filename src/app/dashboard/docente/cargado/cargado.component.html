@@ -1,586 +1,339 @@
-<div class="main">
 
+<div class="main">
   <div class="data">
-    <!-- <div style="margin-right: 20px;"> -->
+    <ng-container >
+      <img mat-card-image src="images/emte.png" alt="Escudo EMTE" class="logo">
+    </ng-container>
+    <ng-container>
       <span><b>GRADO:</b> {{ estudiante.grado || "No definido" }}</span>
+      <span><b>GENERO:</b> {{ estudiante.genero || "No definido" }}</span>
       <span><b>NOMBRES:</b> {{ estudiante.nombres || "No definido" }}</span>
       <span><b>APELLIDOS:</b> {{ estudiante.apPat || "No definido" }} {{ estudiante.apMat || "No definido" }}</span>
-      <!-- <span><b>GESTIÓN:</b> {{fechaHoy.getFullYear()}}</span> -->
-      <!-- <h2>CURSO:</h2> -->
-    <!-- </div> -->
-    <!-- <div>
-      <p>{{ estudiante.grado || "No definido" }}</p>
-      <p>{{ estudiante.nombres || "No definido" }}</p>
-      <p>{{ estudiante.apMat || "No definido" }}</p>
-      <p>2025</p>
-    </div> -->
+    </ng-container>
   </div>
-  <div class="group">
+  <div style="display: flex; width: 100%; min-height: 600px;">
+    <!-- Sidebar -->
+    <div class="sidebar-container">
+      <button mat-button class="sidebar-btn" [ngClass]="{active: vistaSeleccionada === 'academico'}" (click)="vistaSeleccionada = 'academico'">
+        <span class="sidebar-btn-content">
+          <mat-icon>school</mat-icon>
+          <span class="sidebar-btn-text">Académico</span>
+        </span>
+      </button>
+      <button mat-button class="sidebar-btn" [ngClass]="{active: vistaSeleccionada === 'fisico'}" (click)="vistaSeleccionada = 'fisico'">
+        <span class="sidebar-btn-content">
+          <mat-icon>fitness_center</mat-icon>
+          <span class="sidebar-btn-text">Físico</span>
+        </span>
+      </button>
+      <button mat-button class="sidebar-btn" [ngClass]="{active: vistaSeleccionada === 'disciplinario'}" (click)="vistaSeleccionada = 'disciplinario'">
+        <span class="sidebar-btn-content">
+          <mat-icon>gavel</mat-icon>
+          <span class="sidebar-btn-text">Disciplinario</span>
+        </span>
+      </button>
+    </div>
+    <!-- Contenido principal -->
+    <div style="flex: 1; padding: 30px 0;">
+      <ng-container [ngSwitch]="vistaSeleccionada">
+        <div *ngSwitchCase="'academico'">
+          <!-- ...existing code... -->
+          <div class="group">
+            <mat-form-field class="nivel">
+              <mat-label>Seleccione el curso</mat-label>
+              <mat-select [(ngModel)]="nivelSeleccionado" (selectionChange)="onNivelChange()">
+                <mat-option *ngFor="let option of options" [value]="option.value">
+                  {{ option.viewValue }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <div *ngIf="cargandoNotas" class="loader-container">
+              <mat-spinner diameter="40"></mat-spinner>
+              <p style="font-weight: bold;">Cargando notas...</p>
+            </div>
+            <!-- ...existing code for notas, buttons, validar... -->
+            <div class="notas" *ngIf="nivelSeleccionado === 'basico' && !cargandoNotas">
+              <ng-container *ngFor="let materia of materiasBasico">
+                <p>
+                  <mat-form-field appearance="outline">
+                    <mat-label>{{ materia.codigo }}</mat-label>
+                    <input
+                      [id]="getInputId(materia.codigo)"
+                      [value]="notasRegistradas[materia.codigo]"
+                      matInput
+                      type="number"
+                      min="0"
+                      max="100"
+                      placeholder="Ingresa la nota"
+                      [value]="notasRegistradas[materia.codigo] ?? ''"
+                      [disabled]="notasRegistradas[materia.codigo] != null && notasRegistradas[materia.codigo]! >= 0 && notasRegistradas[materia.codigo]! <= 100"
+                      (input)="validarRango($event, materia.nombre)">
+                    <mat-hint [id]="getHintId(materia.codigo)">
+                      {{ materia.nombre }}
+                    </mat-hint>
+                  </mat-form-field>
+                </p>
+              </ng-container>
+            </div>
+            <div class="notas" *ngIf="nivelSeleccionado === 'avanzado' && !cargandoNotas">
+              <ng-container *ngFor="let materia of materiasAvanzado">
+                <p>
+                  <mat-form-field appearance="outline">
+                    <mat-label>{{ materia.codigo }}</mat-label>
+                    <input
+                      [id]="getInputId(materia.codigo)"
+                      matInput
+                      type="number"
+                      min="0"
+                      max="100"
+                      placeholder="Ingresa la nota"
+                      [value]="notasRegistradas[materia.codigo] ?? ''"
+                      [disabled]="(notasRegistradas[materia.codigo] != null) && !puedeEditarTodo"
+                      (input)="debeValidarRango(materia.codigo) && validarRango($event, materia.nombre)">
+                    <mat-hint [id]="getHintId(materia.codigo)">
+                      {{ materia.nombre }}
+                    </mat-hint>
+                  </mat-form-field>
+                </p>
+              </ng-container>
+            </div>
+            <div class="notas" *ngIf="nivelSeleccionado === 'primerSemestre' && !cargandoNotas">
+              <ng-container *ngFor="let materia of materiasPrimerSemestre">
+                <p>
+                  <mat-form-field appearance="outline">
+                    <mat-label>{{ materia.codigo }}</mat-label>
+                    <input
+                      [id]="getInputId(materia.codigo)"
+                      matInput
+                      type="number"
+                      min="0"
+                      max="100"
+                      placeholder="Ingresa la nota"
+                      [value]="notasRegistradas[materia.codigo] ?? ''"
+                      [disabled]="(notasRegistradas[materia.codigo] != null) && !puedeEditarTodo"
+                      (input)="debeValidarRango(materia.codigo) && validarRango($event, materia.nombre)">
+                    <mat-hint [id]="getHintId(materia.codigo)">
+                      {{ materia.nombre }}
+                    </mat-hint>
+                  </mat-form-field>
+                </p>
+              </ng-container>
+            </div>
+            <div class="notas" *ngIf="nivelSeleccionado === 'segundoSemestre'">
+              <!-- ...existing code for segundoSemestre... -->
+              <p>
+                <mat-form-field appearance="outline">
+                  <mat-label>FOR-FC-02-02</mat-label>
+                  <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
+                  <mat-hint>Formación Complementaria III</mat-hint>
+                </mat-form-field>
+              </p>
+              <!-- ...other materias... -->
+            </div>
+            <div class="buttons">
+              <button
+                mat-raised-button
+                class="button-primary"
+                (click)="save()">
+                GUARDAR
+              </button>
+              <button
+                mat-raised-button
+                class="button-primary"
+                (click)="edit()">
+                EDITAR
+              </button>
+            </div>
+            <div class="validar" *ngIf="editarNotas">
+              <mat-form-field>
+                <mat-label>Codigo 1</mat-label>
+                <input matInput [(ngModel)]="codigo1Ingresado">
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Codigo 2</mat-label>
+                <input matInput [(ngModel)]="codigo2Ingresado">
+              </mat-form-field>
+              <button mat-raised-button class="button-primary" (click)="editEnable()">
+                VALIDAR
+              </button>
+            </div>
+          </div>
+        </div>
+        <div *ngSwitchCase="'fisico'">
+          <div class="group">
+            <!-- <h2>Entrenamiento Fisico Militar</h2> -->
+            <mat-form-field class="nivel">
+              <mat-label>Seleccione el curso</mat-label>
+              <mat-select [(ngModel)]="nivelSeleccionado2" (selectionChange)="onNivelChangePhysicist()">
+                <mat-option *ngFor="let option of options.slice(0, 6)" [value]="option.value">
+                  {{ option.viewValue }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <div *ngIf="cargandoNotas2" class="loader-container">
+              <mat-spinner diameter="40"></mat-spinner>
+              <p style="font-weight: bold;">Cargando notas...</p>
+            </div>
+            <div class="notas" *ngIf="nivelSeleccionado2 != '' && !cargandoNotas2">
+              <ng-container *ngFor="let materia of pruebasFisicas">
+                <!-- <p> -->
+                  <mat-form-field appearance="outline">
+                    <mat-label>{{ materia.nombre }}</mat-label>
+                    <input
+                      [id]="'nota_' + materia.nombre.split(' ').join('_')"
+                      matInput
+                      [type]="materia.nombre === 'Marcha rapida' ? 'text' : 'number'"
+                      [placeholder]="materia.nombre === 'Marcha rapida' ? 'HH:mm:ss' : 'Ingresa el registro'"
 
-  <!-- </div> -->
 
-  <mat-form-field class="nivel">
-    <mat-label>Seleccione el curso</mat-label>
-    <mat-select [(ngModel)]="nivelSeleccionado" (selectionChange)="onNivelChange()">
-      <!-- <mat-select [(ngModel)]="nivelSeleccionado"> -->
+                      [pattern]="materia.nombre === 'Marcha rapida' 
+                        ? '^([0-1]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$' 
+                        : null"
+                      [value]="notasRegistradas[materia.nombre] ?? ''"
+                      [disabled]="materia.nombre === 'Contextura Fisica' || (notasRegistradas[materia.nombre] != null && notasRegistradas[materia.nombre]! >= 0 && notasRegistradas[materia.nombre]! <= 3000) "
+                      >
+                    <!-- <mat-hint [id]="getHintId(materia.codigo)">
+                      {{ materia.nombre }}
+                    </mat-hint> -->
+                    <!-- min="0"
+                      max="100" -->
+                      <!-- (input)="validarRango($event, materia.nombre)" -->
+                    <!-- agregar boton de guardado y guardar en solo un documento toda las notas del semestre en fisico -->
+                  </mat-form-field>
+                <!-- </p> -->
+              </ng-container>
+            </div>
+            <div class="buttons">
+              <button
+                mat-raised-button
+                class="button-primary"
+                (click)="savePhysicist()">
+                GUARDAR
+              </button>
+              <button
+                mat-raised-button
+                class="button-primary"
+                (click)="printEFM()"
+                [disabled]="!nivelSeleccionado2">
+                IMPRIMIR
+              </button>
+            <!-- <button
+              mat-raised-button
+              class="button-primary"
+              (click)="openDialog()">
+              EDITAR FIRMAS
+            </button> -->
+                <button
+                  mat-raised-button
+                  class="button-primary"
+                  (click)="openDialog()">
+                  EDITAR FIRMAS
+                </button>
+            </div>
+          </div>
+          <div #pdfContentEFM class="pdf-container" [hidden]="!generandoPDF">
+            <div class="title">
+              <div class="encabezado">
+                <span>COMANDO DE INSTITUTOS MILITARES</span>
+                <span>ESCUELA MILITAR DE TOPOGRAFÍA DEL EJÉRCITO</span>
+                <span>“TCNL. JUAN ORDANZA LARA”</span>
+                <span class="bolivia">BOLIVIA </span>
+              </div>
+                <div class="encabezado2">
+                <span>PROCESADO POR SAEC - EMTE</span>
+                <span>FECHA DE EMISION: {{ today | date:'dd/MM/yyyy' }}</span>
+                <span>HORA DE EMISION: {{ today | date:'HH:mm:ss' }}</span>
+                <span class="bolivia">PAGINA 1 - 1 </span>
+              </div>
+            </div>
+            <h2 class="center">REPORTE INDIVIDUAL DE EFM. Y DEPORTES</h2>
+            <p><strong>NOMBRES Y APELLIDOS:</strong> {{ estudiante?.nombres }} {{ estudiante?.apPat }} {{ estudiante?.apMat }}</p>
+            <p><strong>GRADO, ARMA:</strong> {{ estudiante?.grado }}</p>
+            <p><strong>PERIODO:</strong> {{ estudiante?.gestion }}</p>
 
-      <!-- @for (option of options; track option) {
-        <mat-option [value]="option.value">{{option.viewValue}}</mat-option>
-      } -->
-      <mat-option *ngFor="let option of options" [value]="option.value">
-        {{ option.viewValue }}
-      </mat-option>
+            <table class="mat-elevation-z8 table">
+              <tr class="bold">
+                <th colspan="2">PRUEBAS FISICAS</th>
+                <th>CANTIDAD</th>
+                <th>NOTA</th>
+              </tr>
+              <tr>
+                <td>Flexiones</td>
+                <td rowspan="8">95%</td>
+                <td>{{ cantidadesRegistradas['Flexiones_cant'] }}</td>
+                <td>{{ notasRegistradas['Flexiones'] }}</td>
+              </tr>
+              <tr>
+                <td>Abdominales</td>
+                <td>{{ cantidadesRegistradas['Abdominales_cant'] }}</td>
+                <td>{{ notasRegistradas['Abdominales'] }}</td>
+              </tr>
+              <tr>
+                <td>Flexiones en barra</td>
+                <td>{{ cantidadesRegistradas['Flexiones en barra_cant'] }}</td>
+                <td>{{ notasRegistradas['Flexiones en barra'] }}</td>
+              </tr>
+              <tr>
+                <td>Marcha rápida</td>
+                <td>{{ cantidadesRegistradas['Marcha rapida_cant'] }}</td>
+                <td>{{ notasRegistradas['Marcha rapida'] }}</td>
+              </tr>
+              <tr>
+                <td>Ascenso a la cuerda</td>
+                <td>{{ cantidadesRegistradas['Ascenso a la cuerda_cant'] }}</td>
+                <td>{{ notasRegistradas['Ascenso a la cuerda'] }}</td>
+              </tr>
+              <tr>
+                <td>Cruce de obstaculos</td>
+                <td>{{ cantidadesRegistradas['Cruce de obstaculos_cant'] }}</td>
+                <td>{{ notasRegistradas['Cruce de obstaculos'] }}</td>
+              </tr>
+              <tr>
+                <td>Aerobica</td>
+                <td>{{ cantidadesRegistradas['Aerobica_cant'] }}</td>
+                <td>{{ notasRegistradas['Aerobica'] }}</td>
+              </tr>
+              <tr>
+                <td>Natacion estilo crol</td>
+                <td>{{ cantidadesRegistradas['Natacion estilo crol_cant'] }}</td>
+                <td>{{ notasRegistradas['Natacion estilo crol'] }}</td>
+              </tr>
+              <tr>
+                <td colspan="2">PROMEDIO DE PRUEBAS</td>
+                <td colspan="2">{{promPruebas()}}</td>
+              </tr>
+              <tr>
+                <td>Talla y peso</td>
+                <td>5%</td>
+                <td colspan="2">{{ notasRegistradas['Contextura Fisica'] }}</td>
+              </tr>
+              <tr>
+                <td colspan="2">PROMEDIO GENERAL</td>
+                <td colspan="2">{{promPruebas()}}</td>
+              </tr>
+              <!-- agrega las demás pruebas -->
+            </table>
+            <div class="firmas">
+              <p class="ind">
+              <span>{{ jefe() || "No disponible" }}</span>
+              <span><strong>2DO. CMTE. Y JEFE DE ESTUDIOS DE LA E.M.T.E. - E.P.S.S.T.</strong></span>
+              </p>
+              <p><strong>Vo.Bo.</strong></p>
+              <p class="ind">
+                <span>{{ comandante() || "No disponible" }}</span>
+              <span><strong>COMANDANTE DE LA E.M.T.E. - E.P.S.S.T.</strong></span></p>
+            </div>
+          </div>
 
-    </mat-select>
-  </mat-form-field>
-  <div *ngIf="cargandoNotas" class="loader-container">
-    <mat-spinner diameter="40"></mat-spinner>
-    <p style="font-weight: bold;">Cargando notas...</p>
-  </div>
-    <!-- <div *ngIf="cargandoNotas" class="loader-container">
-      <mat-spinner diameter="40"></mat-spinner>
-      <p style="font-weight: bold;">Cargando notas...</p>
-    </div> -->
-
-    <!-- <div class="notas" *ngIf="nivelSeleccionado === 'basico'">
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>BAS-CMI-01-02</mat-label>
-          <input id="nota_BAS_CMI_01_02" matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint id="hint_BAS_CMI_01_02">Correspondencia Militar</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>BAS-DCO-01-04</mat-label>
-          <input id="nota_BAS_DCO_01_04" matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint id="hint_BAS_DCO_01_04">Documentación del Primero de Comp., Edron o Btr.</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>BAS-DOU-01-07</mat-label>
-          <input id="nota_BAS_DOU_01_07" matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint id="hint_BAS_DOU_01_07">Doctrina de Operaciones Urbanas</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>BAS-EFM-01-01</mat-label>
-          <input id="nota_BAS_EFM_01_01" matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint id="hint_BAS_EFM_01_01">Entrenamiento Físico Militar</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>BAS-EST-01-05</mat-label>
-          <input id="nota_BAS_EST_01_05" matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint id="hint_BAS_EST_01_05">Estudio del Terreno</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>BAS-PLA-01-06</mat-label>
-          <input id="nota_BAS_PLA_01_06" matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint id="hint_BAS_PLA_01_06">Planeamiento</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>BAS-RMI-01-01</mat-label>
-          <input id="nota_BAS_RMI_01_01" matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint id="hint_BAS_RMI_01_01">Redacción Militar</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>COM-GEN-01-03</mat-label>
-          <input id="nota_COM_GEN_01_03" matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint id="hint_COM_GEN_01_03">Normativa de Género</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>COM-LID-01-02</mat-label>
-          <input id="nota_COM_LID_01_02" matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint id="hint_COM_LID_01_02">Liderazgo</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>PROY-I-II</mat-label>
-          <input id="nota_PROY_I_II" matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint id="hint_PROY_I_II">Proyectos I y II</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>TEC-GAE-01-02</mat-label>
-          <input id="nota_TEC_GAE_01_02" matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint id="hint_TEC_GAE_01_02">Geoprocesamiento y Análisis Espacial</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>TEC-MDT-01-04</mat-label>
-          <input id="nota_TEC_MDT_01_04" matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint id="hint_TEC_MDT_01_04">Modelamiento Digital del Terreno y Simulación</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>TEC-PRS-01-05</mat-label>
-          <input id="nota_TEC_PRS_01_05" matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint id="hint_TEC_PRS_01_05">Programación SIG.</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>TEC-RGE-01-03</mat-label>
-          <input id="nota_TEC_RGE_01_03" matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint id="hint_TEC_RGE_01_03">Redes Geodésicas I</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>TEC-TOA-01-01</mat-label>
-          <input id="nota_TEC_TOA_01_01" matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint id="hint_TEC_TOA_01_01">Topografía Automatizada</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>TEC-TOV-01-06</mat-label>
-          <input id="nota_TEC_TOV_01_06" matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint id="hint_TEC_TOV_01_06">Topografía Vial</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>promedioDisciplina</mat-label>
-          <input id="nota_promedioDisciplina" matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint id="hint_promedioDisciplina">Promedio disciplina</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>PromedioFisico</mat-label>
-          <input id="nota_promedioFisico" matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint id="hint_promedioFisico">Promedio fisico</mat-hint>
-        </mat-form-field>
-      </p>
-    </div> -->
-
-    <div class="notas" *ngIf="nivelSeleccionado === 'basico' && !cargandoNotas">
-      <ng-container *ngFor="let materia of materiasBasico">
-        <p>
-          <mat-form-field appearance="outline">
-            <mat-label>{{ materia.codigo }}</mat-label>
-            <input
-              [id]="getInputId(materia.codigo)"
-              [value]="notasRegistradas[materia.codigo]"
-              matInput
-              type="number"
-              min="0"
-              max="100"
-              placeholder="Ingresa la nota"
-              [value]="notasRegistradas[materia.codigo] ?? ''"
-              [disabled]="notasRegistradas[materia.codigo] != null && notasRegistradas[materia.codigo]! >= 0 && notasRegistradas[materia.codigo]! <= 100"
-              (input)="validarRango($event)">
-            <mat-hint [id]="getHintId(materia.codigo)">
-              {{ materia.nombre }}
-            </mat-hint>
-          </mat-form-field>
-        </p>
+        </div>
+        <div *ngSwitchCase="'disciplinario'">
+          <h2>Esta es la vista disciplinario</h2>
+        </div>
+        <div *ngSwitchDefault>
+          <h2>Seleccione una opción en el menú</h2>
+        </div>
       </ng-container>
     </div>
-    <div class="notas" *ngIf="nivelSeleccionado === 'avanzado' && !cargandoNotas">
-      <ng-container *ngFor="let materia of materiasAvanzado">
-        <p>
-          <mat-form-field appearance="outline">
-            <mat-label>{{ materia.codigo }}</mat-label>
-            <input
-              [id]="getInputId(materia.codigo)"
-              matInput
-              type="number"
-              min="0"
-              max="100"
-              placeholder="Ingresa la nota"
-              [value]="notasRegistradas[materia.codigo] ?? ''"
-              [disabled]="(notasRegistradas[materia.codigo] != null) && !puedeEditarTodo"
-              (input)="debeValidarRango(materia.codigo) && validarRango($event)">
-            <mat-hint [id]="getHintId(materia.codigo)">
-              {{ materia.nombre }}
-            </mat-hint>
-          </mat-form-field>
-        </p>
-      </ng-container>
-    </div>
-
-
-
-    <!-- <div class="notas" *ngIf="nivelSeleccionado === 'avanzado' && !cargandoNotas">
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>BAS-ASI-01-02</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Asignatura Militar I</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>BAS-ASO-01-03</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Asignatura Operativa</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>BAS-ASP-01-01</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Asignatura Profesional</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>BAS-PICB-01-07</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Plan Integral de Capacitación Básica</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>COM-CPM-01-01</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Comunicación para el Mando</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>COM-SSU-01-02</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Seguridad y Soporte de Unidades</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>EJT-AEM-01-01</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Ejercicio de Aplicación Militar</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>PFD-EFM-01-01</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Educación Física Militar</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>TEC-BDG-01-06</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Base de Datos Geográficos</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>TEC-CTE-01-09</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Cartografía Temática</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>TEC-GPR-01-04</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Gestión de Proyectos</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>TEC-SCT-01-08</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Sistemas de Control Topográfico</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>TEC-TIN-01-07</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Tecnología de Información</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>TIT-TTE-01-01</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Trabajo de Titulación</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>promedioDisciplina</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Promedio disciplina</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>PromedioFisico</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Promedio fisico</mat-hint>
-        </mat-form-field>
-      </p>
-    </div> -->
-
-    <div class="notas" *ngIf="nivelSeleccionado === 'primerSemestre'">
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>FOR-FC-01-01</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Formación Complementaria I</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>FOR-FC-02-01</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Formación Complementaria II</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>FOR-FM-02-01</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Formación Militar I</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>FOR-FM-02-02</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Formación Militar II</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>FOR-FM-02-03</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Formación Militar III</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>FOR-FT-01-01</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Formación Técnica I</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>FOR-FT-01-02</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Formación Técnica II</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>FOR-FT-01-03</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Formación Técnica III</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>FOR-FT-01-04</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Formación Técnica IV</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>MAT-DIS-01</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Disciplina</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>MAT-EFM-01</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Educación Física Militar</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>MAT-MIL-01</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Materias Militares</mat-hint>
-        </mat-form-field>
-      </p>
-    </div>
-    <div class="notas" *ngIf="nivelSeleccionado === 'segundoSemestre'">
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>FOR-FC-02-02</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Formación Complementaria III</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>FOR-FC-03-01</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Formación Complementaria IV</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>FOR-FM-02-04</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Formación Militar IV</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>FOR-FT-02-01</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Formación Técnica V</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>FOR-FT-02-02</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Formación Técnica VI</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>FOR-FT-02-03</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Formación Técnica VII</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>FOR-FT-03-01</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Formación Técnica VIII</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>MAT-DIS-02</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Disciplina II</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>MAT-EFM-02</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Educación Física Militar II</mat-hint>
-        </mat-form-field>
-      </p>
-
-      <p>
-        <mat-form-field appearance="outline">
-          <mat-label>MAT-MIL-02</mat-label>
-          <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
-          <mat-hint>Materias Militares II</mat-hint>
-        </mat-form-field>
-      </p>
-    </div>
-
-
-    <!-- <h1 *ngIf="nivelSeleccionado === 'avanzado'">Avanzado</h1>
-    <h1 *ngIf="nivelSeleccionado === 'primerSemestre'">Primer Semestre</h1>
-    <h1 *ngIf="nivelSeleccionado === 'segundoSemestre'">Segundo Semestre</h1>
-    <h1 *ngIf="nivelSeleccionado === 'tercerSemestre'">Tercer Semestre</h1>
-    <h1 *ngIf="nivelSeleccionado === 'cuartoSemestre'">Cuarto Semestre</h1>
-    <h1 *ngIf="nivelSeleccionado === 'quintoSemestre'">Quinto Semestre</h1>
-    <h1 *ngIf="nivelSeleccionado === 'sextoSemestre'">Sexto Semestre</h1> -->
-  <div class="buttons">
-    <button
-      mat-raised-button
-      class="button-primary"
-      (click)="save()">
-      GUARDAR
-    </button>
-    <button
-      mat-raised-button
-      class="button-primary"
-      (click)="edit()">
-      EDITAR
-    </button>
   </div>
-  <div class="validar" *ngIf="editarNotas">
-    <mat-form-field>
-      <mat-label>Codigo 1</mat-label>
-      <input matInput [(ngModel)]="codigo1Ingresado">
-    </mat-form-field>
-    <mat-form-field>
-      <mat-label>Codigo 2</mat-label>
-      <input matInput [(ngModel)]="codigo2Ingresado">
-    </mat-form-field>
-    <button mat-raised-button class="button-primary" (click)="editEnable()">
-      VALIDAR
-    </button>
-  </div>
-</div>
-
 </div>
 

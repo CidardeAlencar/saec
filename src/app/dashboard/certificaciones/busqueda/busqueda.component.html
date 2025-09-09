@@ -1,12 +1,12 @@
 <div class="main">
-  <img src="images/compas.png" alt="Escudo EMTE" class="compas">
+  <!-- <img src="images/compas.png" alt="Escudo EMTE" class="compas"> -->
   <div class="container">
     <form>
       <mat-form-field>
-        <mat-label>BUSQUEDA</mat-label>
+        <mat-label>BUSQUEDA POR C.I.</mat-label>
         <input
           matInput
-          placeholder="CI A BUSCAR"
+          placeholder="C.I. A BUSCAR"
           [formControl]="ci"
           (keydown.enter)="buscar(); $event.preventDefault()"
           />
@@ -23,5 +23,5 @@
       </mat-form-field>
     </form>
   </div>
-  <img src="images/libroAzul.png" alt="Escudo EMTE" class="letra">
+  <!-- <img src="images/libroAzul.png" alt="Escudo EMTE" class="letra"> -->
 </div>

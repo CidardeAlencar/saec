@@ -1,11 +1,99 @@
+.sidebar-container {
+  width: 220px;
+  background: #587471;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 20px 0;
+  min-height: calc(100vh - 60px);
+  // height: 100%;
+  transition: width 0.3s;
+}
+
+.sidebar-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white !important;
+  height: 100px;
+  text-align: center;
+  padding: 28px 16px;
+  font-size: 22px;
+  background: none;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  width: 100%;
+  border-radius: 0;
+  transition: background 0.2s;
+}
+
+.sidebar-btn-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.sidebar-btn-content mat-icon {
+  font-size: 36px;
+  margin-bottom: 8px;
+  overflow: visible;
+}
+
+.sidebar-btn-text {
+  font-size: 16px;
+  font-weight: 500;
+  transition: opacity 0.3s;
+  padding-top: 10px;
+}
+
+.sidebar-btn.active,
+.sidebar-btn:hover {
+  background: #46605d;
+}
+
+/* Responsive para móviles */
+@media (max-width: 600px) {
+  .sidebar-container {
+    width: 70px;
+    padding: 10px 0;
+  }
+
+  .sidebar-btn {
+    padding: 18px 0;
+    font-size: 0;
+  }
+
+  .sidebar-btn-content mat-icon {
+    font-size: 28px;
+    margin-bottom: 0;
+  }
+
+  .sidebar-btn-text {
+    display: none;
+  }
+}
+
 .main{
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  height: 100vh;
-  background-color: var(--color-background-light);
-
+  min-height: 100vh;
+  // background-color: var(--color-background-light);
+  // background-image: url('../../../assets/background.jpeg');
+  background-image: 
+    linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), /* capa oscura */
+    url('../../../assets/background3.jpeg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100%;
+  box-sizing: border-box;
 }
 .table {
   min-width: 80% !important;
@@ -13,7 +101,7 @@
 .data{
   background-color: #587471;
   width: 100%;
-  margin-bottom: 50px;
+  // margin-bottom: 50px;
   padding: 40px;
   // font-weight: bold;
   font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -21,21 +109,30 @@
   // border-radius: 20px;
   color: white;
   display: flex;
+  align-items: center;
   // padding-left: 10px;
-  justify-content: center;
+  justify-content: space-around;
   font-size: 20px;
   box-sizing: border-box;
   span{
     padding-left: 20px;
 
   }
+  .logo{
+    max-width: 70px;
+    transform: scale(1.8);
+    transform-origin: center;
+  }
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: center;
-    width: 80%;
+    width: 100%;
     span {
       padding-left: 0;
       margin-top: 10px;
+    }
+    span:first-of-type {
+      margin-top: 30px; /* o el valor que quieras */
     }
   }
 }
@@ -66,7 +163,7 @@
   }
 
   .firmas {
-    margin-top: 40px;
+    margin-top: 150px;
     text-align: left;
     padding-left: 50px;
     display: flex;
@@ -77,18 +174,30 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      padding:50px 0;
+      padding:100px 0;
     }
   }
   .title{
     display: flex;
-    justify-content: start;
+    justify-content: space-between;
     .encabezado {
       display: flex;
       // justify-content: start;
       flex-direction: column;
       align-items: center;
       font-size: 18px;
+
+      .bolivia{
+        font-weight: bold;
+        text-decoration: underline;
+      }
+    }
+    .encabezado2 {
+      display: flex;
+      // justify-content: start;
+      flex-direction: column;
+      align-items: center;
+      font-size: 14px;
 
       .bolivia{
         font-weight: bold;
@@ -147,11 +256,11 @@ table.table td {
   padding: 8px 12px;
   text-align: center;
   border: 2px solid #e0e0e0;
-  background-color: #f5f5f5;
+  background-color: white;
 }
 
 table.table th {
-  background-color: #f5f5f5;
+  background-color: white;
   font-weight: bold;
 }
 
@@ -180,9 +289,13 @@ table.table th {
 .notas{
   display: flex;
   flex-wrap: wrap;
-  padding: 30px;
+  padding: 20px;
   justify-content: center;
   gap: 10px;
+  background-color: #f7f9fa; // tono suave de fondo
+  border-radius: 10px;
+  width: 60%;
+  margin-bottom: 20px;
 }
 
 .validar{
