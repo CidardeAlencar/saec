@@ -3,6 +3,34 @@ import { Firestore, doc, getDoc, setDoc, collection, query, where, getDocs } fro
 import { BehaviorSubject } from 'rxjs';
 import { Auth } from '@angular/fire/auth';
 
+export interface ItemBase {
+  codigo: string;
+  label: string;
+  valor: number;
+  creadoEn?: string | null;
+}
+
+export interface ItemConsejoDoc {
+  codigo: string;
+  label: string;
+  valorCatalogo: number;   // p.ej., -7
+  valorConsejo: number;    // decidido en UI
+  observacion?: string | null;
+  creadoEn?: string | null;
+}
+
+export interface NotasDisciplina {
+  meritos: ItemBase[];
+  demeritos: ItemBase[];
+  consejos: ItemConsejoDoc[];
+  totalMeritos: number;
+  totalDemeritos: number;
+  totalConsejo: number;     // suma de valorConsejo
+  ultimoMerito?: string | null;
+  ultimoDemerito?: string | null;
+  ultimoConsejo?: string | null;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -87,6 +115,94 @@ export class EstudianteService {
     return {};
   }
 }
+
+private async leerItemsBase(ci: string, nivel: string, contenedor: 'MERITOS' | 'DEMERITOS'): Promise<ItemBase[]> {
+    const path = `estudiante/${ci}/${nivel}/${contenedor}/items`;
+    const snap = await getDocs(collection(this.firestore, path));
+    return snap.docs.map(d => {
+      const data: any = d.data();
+      return {
+        codigo: data.codigo ?? '',
+        label: data.label ?? '',
+        valor: Number(data.valor) || 0,
+        creadoEn: data.creadoEn ?? null,
+      } as ItemBase;
+    });
+  }
+
+  /** Lee items de CONSEJO: estudiante/{ci}/{nivel}/CONSEJO/items */
+  private async leerItemsConsejo(ci: string, nivel: string): Promise<ItemConsejoDoc[]> {
+    const path = `estudiante/${ci}/${nivel}/CONSEJO/items`;
+    const snap = await getDocs(collection(this.firestore, path));
+    return snap.docs.map(d => {
+      const data: any = d.data();
+      return {
+        codigo: data.codigo ?? '',
+        label: data.label ?? '',
+        valorCatalogo: Number(data.valorCatalogo) || 0,
+        valorConsejo: Number(data.valorConsejo) || 0,
+        observacion: data.observacion ?? null,
+        creadoEn: data.creadoEn ?? null,
+      } as ItemConsejoDoc;
+    });
+  }
+
+  /** Toma el último por fecha ISO (desc), si no hay fecha usa orden por código (desc) */
+  private tomarUltimoCodigo<T extends { codigo: string; creadoEn?: string | null }>(arr: T[]): string | null {
+    if (!arr.length) return null;
+    const conFecha = arr.filter(a => !!a.creadoEn);
+    if (conFecha.length) {
+      const last = conFecha.sort((a, b) => (a.creadoEn! < b.creadoEn! ? 1 : -1))[0];
+      return last.codigo;
+    }
+    return arr.sort((a, b) => (a.codigo < b.codigo ? 1 : -1))[0].codigo;
+  }
+
+  /** Suma segura de un campo numérico */
+  private sum<T>(arr: T[], getter: (x: T) => number): number {
+    return arr.reduce((acc, it) => acc + (Number(getter(it)) || 0), 0);
+  }
+
+  /** API pública: obtener todo Disciplina */
+  async obtenerNotasDisciplina(ci: string, nivel: string): Promise<NotasDisciplina> {
+    try {
+      const [meritos, demeritos, consejos] = await Promise.all([
+        this.leerItemsBase(ci, nivel, 'MERITOS'),
+        this.leerItemsBase(ci, nivel, 'DEMERITOS'),
+        this.leerItemsConsejo(ci, nivel),
+      ]);
+
+      const totalMeritos   = this.sum(meritos,   x => x.valor);
+      const totalDemeritos = this.sum(demeritos, x => x.valor);
+      const totalConsejo   = this.sum(consejos,  x => x.valorConsejo);
+
+      return {
+        meritos,
+        demeritos,
+        consejos,
+        totalMeritos,
+        totalDemeritos,
+        totalConsejo,
+        ultimoMerito:   this.tomarUltimoCodigo(meritos),
+        ultimoDemerito: this.tomarUltimoCodigo(demeritos),
+        ultimoConsejo:  this.tomarUltimoCodigo(consejos),
+      };
+    } catch (error) {
+      console.error('Error al obtener notas de disciplina:', error);
+      // Devuelve estructura vacía para evitar null checks en el componente
+      return {
+        meritos: [],
+        demeritos: [],
+        consejos: [],
+        totalMeritos: 0,
+        totalDemeritos: 0,
+        totalConsejo: 0,
+        ultimoMerito: null,
+        ultimoDemerito: null,
+        ultimoConsejo: null,
+      };
+    }
+  }
 
   async obtenerNotas(ci: string, nivel: string) {
     try {
