@@ -302,3 +302,72 @@ table.table th {
   display: flex;
   flex-direction: column;
 }
+
+.form-field-meritos{
+  width: 100%;
+  max-width: 800px;
+}
+
+/* Opción de búsqueda fija arriba */
+.search-option {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--mat-select-panel-background-color, #fff);
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .5rem .75rem !important;
+  cursor: default;
+}
+
+/* Input dentro del panel */
+.search-input {
+  border: none;
+  outline: none;
+  font: inherit;
+  color: #555;
+  background: transparent;
+}
+
+// /* Ancho del panel SOLO para Consejo */
+// .panel-consejo {
+//   width: min(600px, 92vw) !important;
+//   max-width: 92vw !important;
+// }
+
+// /* Barra de búsqueda fija arriba del panel */
+// .panel-consejo .search-option {
+//   position: sticky;
+//   top: 0;
+//   z-index: 1;
+//   background: var(--mat-select-panel-background-color, #fff);
+//   display: flex;
+//   align-items: center;
+//   gap: .5rem;
+//   padding: .5rem .75rem !important;
+//   cursor: default;
+// }
+
+// /* Input de búsqueda dentro del panel */
+// .panel-consejo .search-input {
+//   width: 100%;
+//   border: none;
+//   outline: none;
+//   font: inherit;
+//   background: transparent;
+// }
+.consejo-ponderacion {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: .75rem;
+  margin-top: .5rem;
+}
+.w-100 { width: 100%; }
+@media (min-width: 768px) {
+  .consejo-ponderacion {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+

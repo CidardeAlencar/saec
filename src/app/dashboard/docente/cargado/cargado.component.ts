@@ -5,9 +5,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { EstudianteService } from '../../../shared/services/estudiante.service';
+import { EstudianteService, NotasDisciplina, ItemBase, ItemConsejoDoc } from '../../../shared/services/estudiante.service';
 import { Subscription } from 'rxjs';
-import { Firestore, doc, setDoc } from '@angular/fire/firestore';
+import { collection, Firestore, doc, setDoc, getDocs } from '@angular/fire/firestore';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import Swal from 'sweetalert2';
 import jsPDF from 'jspdf';
@@ -22,6 +22,9 @@ import {
   MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { startWith, map } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
 
 interface Option {
   value: string;
@@ -46,6 +49,13 @@ interface TablaFlexiones {
 interface TablaMarchaRapida {
   [nota: number]: Partial<Record<Grado, string>>;
 }
+
+interface MeritoItem {
+  codigo: string;
+  label: string;
+  valor: number;
+}
+
 export interface DialogData {
   jefe: string;
   comandante: string;
@@ -59,13 +69,21 @@ import { AdminRoutingModule } from "../../admin/admin-routing.module";
 
 @Component({
   selector: 'app-cargado',
-  imports: [MatProgressSpinnerModule, MatInputModule, MatFormFieldModule, MatSelectModule, FormsModule, MatButtonModule, CommonModule, MatIconModule, AdminRoutingModule],
+  imports: [ReactiveFormsModule, MatProgressSpinnerModule, MatInputModule, MatFormFieldModule, MatSelectModule, FormsModule, MatButtonModule, CommonModule, MatIconModule, AdminRoutingModule],
   templateUrl: './cargado.component.html',
   styleUrl: './cargado.component.scss'
 })
 
 export class CargadoComponent implements OnInit, OnDestroy {
+  listaMeritos: ItemBase[] = [];
+  listaDemeritos: ItemBase[] = [];
+  listaConsejo: ItemConsejoDoc[] = [];
+
+  sumaMeritos = 0;
+  sumaDemeritos = 0;
+  sumaConsejo = 0;
   @ViewChild('pdfContentEFM', { static: false }) pdfContentEFM!: ElementRef;
+  @ViewChild('pdfContentDiscipline', { static: false }) pdfContentDiscipline!: ElementRef;
   generandoPDF = false;
   readonly jefe = signal('');
   readonly comandante = signal('');
@@ -1095,6 +1113,312 @@ tablaContexturaFisicaF: ContexturaFisica[] = [
     { codigo: 'EFM', nombre: 'Gestion' }
   ];
 
+  meritosDemeritos = [
+    { codigo: 'MERITOS', nombre: 'Meritos' },
+    { codigo: 'DEMERITOS', nombre: 'Demeritos' },
+    { codigo: 'CONSEJO', nombre: 'Consejo' }
+    // { codigo: 'MD', nombre: 'Total meritos' },
+    // { codigo: 'MD', nombre: 'Total demeritos' },
+  ];
+meritosCatalogo: MeritoItem[] = [
+  { codigo: 'MER-01-01', label: 'Destacada participación en los ejercicios militares o prácticos (terreno).', valor: 5 },
+  { codigo: 'MER-01-02', label: 'Eficiencia en el Cumplimiento de sus deberes (Servicio interno y guardia)', valor: 5 },
+  { codigo: 'MER-01-03', label: 'Felicitación otorgada por el Comandante de E.M.T.E.', valor: 5 },
+  { codigo: 'MER-01-04', label: 'Sobresalientes cualidades de Liderazgo.', valor: 4 },
+  { codigo: 'MER-01-05', label: 'Elevado espíritu de cuerpo.', valor: 4 },
+  { codigo: 'MER-01-06', label: 'Felicitación otorgada por el Segundo Comandante de la E.M.T.E.', valor: 4 },
+  { codigo: 'MER-01-07', label: 'Cumplir comisiones del servicio de manera eficiente o sobresaliente.', valor: 4 },
+  { codigo: 'MER-01-08', label: 'Demostrar sobresalientes valores y principios militares.', valor: 3 },
+  { codigo: 'MER-01-09', label: 'Elevado sentido de camaradería.', valor: 3 },
+  { codigo: 'MER-01-10', label: 'Felicitación otorgada por el Comandante de Compañía.', valor: 3 },
+  { codigo: 'MER-01-11', label: 'Demostrar energía.', valor: 2 },
+  { codigo: 'MER-01-12', label: 'Demostrar iniciativa.', valor: 2 },
+  { codigo: 'MER-01-13', label: 'Llevar correctamente el uniforme (Línea en el pantalón y blusa)', valor: 2 },
+  { codigo: 'MER-01-14', label: 'Demostrar excelente conducta en lugares públicos.', valor: 2 },
+  { codigo: 'MER-A-01', label: 'Al Grado de Alumno Mayor', valor: 3 },
+  { codigo: 'MER-A-02', label: 'Al Grado de Alumno Primero.', valor: 3 },
+  { codigo: 'MER-A-03', label: 'Al Grado de Alumno Segundo.', valor: 3 },
+  { codigo: 'MER-B-01', label: 'Cordón Dorado', valor: 3 },
+  { codigo: 'MER-B-02', label: 'Cordón Turquesa (Carmesí)', valor: 3 },
+  { codigo: 'MER-B-03', label: 'Cordón Rojo', valor: 3 },
+  { codigo: 'MER-B-04', label: 'Cordón Blanco', valor: 3 },
+  { codigo: 'MER-B-05', label: 'Cordón Azul', valor: 3 },
+  { codigo: 'MER-B-06', label: 'Celeste', valor: 3 },
+  { codigo: 'MER-B-07', label: 'Celeste y blanco', valor: 3 },
+  { codigo: 'MER-B-08', label: 'Cordón Verde', valor: 3 },
+  { codigo: 'MER-C-01', label: 'Estandarte de la Escuela Militar de Topografía del Ejército “Tcnl. Juan Ondarza Lara”.', valor: 4 },
+  { codigo: 'MER-C-02', label: 'Bandera de Guerra.', valor: 3 },
+  { codigo: 'MER-D-01', label: 'Escoltas del Estandarte de la Escuela Militar de Topografía del Ejército “Tcnl. Juan Ondarza Lara”.', valor: 2 },
+  { codigo: 'MER-D-02', label: 'Escoltas de la bandera de Guerra.', valor: 2 },
+  { codigo: 'MER-E-01', label: 'Buena presentación (En otros Países.)', valor: 4 },
+  { codigo: 'MER-E-02', label: 'Buena presentación (En otros Departamentos.)', valor: 3 },
+  { codigo: 'MER-E-03', label: 'Buena presentación (En el interior del Departamento.)', valor: 2 },
+  { codigo: 'MER-E-04', label: 'Buena presentación (En el interior del Instituto)', valor: 1 },
+  { codigo: 'MER-F-01', label: 'Actividades Internas (Al primer puesto.)', valor: 3 },
+  { codigo: 'MER-F-02', label: 'Actividades Internas (Al segundo puesto.)', valor: 2 },
+  { codigo: 'MER-F-03', label: 'Actividades Internas (Al tercer puesto.)', valor: 1 },
+  { codigo: 'MER-G-01', label: 'Campeonatos Departamentales (Al primer puesto.)', valor: 4 },
+  { codigo: 'MER-G-02', label: 'Campeonatos Departamentales (Al segundo puesto.)', valor: 3 },
+  { codigo: 'MER-G-03', label: 'Campeonatos Departamentales (Al tercer puesto.)', valor: 2 },
+  { codigo: 'MER-H-01', label: 'Campeonatos Nacionales (Al primer puesto.)', valor: 5 },
+  { codigo: 'MER-H-02', label: 'Campeonatos Nacionales (Al segundo puesto.)', valor: 4 },
+  { codigo: 'MER-H-03', label: 'Campeonatos Nacionales (Al tercer puesto.)', valor: 3 },
+  { codigo: 'MER-I-01', label: 'Campeonatos Internacionales (Al primer puesto.)', valor: 6 },
+  { codigo: 'MER-I-02', label: 'Campeonatos Internacionales (Al segundo puesto.)', valor: 5 },
+  { codigo: 'MER-I-03', label: 'Campeonatos Internacionales (Al tercer puesto.)', valor: 4 },
+  { codigo: 'MER-J-01', label: 'Actividades sociales, culturales de carácter Departamental (Representaciones en Concursos Departamentales.)', valor: 3 },
+  { codigo: 'MER-J-02', label: 'Actividades sociales, culturales de carácter Departamental (Responsables de revistas o publicaciones.)', valor: 3 },
+  { codigo: 'MER-J-03', label: 'Actividades sociales, culturales de carácter Departamental (Dictar conferencias fuera de la Escuela Militar de Topografía del Ejército.)', valor: 3 },
+  { codigo: 'MER-K-01', label: 'Actividades socio - culturales Nacionales (Primer puesto en torneos y concursos.)', valor: 3 },
+  { codigo: 'MER-K-02', label: 'Actividades socio - culturales Nacionales (Segundo Puesto en torneos y concursos.)', valor: 2 },
+  { codigo: 'MER-K-03', label: 'Actividades socio - culturales Nacionales (Tercer Puesto en torneos y concursos.)', valor: 1 },
+  { codigo: 'MER-L-01', label: 'Notas más altas al finalizar un periodo académico (1er. Puesto.)', valor: 5 },
+  { codigo: 'MER-L-02', label: 'Notas más altas al finalizar un periodo académico (2do. Puesto.)', valor: 4 },
+  { codigo: 'MER-L-03', label: 'Notas más altas al finalizar un periodo académico (3er. Puesto.)', valor: 3 },
+  { codigo: 'MER-L-04', label: 'Notas más altas al finalizar un periodo académico (4to. Puesto.)', valor: 2 },
+  { codigo: 'MER-L-05', label: 'Notas más altas al finalizar un periodo académico (5to. Puesto.)', valor: 1 },
+  { codigo: 'MER-M-01', label: 'Atributo de "E" (Excelencia)(Por unidad temática que tenga el atributo "E" )', valor: 3 },
+  { codigo: 'MER-N-01', label: 'Trabajos prácticos sobresalientes (Trabajo individual)', valor: 3 },
+  { codigo: 'MER-N-02', label: 'Trabajos prácticos sobresalientes (Trabajo grupal)', valor: 2 },
+];
+demeritosCatalogo: MeritoItem[] = [
+  { codigo: 'DEM-01-01', label: 'Atrasarse a formación, mientras no constituya una falta grave.', valor: -1 },
+  { codigo: 'DEM-01-02', label: 'Atrasarse al ingreso de aulas.', valor: -1 },
+  { codigo: 'DEM-01-03', label: 'Bostezar en filas.', valor: -1 },
+  { codigo: 'DEM-01-04', label: 'Botar basura fuera de los contenedores.', valor: -1 },
+  { codigo: 'DEM-01-05', label: 'Carecer de útiles de aseo personal (Pañuelos, trapo de calzado, hilo, agujas, etc.).', valor: -1 },
+  { codigo: 'DEM-01-06', label: 'Carecer de implementos de limpieza de armas.', valor: -1 },
+  { codigo: 'DEM-01-07', label: 'Dejar abandonado material de escritorio.', valor: -1 },
+  { codigo: 'DEM-01-08', label: 'Desconocer el número de su arma de dotación.', valor: -1 },
+  { codigo: 'DEM-01-09', label: 'Estar desatento.', valor: -1 },
+  { codigo: 'DEM-01-10', label: 'Falta de cuidado o limpieza de las áreas verdes.', valor: -1 },
+  { codigo: 'DEM-01-11', label: 'Falta de postura militar.', valor: -1 },
+  { codigo: 'DEM-01-12', label: 'Falta de pulcritud.', valor: -1 },
+  { codigo: 'DEM-01-13', label: 'Hablar o reír en filas.', valor: -1 },
+  { codigo: 'DEM-01-14', label: 'Jugar en filas.', valor: -1 },
+  { codigo: 'DEM-01-15', label: 'Mal tendido de cama.', valor: -1 },
+  { codigo: 'DEM-01-16', label: 'Moverse en filas.', valor: -1 },
+  { codigo: 'DEM-01-17', label: 'No efectuar el saludo correctamente.', valor: -1 },
+  { codigo: 'DEM-01-18', label: 'No pedir permiso para continuar.', valor: -1 },
+  { codigo: 'DEM-01-19', label: 'No pedir permiso para pasar o retirarse.', valor: -1 },
+  { codigo: 'DEM-01-20', label: 'No realizar correctamente un ejercicio.', valor: -1 },
+  { codigo: 'DEM-01-21', label: 'No presentarse cinco pasos delante de un superior.', valor: -1 },
+  { codigo: 'DEM-01-22', label: 'Tener el casillero desordenado.', valor: -1 },
+
+  { codigo: 'DEM-02-01', label: 'Comer en filas o en aulas.', valor: -2 },
+  { codigo: 'DEM-02-02', label: 'Demostrar indiferencia.', valor: -2 },
+  { codigo: 'DEM-02-03', label: 'Desconocer la jerarquía.', valor: -2 },
+  { codigo: 'DEM-02-04', label: 'Descuidado con el uniforme.', valor: -2 },
+  { codigo: 'DEM-02-05', label: 'Desordenado con sus efectos personales.', valor: -2 },
+  { codigo: 'DEM-02-06', label: 'Desaseado.', valor: -2 },
+  { codigo: 'DEM-02-07', label: 'Eludir el saludo.', valor: -2 },
+  { codigo: 'DEM-02-08', label: 'Falta de camaradería.', valor: -2 },
+  { codigo: 'DEM-02-09', label: 'Falta de cortesía militar.', valor: -2 },
+  { codigo: 'DEM-02-10', label: 'Falta de urbanidad.', valor: -2 },
+  { codigo: 'DEM-02-11', label: 'No acudir con presteza al llamado de un Superior.', valor: -2 },
+  { codigo: 'DEM-02-12', label: 'No contestar el saludo.', valor: -2 },
+  { codigo: 'DEM-02-13', label: 'No cumplir con el horario de encendido y apagado de luces.', valor: -2 },
+  { codigo: 'DEM-02-14', label: 'No cumplir con sus obligaciones como encargado de curso.', valor: -2 },
+  { codigo: 'DEM-02-15', label: 'No cumplir con sus obligaciones como encargado de dormitorio.', valor: -2 },
+  { codigo: 'DEM-02-16', label: 'No cumplir con sus obligaciones como encargado de limpieza.', valor: -2 },
+  { codigo: 'DEM-02-17', label: 'No cumplir con sus obligaciones como encargado de pabellón.', valor: -2 },
+  { codigo: 'DEM-02-18', label: 'No cumplir con sus obligaciones cuando se encuentre de servicio.', valor: -2 },
+  { codigo: 'DEM-02-19', label: 'No pedir permiso para moverse.', valor: -2 },
+  { codigo: 'DEM-02-20', label: 'No llevar la placa de identificación personal.', valor: -2 },
+  { codigo: 'DEM-02-21', label: 'No portar sus útiles de estudio.', valor: -2 },
+  { codigo: 'DEM-02-22', label: 'No repetir correctamente la orden impartida por un superior.', valor: -2 },
+  { codigo: 'DEM-02-23', label: 'Prestar prendas de dotación sin autorización u orden superior.', valor: -2 },
+  { codigo: 'DEM-02-24', label: 'Retirarse o incorporarse a formación sin pedir permiso.', valor: -2 },
+  { codigo: 'DEM-02-25', label: 'Negligente.', valor: -2 },
+
+  { codigo: 'DEM-03-01', label: 'Abuso de confianza.', valor: -3 },
+  { codigo: 'DEM-03-02', label: 'Aducir problemas de salud para no realizar un ejercicio, sin la acreditación médica.', valor: -3 },
+  { codigo: 'DEM-03-03', label: 'Alterar el color natural del cabello.', valor: -3 },
+  { codigo: 'DEM-03-04', label: 'Alterar el uniforme.', valor: -3 },
+  { codigo: 'DEM-03-05', label: 'Demostrar negligencia.', valor: -3 },
+  { codigo: 'DEM-03-06', label: 'Desconocimiento de la reglamentación interna.', valor: -3 },
+  { codigo: 'DEM-03-07', label: 'Descuidado con sus prendas de dotación.', valor: -3 },
+  { codigo: 'DEM-03-08', label: 'Dormir en lugares indebidos.', valor: -3 },
+  { codigo: 'DEM-03-09', label: 'Excederse en sus atribuciones.', valor: -3 },
+  { codigo: 'DEM-03-10', label: 'Comportamiento antideportivo.', valor: -3 },
+  { codigo: 'DEM-03-11', label: 'Falta de control con el personal a su mando.', valor: -3 },
+  { codigo: 'DEM-03-12', label: 'Falta de espíritu de cuerpo.', valor: -3 },
+  { codigo: 'DEM-03-13', label: 'Falta de interés en instrucción o en clases.', valor: -3 },
+  { codigo: 'DEM-03-14', label: 'No cumplir el horario de estudios.', valor: -3 },
+  { codigo: 'DEM-03-15', label: 'No dar correctamente las voces de mando.', valor: -3 },
+  { codigo: 'DEM-03-16', label: 'No dar parte oportunamente.', valor: -3 },
+  { codigo: 'DEM-03-17', label: 'No devolver libros, revistas y otros a la biblioteca en el plazo establecido.', valor: -3 },
+  { codigo: 'DEM-03-18', label: 'No elevar solicitudes.', valor: -3 },
+  { codigo: 'DEM-03-19', label: 'No llevar correctamente el uniforme.', valor: -3 },
+  { codigo: 'DEM-03-20', label: 'No llevar el corte militar reglamentario.', valor: -3 },
+  { codigo: 'DEM-03-21', label: 'No llevar el traje de baño reglamentario.', valor: -3 },
+  { codigo: 'DEM-03-22', label: 'No respetar el toque de silencio.', valor: -3 },
+  { codigo: 'DEM-03-23', label: 'No presentar su papeleta de reposo firmada por el médico de la Escuela Militar de Topografía del Ejército.', valor: -3 },
+  { codigo: 'DEM-03-24', label: 'No presentarse a un Superior después de haber recibido una orden.', valor: -3 },
+  { codigo: 'DEM-03-25', label: 'No vestir el uniforme prescrito.', valor: -3 },
+  { codigo: 'DEM-03-26', label: 'Permanecer en lugares y horas indebidas.', valor: -3 },
+  { codigo: 'DEM-03-27', label: 'Tener objetos o prendas no autorizados.', valor: -3 },
+  { codigo: 'DEM-03-28', label: 'Utilizar joyas de uniforme (anillos, collares, pulseras, aretes no autorizados, etc.).', valor: -3 },
+  { codigo: 'DEM-03-29', label: 'Utilizar maquillaje, pintura de labios, cejas, uñas, etc., no autorizados.', valor: -3 },
+
+  { codigo: 'DEM-04-01', label: 'Dar mal ejemplo.', valor: -4 },
+  { codigo: 'DEM-04-02', label: 'Dar parte falso.', valor: -4 },
+  { codigo: 'DEM-04-03', label: 'Descuidado con el equipo militar.', valor: -4 },
+  { codigo: 'DEM-04-04', label: 'Descuidado con la limpieza de su armamento.', valor: -4 },
+  { codigo: 'DEM-04-05', label: 'Despreciar los alimentos del comedor.', valor: -4 },
+  { codigo: 'DEM-04-06', label: 'Eludir el conducto regular.', valor: -4 },
+  { codigo: 'DEM-04-07', label: 'Expresarse en lenguaje obsceno o inapropiado.', valor: -4 },
+  { codigo: 'DEM-04-08', label: 'Falta de responsabilidad o seriedad en actos de servicio.', valor: -4 },
+  { codigo: 'DEM-04-09', label: 'Fumar en actos del servicio, dentro o fuera de la Escuela Militar de Topografía del Ejército.', valor: -4 },
+  { codigo: 'DEM-04-10', label: 'Ingerir o apropiarse de alimentos destinados a otros Alumnos.', valor: -4 },
+  { codigo: 'DEM-04-11', label: 'Poner apodos ofensivos o denigrantes.', valor: -4 },
+  { codigo: 'DEM-04-12', label: 'Realizar movimientos y gestos obscenos.', valor: -4 },
+  { codigo: 'DEM-04-13', label: 'Realizar reclamos infundados.', valor: -4 },
+  { codigo: 'DEM-04-14', label: 'No cumplir las prescripciones médicas o auto medicarse.', valor: -4 },
+  { codigo: 'DEM-04-15', label: 'No dar parte.', valor: -4 },
+  { codigo: 'DEM-04-16', label: 'No levantarse al toque de diana.', valor: -4 },
+  { codigo: 'DEM-04-17', label: 'No pasar consignas.', valor: -4 },
+  { codigo: 'DEM-04-18', label: 'No permanecer con su Unidad.', valor: -4 },
+  { codigo: 'DEM-04-19', label: 'Promover desorden.', valor: -4 },
+  { codigo: 'DEM-04-20', label: 'Prestarse prendas militares de Subalternos sin autorización u orden Superior.', valor: -4 },
+
+  { codigo: 'DEM-05-01', label: 'Atrasarse a actividades programadas por el Comando de la Escuela Militar de Topografía del Ejército (hasta 15min. después del parte).', valor: -5 },
+  { codigo: 'DEM-05-02', label: 'Atrasarse al relevo de guardia o servicio interno.', valor: -5 },
+  { codigo: 'DEM-05-03', label: 'Eludir los procedimientos de interconsulta médica.', valor: -5 },
+  { codigo: 'DEM-05-04', label: 'Falta de celo con la seguridad de la Escuela Militar de Topografía del Ejército.', valor: -5 },
+  { codigo: 'DEM-05-05', label: 'Falta de don de mando.', valor: -5 },
+  { codigo: 'DEM-05-06', label: 'Falta de moral militar.', valor: -5 },
+  { codigo: 'DEM-05-07', label: 'Falta de respeto con sus camaradas o subalternos.', valor: -5 },
+  { codigo: 'DEM-05-08', label: 'Faltar a formación, mientras no constituya una falta gravísima.', valor: -5 },
+  { codigo: 'DEM-05-09', label: 'Faltar a la palabra empeñada.', valor: -5 },
+  { codigo: 'DEM-05-10', label: 'Hacerse anotar una sanción diferente a la impuesta.', valor: -5 },
+  { codigo: 'DEM-05-11', label: 'Imponer sanciones a nombre de otro superior o camarada.', valor: -5 },
+  { codigo: 'DEM-05-12', label: 'Imponer sanciones por faltas que no se encuentren expresamente tipificadas en el presente Reglamento.', valor: -5 },
+  { codigo: 'DEM-05-13', label: 'Imponer sanciones que se encuentren fuera de su competencia ejecutiva sancionadora.', valor: -5 },
+  { codigo: 'DEM-05-14', label: 'Mantener conversaciones o encontrarse con el sexo opuesto, en áreas aisladas, restringidas o en horas indebidas.', valor: -5 },
+  { codigo: 'DEM-05-15', label: 'Mantener amistad con Superiores, Subalternos, empleados civiles, personal de servicios y Soldados.', valor: -5 },
+  { codigo: 'DEM-05-16', label: 'No cumplir las normas de seguridad en toda actividad.', valor: -5 },
+  { codigo: 'DEM-05-17', label: 'No cumplir una sanción.', valor: -5 },
+  { codigo: 'DEM-05-18', label: 'No dar parte de algún incidente en actos del servicio.', valor: -5 },
+  { codigo: 'DEM-05-19', label: 'No hacerse anotar una sanción.', valor: -5 },
+  { codigo: 'DEM-05-20', label: 'No honrar sus deudas.', valor: -5 },
+  { codigo: 'DEM-05-21', label: 'No presentar trabajos o ejercicios prácticos.', valor: -5 },
+  { codigo: 'DEM-05-22', label: 'Realizar instalaciones eléctricas clandestinas en la Escuela Militar de Topografía del Ejército.', valor: -5 },
+  { codigo: 'DEM-05-23', label: 'Recibir o entregar la guardia o cualquier servicio interno incorrectamente.', valor: -5 },
+  { codigo: 'DEM-05-24', label: 'Recibir visitas en horas o lugares indebidos.', valor: -5 },
+  { codigo: 'DEM-05-25', label: 'Representar en términos indecorosos.', valor: -5 },
+  { codigo: 'DEM-05-26', label: 'Reincidencia en la comisión de faltas del Grupo IV.', valor: -5 },
+
+  { codigo: 'DEM-06-01', label: 'Abandonar actividades programadas sin autorización.', valor: -6 },
+  { codigo: 'DEM-06-02', label: 'Abandonar la sanidad, hospital o centro médico sin autorización.', valor: -6 },
+  { codigo: 'DEM-06-03', label: 'Abuso de autoridad.', valor: -6 },
+  { codigo: 'DEM-06-04', label: 'Acosar, hostigar a un Superior, camarada o Subalterno.', valor: -6 },
+  { codigo: 'DEM-06-05', label: 'Incorporarse con retraso de hasta 15 (quince) minutos, a cualquier actividad programada por la Escuela Militar de Topografía del Ejército.', valor: -6 },
+  { codigo: 'DEM-06-06', label: 'Concurrir de uniforme a lugares inapropiados o indebidos.', valor: -6 },
+  { codigo: 'DEM-06-07', label: 'Demostrar conducta indecorosa dentro o fuera de la Escuela Militar de Topografía del Ejército.', valor: -6 },
+  { codigo: 'DEM-06-08', label: 'Descuidado con el armamento o material.', valor: -6 },
+  { codigo: 'DEM-06-09', label: 'Discutir delante de Superiores o Subalternos.', valor: -6 },
+  { codigo: 'DEM-06-10', label: 'Extraviar prendas o artículos de dotación.', valor: -6 },
+  { codigo: 'DEM-06-11', label: 'Falta de hidalguía.', valor: -6 },
+  { codigo: 'DEM-06-12', label: 'Falta de respeto con el Uniforme.', valor: -6 },
+  { codigo: 'DEM-06-13', label: 'Falta de respeto con un Superior, Docente o Personal de Apoyo.', valor: -6 },
+  { codigo: 'DEM-06-14', label: 'Faltar a la verdad.', valor: -6 },
+  { codigo: 'DEM-06-15', label: 'Faltar a clases, instrucción, deportes o actividades programadas.', valor: -6 },
+  { codigo: 'DEM-06-16', label: 'Fingir enfermedad o problemas de salud.', valor: -6 },
+  { codigo: 'DEM-06-17', label: 'Fingir el periodo menstrual para eludir actividades o para no cumplir sanciones.', valor: -6 },
+  { codigo: 'DEM-06-18', label: 'Fomentar la discordia y los chismes.', valor: -6 },
+  { codigo: 'DEM-06-19', label: 'Hacerse anotar una falta no impuesta por un Superior.', valor: -6 },
+  { codigo: 'DEM-06-20', label: 'Levantar en falso el nombre de un Superior.', valor: -6 },
+  { codigo: 'DEM-06-21', label: 'Modificar las órdenes de un Superior.', valor: -6 },
+  { codigo: 'DEM-06-22', label: 'No auxiliar a los Miembros de las FF.AA.', valor: -6 },
+  { codigo: 'DEM-06-23', label: 'No cumplir sus obligaciones en la guardia.', valor: -6 },
+  { codigo: 'DEM-06-24', label: 'No cumplir una orden verbal o escrita.', valor: -6 },
+  { codigo: 'DEM-06-27', label: 'No incorporarse inmediatamente a la Escuela Militar de Topografía del Ejército o a sus actividades después de su alta de Sanidad, Hospital o Centro Médico.', valor: -6 },
+  { codigo: 'DEM-06-28', label: 'No presentar vestuario, material, equipo o prendas de dotación.', valor: -6 },
+  { codigo: 'DEM-06-29', label: 'No presentarse a la autoridad militar más próxima cuando sale de la guarnición por cualquier motivo.', valor: -6 },
+  { codigo: 'DEM-06-30', label: 'No respetar los horarios de descanso.', valor: -6 },
+  { codigo: 'DEM-06-31', label: 'Obligar o ejercer influencias negativas sobre subalternos.', valor: -6 },
+  { codigo: 'DEM-06-32', label: 'Practicar juegos de azar en la Escuela Militar de Topografía del Ejército.', valor: -6 },
+  { codigo: 'DEM-06-33', label: 'Propagar rumores.', valor: -6 },
+  { codigo: 'DEM-06-34', label: 'Publicar imágenes o videos en las redes sociales con uniforme y equipo militar.', valor: -6 },
+  { codigo: 'DEM-06-35', label: 'Reincidencia en la comisión de faltas del Grupo V.', valor: -6 },
+  { codigo: 'DEM-06-36', label: 'Sacar de la Escuela Militar de Topografía del Ejército, vestuario, equipo o prendas de dotación sin autorización.', valor: -6 },
+  { codigo: 'DEM-06-37', label: 'Tener, portar o difundir material pornográfico por cualquier medio electrónico o escrito.', valor: -6 },
+  { codigo: 'DEM-06-38', label: 'Tratar de engañar a un Superior o sorprender la buena fe de un Superior.', valor: -6 },
+  { codigo: 'DEM-06-39', label: 'Ingresar, transitar o permanecer en áreas restringidas o prohibidas sin autorización.', valor: -6 }
+];
+
+consejoCatalogo: MeritoItem[] = [
+  { codigo: 'DEM-07-01', label: 'Abandonar el servicio interno.', valor: -7 },
+  { codigo: 'DEM-07-02', label: 'Abandonar la guarnición sin autorización.', valor: -7 },
+  { codigo: 'DEM-07-03', label: 'No cumplir o abandonar comisiones del servicio.', valor: -7 },
+  { codigo: 'DEM-07-04', label: 'Acusar o denunciar a un superior, camarada o subalterno sin prueba o evidencias objetivas.', valor: -7 },
+  { codigo: 'DEM-07-05', label: 'Adquirir, vender, donar o recibir vestuario, equipo militar, etc.', valor: -7 },
+  { codigo: 'DEM-07-06', label: 'Burlar la vigilancia de la guardia.', valor: -7 },
+  { codigo: 'DEM-07-07', label: 'Cometer faltas reñidas contra la moral y las buenas costumbres.', valor: -7 },
+  { codigo: 'DEM-07-08', label: 'Dar órdenes o disposiciones contrarias a las normas establecidos en los Reglamentos.', valor: -7 },
+  { codigo: 'DEM-07-09', label: 'Disparar un arma sin autorización.', valor: -7 },
+  { codigo: 'DEM-07-10', label: 'Dormirse en cumplimiento de su servicio de guardia.', valor: -7 },
+  { codigo: 'DEM-07-11', label: 'Efectuar descuentos no autorizados.', valor: -7 },
+  { codigo: 'DEM-07-12', label: 'Realizar actos indecorosos dentro o fuera de la Escuela Militar de Topografía del Ejército, vistiendo uniforme militar.', valor: -7 },
+  { codigo: 'DEM-07-13', label: 'Falta de respeto con los símbolos patrios.', valor: -7 },
+  { codigo: 'DEM-07-14', label: 'Incorporarse por más de una hora de retraso al horario establecido para la incorporación de francos o de cualquier actividad programada por la Escuela Militar de Topografía del Ejército.', valor: -7 },
+  { codigo: 'DEM-07-15', label: 'Formular maliciosamente representaciones con falsos argumentos.', valor: -7 },
+  { codigo: 'DEM-07-16', label: 'Hacerse reemplazar en la guardia sin autorización del Comando.', valor: -7 },
+  { codigo: 'DEM-07-17', label: 'Imponer castigos indebidos con fines de diversión, burla o que atenten contra la dignidad.', valor: -7 },
+  { codigo: 'DEM-07-18', label: 'Incorporarse a la Escuela Militar de Topografía del Ejército de cualquier actividad o permiso con aliento a bebidas alcohólicas.', valor: -7 },
+  { codigo: 'DEM-07-19', label: 'Incorporarse a cumplir con el servicio de guardia o servicio interno, hasta dos horas después de la hora del relevo.', valor: -7 },
+  { codigo: 'DEM-07-20', label: 'Ingresar o salir de la Escuela Militar de Topografía del Ejército, por lugares indebidos.', valor: -7 },
+  { codigo: 'DEM-07-21', label: 'Intento de fraude en exámenes o pruebas de evaluación.', valor: -7 },
+  { codigo: 'DEM-07-22', label: 'Intentar sobornar al personal encargado de las calificaciones para mejorar o cambiar su nota.', valor: -7 },
+  { codigo: 'DEM-07-23', label: 'Intentar sobornar a personal de cuadros, soldados o personal civil de la Escuela Militar de Topografía del Ejército buscando algún beneficio personal.', valor: -7 },
+  { codigo: 'DEM-07-24', label: 'Instigar o ser causante del abandono o deserción de la Escuela Militar de Topografía del Ejército de las Alumnas, Alumnos y/o Postulantes a Alumnos.', valor: -7 },
+  { codigo: 'DEM-07-25', label: 'Manifestaciones de tibieza, o disgusto o desprecio delante de un Superior.', valor: -7 },
+  { codigo: 'DEM-07-26', label: 'Modificar maliciosamente una sanción impuesta por un Superior.', valor: -7 },
+  { codigo: 'DEM-07-27', label: 'Murmurar o hablar mal de un Superior.', valor: -7 },
+  { codigo: 'DEM-07-28', label: 'No asistir a ejercicios militares o actividades programadas sin autorización del Comando.', valor: -7 },
+  { codigo: 'DEM-07-29', label: 'No cumplir disposiciones contenidas en la orden del día.', valor: -7 },
+  { codigo: 'DEM-07-30', label: 'No presentarse a exámenes sin justificación o autorización.', valor: -7 },
+  { codigo: 'DEM-07-31', label: 'No presentarse en la ejecución del Plan de Llamadas.', valor: -7 },
+  { codigo: 'DEM-07-32', label: 'No presentarse en la Escuela Militar de Topografía del Ejército o no dar parte al Capitán de Servicio inmediatamente después de haber sufrido un incidente durante permisos, franco o descanso pedagógico.', valor: -7 },
+  { codigo: 'DEM-07-33', label: 'No sobreponerse al miedo, temor o pánico.', valor: -7 },
+  { codigo: 'DEM-07-34', label: 'Ocupar soldados para fines personales.', valor: -7 },
+  { codigo: 'DEM-07-35', label: 'Pedir cuotas y otras contribuciones no autorizadas.', valor: -7 },
+  { codigo: 'DEM-07-36', label: 'Promover o participar en escándalos, reyertas callejeras, frecuentar lenocinios o lugares indebidos.', valor: -7 },
+  { codigo: 'DEM-07-37', label: 'Protagonizar o ser parte de peleas con sus camaradas.', valor: -7 },
+  { codigo: 'DEM-07-38', label: 'Realizar plagio en trabajos prácticos.', valor: -7 },
+  { codigo: 'DEM-07-39', label: 'Sacar armamento que no le corresponda.', valor: -7 },
+  { codigo: 'DEM-07-40', label: 'Tener, adquirir, vender, obtener, hacer circular preguntas, exámenes o pruebas de evaluación.', valor: -7 },
+  { codigo: 'DEM-07-41', label: 'Tenencia, portación o difusión de videos o fotografías, que denigren la dignidad de un superior, camarada o subalterno.', valor: -7 },
+  { codigo: 'DEM-07-42', label: 'Tenencia, portación o uso de celular, Tablet, MP3, modem de internet sin autorización del Comando.', valor: -7 },
+  { codigo: 'DEM-07-43', label: 'Tratar o conseguir favores a través de indulgencias o servilismo.', valor: -7 },
+  { codigo: 'DEM-07-44', label: 'Realizar acoso de cualquier naturaleza con malas intenciones.', valor: -7 },
+  { codigo: 'DEM-07-45', label: 'Reincidencia en la comisión de faltas del Grupo VI.', valor: -7 },
+  { codigo: 'DEM-07-46', label: 'Reusarse a someterse a las pruebas de sangre u orina, de alcoholemia, test de embarazo, VIH, estupefacientes y otros que se requiera en la Escuela Militar de Topografía del Ejército.', valor: -7 },
+  { codigo: 'DEM-07-47', label: 'Suplantar la jerarquía militar.', valor: -7 },
+  { codigo: 'DEM-07-48', label: 'Utilizar información manipulada, distorsionada o falsa.', valor: -7 },
+  { codigo: 'DEM-07-49', label: 'Utilizar injerencias internas o externas al Régimen Interno y Disciplinario.', valor: -7 },
+  { codigo: 'DEM-07-50', label: 'Utilizar redes de internet sin autorización del Comando.', valor: -7 }
+];
+
+
+  consejoSeleccionado: string | null = null;
+  valorConsejoControl = new FormControl<number | null>(null);
+  // obsConsejoControl   = new FormControl<string>('');
+  
+  deshabilitarCampo(materia: { nombre: string }): boolean {
+    const v = this.notasRegistradas[materia.nombre];
+    if (typeof v === 'number') {
+      return v >= 0 && v <= 3000;
+    }
+    return false;
+  }
+  onMeritoChange(valor: number) {
+    // Guarda el valor seleccionado del select
+    this.notasRegistradas['Meritos'] = valor;
+    // Si necesitas disparar persistencia o cálculo posterior, hazlo aquí
+    // this.guardarNotas(); // opcional
+  }
   materiasBasico = [
     { codigo: 'BAS-CMI-01-02', nombre: 'Correspondencia Militar' },
     { codigo: 'BAS-DCO-01-04', nombre: 'Documentación del Primero de Comp., Edron o Btr.' },
@@ -1167,8 +1491,10 @@ tablaContexturaFisicaF: ContexturaFisica[] = [
   estudiante: any = null;
   nivelSeleccionado: string = '';
   nivelSeleccionado2: string = '';
+  nivelSeleccionado3: string = '';
   cargandoNotas: boolean = false;
   cargandoNotas2: boolean = false;
+  cargandoNotas3: boolean = false;
   editarNotas: boolean = false;
   codigo1Generado = '';
   codigo2Generado = '';
@@ -1177,7 +1503,15 @@ tablaContexturaFisicaF: ContexturaFisica[] = [
   puedeEditarTodo = false;
   private subscription!: Subscription;
   readonly dialog = inject(MatDialog);
-
+  meritosFilterControl = new FormControl<string>('', { nonNullable: true });
+  filteredMeritosCatalogo$: Observable<MeritoItem[]> = of(this.meritosCatalogo);
+  demeritosFilterControl = new FormControl<string>('', { nonNullable: true });
+  filteredDemeritosCatalogo$: Observable<MeritoItem[]> = of(this.demeritosCatalogo);
+  consejoFilterControl = new FormControl<string>('', { nonNullable: true });
+  filteredConsejoCatalogo$: Observable<MeritoItem[]> = of(this.consejoCatalogo);
+  @ViewChild('consejoSearchInput') consejoSearchInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('meritosSearchInput') meritosSearchInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('demeritosSearchInput') demeritosSearchInput!: ElementRef<HTMLInputElement>;
   constructor(private estudianteService: EstudianteService, private firestore: Firestore) {}
 
   ngOnInit(): void {
@@ -1186,12 +1520,105 @@ tablaContexturaFisicaF: ContexturaFisica[] = [
       console.log("Datos recibidos:", data);
     });
     this.obtenerFirmas();
+    this.filteredMeritosCatalogo$ = this.meritosFilterControl.valueChanges.pipe(
+      startWith(''),
+      map(term => this.filterMeritos(term))
+    );
+    this.filteredDemeritosCatalogo$ = this.demeritosFilterControl.valueChanges.pipe(
+      startWith(''),
+      map(term => this.filterCatalogo(this.demeritosCatalogo, term))
+    );
+    this.filteredConsejoCatalogo$ = this.consejoFilterControl.valueChanges.pipe(
+      startWith(''),
+      map(term => this.filterCatalogoConsejo(term))
+    );
   }
 
   ngOnDestroy() {
     // this.subscription.unsubscribe();
   }
 
+  private normalize(text: string): string {
+    return (text || '')
+      .toLowerCase()
+      .normalize('NFD')        // quita acentos
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim();
+  }
+
+  private filterMeritos(term: string): MeritoItem[] {
+    const q = this.normalize(term);
+    if (!q) return this.meritosCatalogo;
+
+    return this.meritosCatalogo.filter(item => {
+      const code = this.normalize(item.codigo);
+      const label = this.normalize(item.label);
+      return code.includes(q) || label.includes(q);
+    });
+  }
+
+  private filterCatalogoConsejo(term: string): MeritoItem[] {
+    const q = this.normalize(term);
+    if (!q) return this.consejoCatalogo;
+    return this.consejoCatalogo.filter(item => {
+      const code = this.normalize(item.codigo);
+      const label = this.normalize(item.label);
+      return code.includes(q) || label.includes(q);
+    });
+  }
+
+  /** Enfoca el input cuando se abre el select */
+  onMeritosOpened(opened: boolean) {
+    if (opened) {
+      // Pequeño delay para que el panel exista en el DOM
+      setTimeout(() => this.meritosSearchInput?.nativeElement?.focus(), 60);
+    } else {
+      // Limpia el filtro al cerrar (opcional)
+      // this.meritosFilterControl.setValue('');
+    }
+  }
+  onConsejosOpened(opened: boolean) {
+    if (opened) {
+      setTimeout(() => this.consejoSearchInput?.nativeElement?.focus(), 60);
+    } else {
+      // opcional: limpiar el filtro
+      // this.consejoFilterControl.setValue('');
+    }
+  }
+  onDemeritosOpened(opened: boolean) {
+    if (opened) {
+      setTimeout(() => this.demeritosSearchInput?.nativeElement?.focus(), 60);
+    } else {
+      // opcional: limpiar búsqueda al cerrar
+      // this.demeritosFilterControl.setValue('');
+    }
+  }
+  private demeritoSeleccionado: string | null = null;
+  onDemeritoSeleccionado(value: string) {
+    this.demeritoSeleccionado = value;                // p.ej. 'DEM-01-01'
+    this.notasRegistradas['Demeritos'] = value as any;
+  }
+  onConsejoSeleccionado(codigo: string) {
+    this.consejoSeleccionado = codigo;
+    this.notasRegistradas['Consejo'] = codigo as any;
+
+    // (opcional) precargar valor sugerido del catálogo para que lo editen
+    const it = this.consejoCatalogo.find(c => c.codigo === codigo);
+    this.valorConsejoControl.setValue(it ? it.valor : null);
+  }
+  // onMeritoSeleccionado(value: string) {
+  //   this.meritoSeleccionado = value;            // ya lo usas para guardar
+  //   this.notasRegistradas['Meritos'] = value as any;
+  // }
+  filterCatalogo(cat: MeritoItem[], term: string): MeritoItem[] {
+    const q = this.normalize(term);
+    if (!q) return cat;
+    return cat.filter(item => {
+      const code = this.normalize(item.codigo);
+      const label = this.normalize(item.label);
+      return code.includes(q) || label.includes(q);
+    });
+  }
   async obtenerFirmas() {
     const firmas = await this.estudianteService.obtenerFirmas();
     if (firmas) {
@@ -2037,6 +2464,48 @@ async obtenerNotasFisico() {
     }
   }
 
+ async obtenerNotasDiciplina() {
+  this.cargandoNotas3 = true;
+  try {
+    if (!this.estudiante?.id || !this.nivelSeleccionado3) {
+      console.warn('Faltan datos para obtener notas de disciplina.');
+      return;
+    }
+
+    const ci = this.estudiante.id;
+    const nivel = this.nivelSeleccionado3;
+
+    const datos: NotasDisciplina = await this.estudianteService.obtenerNotasDisciplina(ci, nivel);
+
+    // Listas
+    this.listaMeritos   = datos.meritos;
+    this.listaDemeritos = datos.demeritos;
+    this.listaConsejo   = datos.consejos;
+
+    // Totales
+    this.sumaMeritos   = datos.totalMeritos;
+    this.sumaDemeritos = datos.totalDemeritos;
+    this.sumaConsejo   = datos.totalConsejo;
+
+    // Preselección (si quieres)
+    this.notasRegistradas = { ...(this.notasRegistradas || {}) };
+    // this.notasRegistradas['Meritos']   = datos.ultimoMerito   ?? null;
+    // this.notasRegistradas['Demeritos'] = datos.ultimoDemerito ?? null;
+    // this.notasRegistradas['Consejo']   = datos.ultimoConsejo  ?? null;
+
+  } catch (e) {
+    console.error('Error al procesar notas de disciplina:', e);
+    this.listaMeritos = [];
+    this.listaDemeritos = [];
+    this.listaConsejo = [];
+    this.sumaMeritos = 0;
+    this.sumaDemeritos = 0;
+    this.sumaConsejo = 0;
+  } finally {
+    this.cargandoNotas3 = false;
+  }
+}
+
   onNivelChange() {
     if (this.estudiante?.id && this.nivelSeleccionado) {
       this.obtenerNotas();
@@ -2048,6 +2517,234 @@ async obtenerNotasFisico() {
       this.obtenerNotasFisico();
     }
   }
+
+  onNivelChangeDiscipline() {
+    if (this.estudiante?.id && this.nivelSeleccionado3) {
+      this.obtenerNotasDiciplina();
+    }
+  }
+
+  private meritoSeleccionado: string | number | null = null;
+
+onMeritoSeleccionado(value: string): void {
+  this.meritoSeleccionado = value;                 // p.ej. 'MER-01-01'
+  this.notasRegistradas['Meritos'] = value as any; // opcional, si quieres reflejarlo
+}
+
+// private async getNextMeritoIndex(ci: string, nivel: string): Promise<number> {
+//   // colección: estudiante/{ci}/{nivel}/MERITOS/items
+//   const itemsCol = collection(this.firestore, `estudiante/${ci}/${nivel}/MERITOS/items`);
+//   const snap = await getDocs(itemsCol);
+
+//   const indices = snap.docs
+//     .map(d => d.id)
+//     .filter(id => /^MERITO\d+$/.test(id))
+//     .map(id => parseInt(id.replace('MERITO', ''), 10))
+//     .filter(n => !Number.isNaN(n));
+
+//   return indices.length ? Math.max(...indices) + 1 : 1;
+// }
+// private async getNextIndexFor(pathCol: string): Promise<number> {
+//   const itemsCol = collection(this.firestore, pathCol);
+//   const snap = await getDocs(itemsCol);
+//   const indices = snap.docs
+//     .map(d => d.id)
+//     .filter(id => /^DEMERITO\d+$/.test(id))
+//     .map(id => parseInt(id.replace('DEMERITO', ''), 10))
+//     .filter(n => !Number.isNaN(n));
+//   return indices.length ? Math.max(...indices) + 1 : 1;
+// }
+/** Obtiene el siguiente correlativo para IDS tipo PREFIX{N}, p.ej. MERITO3 / DEMERITO7 */
+private async getNextIndex(
+  pathCol: string,
+  prefix: 'MERITO' | 'DEMERITO' | 'CONSEJO'
+): Promise<number> {
+  const itemsCol = collection(this.firestore, pathCol);
+  const snap = await getDocs(itemsCol);
+
+  const indices = snap.docs
+    .map(d => d.id)
+    .filter(id => new RegExp(`^${prefix}\\d+$`).test(id))
+    .map(id => parseInt(id.replace(prefix, ''), 10))
+    .filter(n => !Number.isNaN(n));
+
+  return indices.length ? Math.max(...indices) + 1 : 1;
+}
+private async guardarConsejo(ci: string, nivel: string): Promise<string> {
+  if (!this.consejoSeleccionado) throw new Error('No hay consejo seleccionado');
+
+  const item = this.consejoCatalogo.find(c => c.codigo === this.consejoSeleccionado);
+  if (!item) throw new Error('Consejo no encontrado en el catálogo');
+
+  const valorConsejo = this.valorConsejoControl?.value;
+  if (valorConsejo == null || Number.isNaN(+valorConsejo)) {
+    throw new Error('Valor del consejo inválido');
+  }
+  // Rango (ajústalo si cambia): mín -30, máx -7
+  if (+valorConsejo < -30 || +valorConsejo > -7) {
+    throw new Error('El valor del consejo debe estar entre -30 y -7');
+  }
+
+  // Doc contenedor CONSEJO
+  const contenedorRef = doc(this.firestore, `estudiante/${ci}/${nivel}/CONSEJO`);
+  await setDoc(contenedorRef, { actualizadoEn: new Date().toISOString() }, { merge: true });
+
+  // Subcolección e índice
+  const itemsPath = `estudiante/${ci}/${nivel}/CONSEJO/items`;
+  const nextIndex = await this.getNextIndex(itemsPath, 'CONSEJO');
+  const docId = `CONSEJO${nextIndex}`;
+
+  const ref = doc(this.firestore, `${itemsPath}/${docId}`);
+  const payload = {
+    codigo: item.codigo,
+    label: item.label,
+    valorCatalogo: item.valor,                         // en tu catálogo es -7
+    valorConsejo: +valorConsejo,                       // decidido por el consejo
+    // observacion: this.obsConsejoControl?.value?.trim() || null,
+    creadoEn: new Date().toISOString(),
+    // creadoPor: this.usuarioActual?.id ?? null,
+  };
+
+  await setDoc(ref, payload);
+  return docId;
+}
+
+/** Guarda un item en estudiante/{ci}/{nivel}/{CONTENEDOR}/items/{PREFIX}{N} */
+private async guardarItemDisciplina(opts: {
+  ci: string;
+  nivel: string;
+  contenedor: 'MERITOS' | 'DEMERITOS';
+  prefix: 'MERITO' | 'DEMERITO';
+  item: MeritoItem;
+}): Promise<string> {
+  const { ci, nivel, contenedor, prefix, item } = opts;
+
+  // doc contenedor (útil para metadatos)
+  const contenedorRef = doc(this.firestore, `estudiante/${ci}/${nivel}/${contenedor}`);
+  await setDoc(contenedorRef, { actualizadoEn: new Date().toISOString() }, { merge: true });
+
+  const itemsPath = `estudiante/${ci}/${nivel}/${contenedor}/items`;
+  const nextIndex = await this.getNextIndex(itemsPath, prefix);
+  const docId = `${prefix}${nextIndex}`;
+
+  const itemRef = doc(this.firestore, `${itemsPath}/${docId}`);
+  const payload = {
+    codigo: item.codigo,
+    label: item.label,
+    valor: item.valor,
+    creadoEn: new Date().toISOString(),
+    // creadoPor: this.usuarioActual?.id ?? null,
+  };
+
+  await setDoc(itemRef, payload);
+  return docId; // por si quieres mostrarlo en el toast
+}
+async saveDiscipline(): Promise<void> {
+  try {
+    if (!this.estudiante?.id || !this.nivelSeleccionado3) {
+      await Swal.fire({
+        icon: 'warning',
+        title: 'Faltan datos',
+        text: 'Debes seleccionar un nivel y un estudiante antes de continuar.'
+      });
+      return;
+    }
+
+    const ci = this.estudiante.id;
+    const nivel = this.nivelSeleccionado3;
+
+    let guardoMerito = false;
+    let guardoDemerito = false;
+    let guardoConsejo = false;
+
+    let idMeritoCreado = '';
+    let idDemeritoCreado = '';
+    let idConsejoCreado = '';
+
+    // ====== MÉRITO (igual que antes) ======
+    if (this.meritoSeleccionado) {
+      const merito = this.meritosCatalogo.find(m => m.codigo === this.meritoSeleccionado);
+      if (!merito) {
+        await Swal.fire({ icon: 'error', title: 'Mérito no encontrado', text: 'No se pudo localizar el mérito seleccionado en el catálogo.' });
+      } else {
+        idMeritoCreado = await this.guardarItemDisciplina({
+          ci, nivel, contenedor: 'MERITOS', prefix: 'MERITO', item: merito
+        });
+        guardoMerito = true;
+      }
+    }
+
+    // ====== DEMÉRITO (igual que antes) ======
+    if (this.demeritoSeleccionado) {
+      const demerito = this.demeritosCatalogo.find(d => d.codigo === this.demeritoSeleccionado);
+      if (!demerito) {
+        await Swal.fire({ icon: 'error', title: 'Demérito no encontrado', text: 'No se pudo localizar el demérito seleccionado en el catálogo.' });
+      } else {
+        idDemeritoCreado = await this.guardarItemDisciplina({
+          ci, nivel, contenedor: 'DEMERITOS', prefix: 'DEMERITO', item: demerito
+        });
+        guardoDemerito = true;
+      }
+    }
+
+    // ====== CONSEJO (nuevo) ======
+    if (this.consejoSeleccionado && this.valorConsejoControl?.value != null) {
+      try {
+        idConsejoCreado = await this.guardarConsejo(ci, nivel);
+        guardoConsejo = true;
+      } catch (e: any) {
+        await Swal.fire({ icon: 'error', title: 'Consejo', text: e?.message || 'No se pudo guardar el Consejo.' });
+      }
+    }
+
+    if (!guardoMerito && !guardoDemerito && !guardoConsejo) {
+      await Swal.fire({
+        icon: 'info',
+        title: 'Sin selección',
+        text: 'Selecciona al menos un Mérito, un Demérito o un Consejo para guardar.'
+      });
+      return;
+    }
+
+    const partes: string[] = [];
+    if (guardoMerito)   partes.push(`Mérito (${idMeritoCreado})`);
+    if (guardoDemerito) partes.push(`Demérito (${idDemeritoCreado})`);
+    if (guardoConsejo)  partes.push(`Consejo (${idConsejoCreado})`);
+
+    await Swal.fire({
+      icon: 'success',
+      title: 'Guardado',
+      text: `Se registró: ${partes.join(' • ')}.`,
+      timer: 2200,
+      showConfirmButton: false
+    });
+
+    // Limpieza opcional
+    if (guardoMerito) {
+      this.meritoSeleccionado = null;
+      this.notasRegistradas['Meritos'] = null as any;
+    }
+    if (guardoDemerito) {
+      this.demeritoSeleccionado = null;
+      this.notasRegistradas['Demeritos'] = null as any;
+    }
+    if (guardoConsejo) {
+      this.consejoSeleccionado = null;
+      this.notasRegistradas['Consejo'] = null as any;
+      this.valorConsejoControl.reset();
+      // this.obsConsejoControl?.reset?.();
+    }
+
+  } catch (error) {
+    console.error('Error al guardar disciplina:', error);
+    await Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'Ocurrió un problema al guardar los datos de disciplina.'
+    });
+  }
+}
+
 
   // validarRango(event: Event) {
   //   const input = event.target as HTMLInputElement;
@@ -2174,8 +2871,32 @@ validarRango(event: Event, materiaNombre: string, fase: 'input' | 'blur' = 'inpu
 
       this.generandoPDF = false;
     }, 500);
-}
+  }
 
+  async printDiscipline() {
+    this.today = new Date();
+    this.generandoPDF = true;
+    setTimeout(async () => {
+      const content = this.pdfContentDiscipline.nativeElement; // 👈 referencia nueva
+      const canvas = await html2canvas(content, {
+        scale: 2,
+        backgroundColor: '#FFFFFF',
+        useCORS: true
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'letter');
+
+      const pageWidth = 215.9; // carta
+      const pageHeight = 279.4;
+      const imgHeight = (canvas.height * pageWidth) / canvas.width;
+
+      pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, imgHeight);
+      pdf.save('Diciplina.pdf');
+
+      this.generandoPDF = false;
+    }, 500);
+  }
 
 
 }
