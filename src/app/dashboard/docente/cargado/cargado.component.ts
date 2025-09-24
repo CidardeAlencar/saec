@@ -1492,9 +1492,11 @@ consejoCatalogo: MeritoItem[] = [
   nivelSeleccionado: string = '';
   nivelSeleccionado2: string = '';
   nivelSeleccionado3: string = '';
+  nivelSeleccionado4: string = '';
   cargandoNotas: boolean = false;
   cargandoNotas2: boolean = false;
   cargandoNotas3: boolean = false;
+  cargandoNotas4: boolean = false;
   editarNotas: boolean = false;
   codigo1Generado = '';
   codigo2Generado = '';
@@ -2873,30 +2875,103 @@ validarRango(event: Event, materiaNombre: string, fase: 'input' | 'blur' = 'inpu
     }, 500);
   }
 
+  // async printDiscipline() {
+  //   this.today = new Date();
+  //   this.generandoPDF = true;
+  //   setTimeout(async () => {
+  //     const content = this.pdfContentDiscipline.nativeElement; // 👈 referencia nueva
+  //     const canvas = await html2canvas(content, {
+  //       scale: 2,
+  //       backgroundColor: '#FFFFFF',
+  //       useCORS: true
+  //     });
+
+  //     const imgData = canvas.toDataURL('image/png');
+  //     const pdf = new jsPDF('p', 'mm', 'letter');
+
+  //     const pageWidth = 215.9; // carta
+  //     const pageHeight = 279.4;
+  //     const imgHeight = (canvas.height * pageWidth) / canvas.width;
+
+  //     pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, imgHeight);
+  //     pdf.save('Diciplina.pdf');
+
+  //     this.generandoPDF = false;
+  //   }, 500);
+  // }
+
   async printDiscipline() {
     this.today = new Date();
     this.generandoPDF = true;
+
     setTimeout(async () => {
-      const content = this.pdfContentDiscipline.nativeElement; // 👈 referencia nueva
-      const canvas = await html2canvas(content, {
-        scale: 2,
-        backgroundColor: '#FFFFFF',
-        useCORS: true
-      });
+      try {
+        const content = this.pdfContentDiscipline.nativeElement;
 
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'letter');
+        const canvas = await html2canvas(content, {
+          scale: 2,
+          backgroundColor: '#FFFFFF',
+          useCORS: true,
+          allowTaint: false,
+          logging: false
+        });
 
-      const pageWidth = 215.9; // carta
-      const pageHeight = 279.4;
-      const imgHeight = (canvas.height * pageWidth) / canvas.width;
+        const pdf = new jsPDF('p', 'mm', 'letter');
 
-      pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, imgHeight);
-      pdf.save('Diciplina.pdf');
+        // Tamaño carta en mm
+        const pageWidth  = pdf.internal.pageSize.getWidth();   // ~215.9
+        const pageHeight = pdf.internal.pageSize.getHeight();  // ~279.4
 
-      this.generandoPDF = false;
+        // Márgenes y área útil (ajusta si quieres márgenes distintos)
+        const margin   = 10;   // mm
+        const usableW  = pageWidth  - margin * 2;
+        const usableH  = pageHeight - margin * 2;
+
+        // Altura (en píxeles del canvas) equivalente a una página del PDF
+        // Se respeta la proporción usando el ancho útil
+        const pxPerPage = Math.floor(canvas.width * (usableH / usableW));
+
+        // Canvas “por página” para ir recortando porciones verticales
+        const pageCanvas = document.createElement('canvas');
+        const pageCtx = pageCanvas.getContext('2d')!;
+        pageCanvas.width  = canvas.width;
+        pageCanvas.height = pxPerPage;
+
+        let rendered = 0;
+        let isFirstPage = true;
+
+        while (rendered < canvas.height) {
+          // Recortar la porción visible
+          pageCtx.clearRect(0, 0, pageCanvas.width, pageCanvas.height);
+          pageCtx.drawImage(
+            canvas,
+            0, rendered, canvas.width, pxPerPage,   // src (recorte)
+            0, 0, pageCanvas.width, pageCanvas.height // dst
+          );
+
+          const pageImgData = pageCanvas.toDataURL('image/png');
+
+          if (!isFirstPage) {
+            pdf.addPage();
+          }
+
+          // Agregar imagen a la página respetando márgenes y área útil
+          pdf.addImage(pageImgData, 'PNG', margin, margin, usableW, usableH);
+
+          isFirstPage = false;
+          rendered += pxPerPage;
+        }
+
+        pdf.save('Disciplina.pdf'); // (corrijo el nombre)
+
+      } catch (err) {
+        console.error('Error al generar PDF de Disciplina:', err);
+      } finally {
+        this.generandoPDF = false;
+      }
     }, 500);
   }
+
 
 
 }
