@@ -84,7 +84,14 @@
   justify-content: flex-start;
   align-items: center;
   min-height: 100vh;
-  background-color: var(--color-background-light);
+  // background-color: var(--color-background-light);
+  // background-image: url('../../../assets/background.jpeg');
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), /* capa oscura */
+    url('../../../assets/background3.jpeg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   width: 100%;
   box-sizing: border-box;
 }
@@ -114,6 +121,11 @@
     padding-left: 20px;
 
   }
+  .logo{
+    max-width: 70px;
+    transform: scale(1.8);
+    transform-origin: center;
+  }
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: center;
@@ -121,6 +133,9 @@
     span {
       padding-left: 0;
       margin-top: 10px;
+    }
+    span:first-of-type {
+      margin-top: 30px; /* o el valor que quieras */
     }
   }
 }
@@ -151,7 +166,7 @@
   }
 
   .firmas {
-    margin-top: 40px;
+    margin-top: 150px;
     text-align: left;
     padding-left: 50px;
     display: flex;
@@ -162,18 +177,30 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      padding:50px 0;
+      padding:100px 0;
     }
   }
   .title{
     display: flex;
-    justify-content: start;
+    justify-content: space-between;
     .encabezado {
       display: flex;
       // justify-content: start;
       flex-direction: column;
       align-items: center;
       font-size: 18px;
+
+      .bolivia{
+        font-weight: bold;
+        text-decoration: underline;
+      }
+    }
+    .encabezado2 {
+      display: flex;
+      // justify-content: start;
+      flex-direction: column;
+      align-items: center;
+      font-size: 14px;
 
       .bolivia{
         font-weight: bold;
@@ -232,11 +259,11 @@ table.table td {
   padding: 8px 12px;
   text-align: center;
   border: 2px solid #e0e0e0;
-  background-color: #f5f5f5;
+  background-color: white;
 }
 
 table.table th {
-  background-color: #f5f5f5;
+  background-color: white;
   font-weight: bold;
 }
 
@@ -278,3 +305,72 @@ table.table th {
   display: flex;
   flex-direction: column;
 }
+
+.form-field-meritos{
+  width: 100%;
+  max-width: 800px;
+}
+
+/* Opción de búsqueda fija arriba */
+.search-option {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--mat-select-panel-background-color, #fff);
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .5rem .75rem !important;
+  cursor: default;
+}
+
+/* Input dentro del panel */
+.search-input {
+  border: none;
+  outline: none;
+  font: inherit;
+  color: #555;
+  background: transparent;
+}
+
+// /* Ancho del panel SOLO para Consejo */
+// .panel-consejo {
+//   width: min(600px, 92vw) !important;
+//   max-width: 92vw !important;
+// }
+
+// /* Barra de búsqueda fija arriba del panel */
+// .panel-consejo .search-option {
+//   position: sticky;
+//   top: 0;
+//   z-index: 1;
+//   background: var(--mat-select-panel-background-color, #fff);
+//   display: flex;
+//   align-items: center;
+//   gap: .5rem;
+//   padding: .5rem .75rem !important;
+//   cursor: default;
+// }
+
+// /* Input de búsqueda dentro del panel */
+// .panel-consejo .search-input {
+//   width: 100%;
+//   border: none;
+//   outline: none;
+//   font: inherit;
+//   background: transparent;
+// }
+.consejo-ponderacion {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: .75rem;
+  margin-top: .5rem;
+}
+.w-100 { width: 100%; }
+@media (min-width: 768px) {
+  .consejo-ponderacion {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+
