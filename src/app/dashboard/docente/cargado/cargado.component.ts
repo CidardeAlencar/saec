@@ -61,6 +61,7 @@ interface MeritoItem {
 export interface DialogData {
   jefe: string;
   comandante: string;
+  responsable: string;
 }
 
 export interface ReporteGeneralItem {
@@ -74,6 +75,37 @@ export interface ReporteGeneralItem {
   type: string;
   year: number;
   efm: any;
+}
+
+export interface DiscItem {
+  id: string;               // id del doc en 'items' (p.ej. 'MERITO 1')
+  codigo?: string | null;
+  creadoEn?: string | null; // ISO string si viene así
+  label?: string | null;
+  valor?: number | null;
+  // puedes agregar más campos si los necesitas...
+  [k: string]: any;
+}
+
+export interface DiscCategoria {
+  gestion?: number | null;      // la gestion del doc padre si existe
+  items: DiscItem[];            // ítems de la subcolección
+  totalValor: number;           // suma de 'valor' numérico
+}
+
+export interface ReporteDisciplinarioItem {
+  ci: string;
+  grado?: string | null;
+  apMat?: string | null;
+  apPat?: string | null;
+  nombres?: string | null;
+  genero?: string | null;
+  scope: string;
+  type: 'disciplinario';
+  year: number;
+  meritos: DiscCategoria;
+  demeritos: DiscCategoria;
+  consejo: DiscCategoria;
 }
 
 type Grado = "3ER_AM" | "2DO_AM" | "1ER_AM";
@@ -103,8 +135,10 @@ export class CargadoComponent implements OnInit, OnDestroy {
   generandoPDF = false;
   loadingRG = false;
   listaRGP: ReporteGeneralItem[] = [];
+  listaRGD: ReporteDisciplinarioItem[] = [];
   readonly jefe = signal('');
   readonly comandante = signal('');
+  readonly responsable = signal('');
   datosEFM: Record<string, any> = {};
   vistaSeleccionada: string = 'academico';
   today: Date = new Date();
@@ -1657,6 +1691,7 @@ consejoCatalogo: MeritoItem[] = [
     if (firmas) {
       this.jefe.set(firmas['jefe']);
       this.comandante.set(firmas['comandante']);
+      this.responsable.set(firmas['responsable']);
       console.log("Firmas obtenidas:", firmas);
     } else {
       console.log("No se encontraron firmas en Firebase.");
@@ -2068,7 +2103,7 @@ Gestion(
 
   openDialog(): void {
     const dialogRef = this.dialog.open(DialogOverviewExampleDialog, {
-      data: {jefe: this.jefe(), comandante: this.comandante()},
+      data: {jefe: this.jefe(), comandante: this.comandante(), responsable: this.responsable()},
       // data: {jefe: '', comandante: ''},
       width:'400px',
     });
@@ -2078,6 +2113,7 @@ Gestion(
       if (result) {
         this.jefe.set(result.jefe);
         this.comandante.set(result.comandante);
+        this.responsable.set(result.responsable);
       }
     });
   }
@@ -2247,6 +2283,19 @@ Gestion(
       timer: 2000,
       showConfirmButton: false
     });
+  }
+  calcularPromedioP(efm: any): number {
+    return (
+      (efm['Contextura Fisica'] * 0.09) +
+      (efm.Flexiones * 0.05) +
+      (efm.Abdominales * 0.05) +
+      (efm['Flexiones en barra'] * 0.1) +
+      (efm.Aerobica * 0.1) +
+      (efm['Ascenso a la cuerda'] * 0.05) +
+      (efm['Cruce de obstaculos'] * 0.15) +
+      (efm['Marcha rapida'] * 0.2) +
+      (efm['Natacion estilo crol'] * 0.2)
+    );
   }
 
 async savePhysicist() {
@@ -2619,8 +2668,12 @@ private async guardarConsejo(ci: string, nivel: string): Promise<string> {
   }
 
   // Doc contenedor CONSEJO
+  const gestion = new Date().getFullYear();
   const contenedorRef = doc(this.firestore, `estudiante/${ci}/${nivel}/CONSEJO`);
-  await setDoc(contenedorRef, { actualizadoEn: new Date().toISOString() }, { merge: true });
+  await setDoc(contenedorRef, {
+    actualizadoEn: new Date().toISOString(),
+    gestion: gestion
+  }, { merge: true });
 
   // Subcolección e índice
   const itemsPath = `estudiante/${ci}/${nivel}/CONSEJO/items`;
@@ -2653,8 +2706,10 @@ private async guardarItemDisciplina(opts: {
   const { ci, nivel, contenedor, prefix, item } = opts;
 
   // doc contenedor (útil para metadatos)
+  const gestion = new Date().getFullYear();
   const contenedorRef = doc(this.firestore, `estudiante/${ci}/${nivel}/${contenedor}`);
-  await setDoc(contenedorRef, { actualizadoEn: new Date().toISOString() }, { merge: true });
+  await setDoc(contenedorRef, { actualizadoEn: new Date().toISOString(), gestion: gestion }, { merge: true });
+
 
   const itemsPath = `estudiante/${ci}/${nivel}/${contenedor}/items`;
   const nextIndex = await this.getNextIndex(itemsPath, prefix);
@@ -2920,14 +2975,17 @@ validarRango(event: Event, materiaNombre: string, fase: 'input' | 'blur' = 'inpu
       scope: this.nivelSeleccionado4!,
       type:  this.reporteSeleccionado!
     };
-    console.log('ingresa:');
     this.loadingRG = true;
     try {
-      // if (params.type === 'EFM') {
+      if (params.type === 'fisico') {
         this.listaRGP  = await this.estudianteService.obtenerDatosGenrales(params);
         console.log('Coincidencias:', this.listaRGP);
         this.printRGP();
-      // }
+      } else if (params.type === 'disciplinario') {
+        console.log('disciplinario');
+        this.listaRGD  = await this.estudianteService.obtenerDatosGenralesD(params);
+        console.log('Coincidencias:', this.listaRGD);
+      }
     } catch (e) {
       console.error('Error en obtenerDatosGenrales:', e);
     } finally {

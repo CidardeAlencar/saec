@@ -354,9 +354,8 @@
               <ng-container *ngFor="let materia of meritosDemeritos">
                 <mat-form-field appearance="outline" class="form-field-meritos">
                   <mat-label>{{ materia.nombre }}</mat-label>
-                     <!-- Switch por tipo de campo -->
+                    <!-- Switch por tipo de campo -->
                     <ng-container [ngSwitch]="materia.nombre">
-
                       <!-- 1) Méritos como mat-select -->
                       <ng-container *ngSwitchCase="'Meritos'">
                         <mat-select
@@ -491,7 +490,7 @@
                       </ng-container>
 
 
-                     </ng-container>
+                    </ng-container>
                 </mat-form-field>
               </ng-container>
             </div>
@@ -700,10 +699,10 @@
               </div>
             </div>
             <h2 class="center">REPORTE GENERAL DE EFM. Y DEPORTES</h2>
-            
+
             <p><strong>PERIODO:</strong> {{anioSeleccionado}}</p>
             <p><strong>LUGAR:</strong> Huarina</p>
-            <p><strong>RESPONSABLE:</strong> {{ jefe() || "No disponible" }}</p>
+            <p><strong>RESPONSABLE:</strong> {{ responsable() || "No disponible" }}</p>
             <table class="mat-elevation-z8 table">
               <tr class="bold">
                 <th rowspan="2">Nro.</th>
@@ -717,51 +716,84 @@
                 <th colspan="3">ABDOMINALES 5%</th>
                 <th colspan="3">FLEXIONES EN BARRA 10%</th>
                 <th colspan="3">AIROBICA 10%</th>
-                <th colspan="3">ASCENSO CUERDAS 5%</th> 
-                <th colspan="3">JARDIN DE OBSTACULOS 15%</th> 
-                <th colspan="3">MARCHA RAPIDA 20%</th> 
-                <th colspan="3">NATACION 25%</th>    
+                <th colspan="3">ASCENSO CUERDAS 5%</th>
+                <th colspan="3">JARDIN DE OBSTACULOS 15%</th>
+                <th colspan="3">MARCHA RAPIDA 20%</th>
+                <th colspan="3">NATACION 25%</th>
                 <th rowspan="2">PROMEDIO FINAL</th>
-                <th rowspan="2">CRITERIO</th>     
+                <th rowspan="2">CRITERIO</th>
               </tr>
               <tr class='Bold'>
                 <th>TALLA</th>
                 <th>PESO</th>
                 <th>PORCENTAJE</th>
                 <th>NOTA</th>
-                <th>9%</th>
+                <th style="background-color: lime;">5%</th>
                 <th>CANT.</th>
                 <th>NOTA</th>
-                <th>5%</th>
+                <th style="background-color: lime;">5%</th>
                 <th>CANT.</th>
                 <th>NOTA</th>
-                <th>5%</th>
+                <th style="background-color: lime;">5%</th>
                 <th>CANT.</th>
                 <th>NOTA</th>
-                <th>5%</th>
+                <th style="background-color: lime;">10%</th>
                 <th>TIEMPO</th>
                 <th>NOTA</th>
-                <th>10%</th>
+                <th style="background-color: lime;">10%</th>
                 <th>TIEMPO</th>
                 <th>NOTA</th>
-                <th>5%</th>
+                <th style="background-color: lime;">5%</th>
                 <th>TIEMPO</th>
                 <th>NOTA</th>
-                <th>15%</th>
+                <th style="background-color: lime;">15%</th>
                 <th>TIEMPO</th>
                 <th>NOTA</th>
-                <th>20%</th>
+                <th style="background-color: lime;">20%</th>
                 <th>TIEMPO</th>
                 <th>NOTA</th>
-                <th>25%</th>
+                <th style="background-color: lime;">25%</th>
               </tr>
-              <!-- <tr *ngFor="let item of listaRGP; let i = index">
+              <tr *ngFor="let item of listaRGP; let i = index">
                 <td>{{ i + 1 }}</td>
-                <td>{{ con.label }}</td>
-                <td>{{ con.creadoEn | date:'dd/MM/yyyy HH:mm' }}</td>
-                <td>{{ con.valorConsejo }}</td>
+                <td>{{ item.grado }}</td>
+                <td>{{ item.apPat }} {{ item.apMat }}</td>
+                <td>{{ item.nombres }}</td>
+                <td> Edad </td>
+                <td>{{ item.genero }}</td>
+                <td>{{ item.efm.Talla }}</td>
+                <td>{{ item.efm.Peso }}</td>
+                <td>{{ item.efm['Contextura Fisica'] === '100' ? 'NORMAL' : 'NO NORMAL' }}</td>
+                <td>{{ item.efm['Contextura Fisica'] }}</td>
+                <td style="background-color: lime;">{{ (item.efm['Contextura Fisica'] * 0.05) | number:'1.0-2' }}</td>
+                <td>{{ item.efm.Flexiones_cant}}</td>
+                <td>{{ item.efm.Flexiones}}</td>
+                <td style="background-color: lime;">{{ item.efm.Flexiones * 0.05 | number:'1.0-2'}}</td>
+                <td>{{ item.efm.Abdominales_cant}}</td>
+                <td>{{ item.efm.Abdominales}}</td>
+                <td style="background-color: lime;">{{ item.efm.Abdominales * 0.05 | number:'1.0-2'}}</td>
+                <td>{{ item.efm['Flexiones en barra_cant']}}</td>
+                <td>{{ item.efm['Flexiones en barra']}}</td>
+                <td style="background-color: lime;">{{ item.efm['Flexiones en barra'] * 0.1 | number:'1.0-2'}}</td>
+                <td>{{ item.efm.Aerobica_cant}}</td>
+                <td>{{ item.efm.Aerobica}}</td>
+                <td style="background-color: lime;">{{ item.efm.Aerobica * 0.1 | number:'1.0-2'}}</td>
+                <td>{{ item.efm['Ascenso a la cuerda_cant']}}</td>
+                <td>{{ item.efm['Ascenso a la cuerda']}}</td>
+                <td style="background-color: lime;">{{ item.efm['Ascenso a la cuerda'] * 0.05 | number:'1.0-2'}}</td>
+                <td>{{ item.efm['Cruce de obstaculos_cant']}}</td>
+                <td>{{ item.efm['Cruce de obstaculos']}}</td>
+                <td style="background-color: lime;">{{ item.efm['Cruce de obstaculos'] * 0.15 | number:'1.0-2'}}</td>
+                <td>{{ item.efm['Marcha rapida_cant']}}</td>
+                <td>{{ item.efm['Marcha rapida']}}</td>
+                <td style="background-color: lime;">{{ item.efm['Marcha rapida'] * 0.2 | number:'1.0-2'}}</td>
+                <td>{{ item.efm['Natacion estilo crol_cant']}}</td>
+                <td>{{ item.efm['Natacion estilo crol']}}</td>
+                <td style="background-color: lime;">{{ item.efm['Natacion estilo crol'] * 0.25 | number:'1.0-2'}}</td>
+                <td style="background-color: orange;">{{calcularPromedioP(item.efm) | number:'1.2-2'}}</td>
+                <td>{{calcularPromedioP(item.efm) > 51 ? 'APROBADO' : 'REPROBADO'}}</td>
               </tr>
-              <tr *ngIf="!listaConsejo?.length">
+              <!-- <tr *ngIf="!listaConsejo?.length">
                 <td colspan="4" class="text-center">Sin registros</td>
               </tr>
               <tr>
@@ -770,6 +802,10 @@
               </tr> -->
             </table>
             <div class="firmas">
+              <p class="ind">
+              <span>{{ responsable() || "No disponible" }}</span>
+              <span><strong>JEFE DE EFM. Y DEPORTES DE LA E.M.T.E. - E.P.S.S.T.</strong></span>
+              </p>
               <p class="ind">
               <span>{{ jefe() || "No disponible" }}</span>
               <span><strong>2DO. CMTE. Y JEFE DE ESTUDIOS DE LA E.M.T.E. - E.P.S.S.T.</strong></span>
