@@ -684,6 +684,102 @@
               </button>
             </div>
           </div>
+          <div #pdfContentRGP class="pdf-container" [hidden]="!generandoPDF">
+            <div class="title">
+              <div class="encabezado">
+                <span>COMANDO DE INSTITUTOS MILITARES</span>
+                <span>ESCUELA MILITAR DE TOPOGRAFÍA DEL EJÉRCITO</span>
+                <span>“TCNL. JUAN ORDANZA LARA”</span>
+                <span class="bolivia">BOLIVIA </span>
+              </div>
+                <div class="encabezado2">
+                <span>PROCESADO POR SAEC - EMTE</span>
+                <span>FECHA DE EMISION: {{ today | date:'dd/MM/yyyy' }}</span>
+                <span>HORA DE EMISION: {{ today | date:'HH:mm:ss' }}</span>
+                <span class="bolivia">PAGINA 1 - 1 </span>
+              </div>
+            </div>
+            <h2 class="center">REPORTE GENERAL DE EFM. Y DEPORTES</h2>
+            
+            <p><strong>PERIODO:</strong> {{anioSeleccionado}}</p>
+            <p><strong>LUGAR:</strong> Huarina</p>
+            <p><strong>RESPONSABLE:</strong> {{ jefe() || "No disponible" }}</p>
+            <table class="mat-elevation-z8 table">
+              <tr class="bold">
+                <th rowspan="2">Nro.</th>
+                <th rowspan="2">Grado</th>
+                <th rowspan="2">Apellidos</th>
+                <th rowspan="2">Nombres</th>
+                <th rowspan="2">Edad</th>
+                <th rowspan="2">Genero</th>
+                <th colspan="5">RELACION PESO TALLA 5%</th>
+                <th colspan="3">FLEXIONES EN SUELO 5%</th>
+                <th colspan="3">ABDOMINALES 5%</th>
+                <th colspan="3">FLEXIONES EN BARRA 10%</th>
+                <th colspan="3">AIROBICA 10%</th>
+                <th colspan="3">ASCENSO CUERDAS 5%</th> 
+                <th colspan="3">JARDIN DE OBSTACULOS 15%</th> 
+                <th colspan="3">MARCHA RAPIDA 20%</th> 
+                <th colspan="3">NATACION 25%</th>    
+                <th rowspan="2">PROMEDIO FINAL</th>
+                <th rowspan="2">CRITERIO</th>     
+              </tr>
+              <tr class='Bold'>
+                <th>TALLA</th>
+                <th>PESO</th>
+                <th>PORCENTAJE</th>
+                <th>NOTA</th>
+                <th>9%</th>
+                <th>CANT.</th>
+                <th>NOTA</th>
+                <th>5%</th>
+                <th>CANT.</th>
+                <th>NOTA</th>
+                <th>5%</th>
+                <th>CANT.</th>
+                <th>NOTA</th>
+                <th>5%</th>
+                <th>TIEMPO</th>
+                <th>NOTA</th>
+                <th>10%</th>
+                <th>TIEMPO</th>
+                <th>NOTA</th>
+                <th>5%</th>
+                <th>TIEMPO</th>
+                <th>NOTA</th>
+                <th>15%</th>
+                <th>TIEMPO</th>
+                <th>NOTA</th>
+                <th>20%</th>
+                <th>TIEMPO</th>
+                <th>NOTA</th>
+                <th>25%</th>
+              </tr>
+              <!-- <tr *ngFor="let item of listaRGP; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ con.label }}</td>
+                <td>{{ con.creadoEn | date:'dd/MM/yyyy HH:mm' }}</td>
+                <td>{{ con.valorConsejo }}</td>
+              </tr>
+              <tr *ngIf="!listaConsejo?.length">
+                <td colspan="4" class="text-center">Sin registros</td>
+              </tr>
+              <tr>
+                <td colspan="3">TOTAL</td>
+                <td>{{ sumaConsejo }}</td>
+              </tr> -->
+            </table>
+            <div class="firmas">
+              <p class="ind">
+              <span>{{ jefe() || "No disponible" }}</span>
+              <span><strong>2DO. CMTE. Y JEFE DE ESTUDIOS DE LA E.M.T.E. - E.P.S.S.T.</strong></span>
+              </p>
+              <p><strong>Vo.Bo.</strong></p>
+              <p class="ind">
+                <span>{{ comandante() || "No disponible" }}</span>
+              <span><strong>COMANDANTE DE LA E.M.T.E. - E.P.S.S.T.</strong></span></p>
+            </div>
+          </div>
         </div>
         <div *ngSwitchDefault>
           <h2>Seleccione una opción en el menú</h2>

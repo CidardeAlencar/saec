@@ -10,6 +10,25 @@ export interface ItemBase {
   creadoEn?: string | null;
 }
 
+export interface ReporteGeneralParams {
+  year: number;   // p.ej. 2026
+  scope: string;  // p.ej. 'primerSemestre'
+  type:  string;  // p.ej. 'fisico'
+}
+
+export interface ReporteGeneralItem {
+  ci: string;
+  grado?: string | null;
+  apMat?: string | null;
+  apPat?: string | null;
+  nombres?: string | null;
+  genero?: string | null;
+  scope: string;
+  type: string;
+  year: number;
+  efm: any; // datos del doc EFM (o el que corresponda)
+}
+
 export interface ItemConsejoDoc {
   codigo: string;
   label: string;
@@ -321,6 +340,96 @@ private async leerItemsBase(ci: string, nivel: string, contenedor: 'MERITOS' | '
     }
   }
 
+  async obtenerDatosGenrales(params: ReporteGeneralParams): Promise<Array<{
+    ci: string;
+    grado?: string | null;
+    apMat?: string | null;
+    apPat?: string | null;
+    nombres?: string | null;
+    genero?: string | null;
+    scope: string;
+    type: string;
+    year: number;
+    efm: any;             // datos del doc (EFM u otro)
+  }>> {
+    const { year, scope, type } = params;
 
+    // 1) Colección raíz de estudiantes
+    const estudiantesCol = collection(this.firestore, 'estudiante');
+    const estudiantesSnap = await getDocs(estudiantesCol);
+
+    // 2) Mapeo de tipo → nombre del documento
+    const docType = this.mapTypeToDoc(type); // 'fisico' -> 'EFM', etc.
+
+    const resultados: Array<{
+      ci: string;
+      grado: string;
+      apMat: string; 
+      apPat: string; 
+      nombres: string; 
+      genero: string;
+      scope: string;
+      type: string;
+      year: number;
+      efm: any;
+    }> = [];
+
+    // 3) Iterar todos los estudiantes
+    const tareas = estudiantesSnap.docs.map(async (estuDoc) => {
+      const ci = estuDoc.id;
+      const estuData = estuDoc.data() as any;
+      console.log(estuData)
+      const grado   = estuData?.grado   ?? null;
+      const apMat   = estuData?.apMat   ?? null;
+      const apPat   = estuData?.apPat   ?? null;
+      const nombres = estuData?.nombres ?? null;
+      const genero  = estuData?.genero  ?? null;
+      
+      // Ruta: estudiante/{ci}/{scope}/{docType}
+      const ref = doc(this.firestore, `estudiante/${ci}/${scope}/${docType}`);
+      const snap = await getDoc(ref);
+
+      if (!snap.exists()) return;
+
+      const data = snap.data() as any;
+
+      // Robustez: Gestion puede venir con may/min y como string/number
+      const gestionRaw = data?.Gestion ?? data?.gestion ?? data?.Gesti\u00f3n;
+      const gestionNum = Number(gestionRaw);
+
+      if (!Number.isFinite(gestionNum)) return;
+
+      if (gestionNum === Number(year)) {
+        resultados.push({
+          ci,
+          grado, 
+          apMat, 
+          apPat, 
+          nombres, 
+          genero,
+          scope,
+          type,
+          year,
+          efm: data,
+        });
+      }
+    });
+
+    await Promise.all(tareas);
+    return resultados;
+  }
+
+  /** Mapea el 'type' de UI al nombre real del documento en Firestore */
+  private mapTypeToDoc(type: string): string {
+    switch ((type || '').toLowerCase()) {
+      case 'fisico':
+        return 'EFM';          // ← tu caso conocido
+      // case 'digital': return 'EDIG';   // <- ejemplo si más adelante hay otro doc
+      // case 'consolidado': return 'ECON'; // <- ejemplo
+      default:
+        // fallback: si quisieras derivar por convención
+        return (type || 'EFM').toUpperCase();
+    }
+  }
 
 }

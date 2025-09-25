@@ -63,6 +63,19 @@ export interface DialogData {
   comandante: string;
 }
 
+export interface ReporteGeneralItem {
+  ci: string;
+  grado?: string | null;
+  apMat?: string | null;
+  apPat?: string | null;
+  nombres?: string | null;
+  genero?: string | null;
+  scope: string;
+  type: string;
+  year: number;
+  efm: any;
+}
+
 type Grado = "3ER_AM" | "2DO_AM" | "1ER_AM";
 type Genero = "Masculino" | "Femenino";
 
@@ -86,7 +99,10 @@ export class CargadoComponent implements OnInit, OnDestroy {
   sumaConsejo = 0;
   @ViewChild('pdfContentEFM', { static: false }) pdfContentEFM!: ElementRef;
   @ViewChild('pdfContentDiscipline', { static: false }) pdfContentDiscipline!: ElementRef;
+  @ViewChild('pdfContentRGP', { static: false }) pdfContentRGP!: ElementRef;
   generandoPDF = false;
+  loadingRG = false;
+  listaRGP: ReporteGeneralItem[] = [];
   readonly jefe = signal('');
   readonly comandante = signal('');
   datosEFM: Record<string, any> = {};
@@ -2890,13 +2906,105 @@ validarRango(event: Event, materiaNombre: string, fase: 'input' | 'blur' = 'inpu
     }, 500);
   }
 
-  async printRG(){
+  // async printRG(){
 
-    console.log(this.anioSeleccionado);
-    console.log(this.nivelSeleccionado4);
-    console.log(this.reporteSeleccionado);
+  //   console.log(this.anioSeleccionado);
+  //   console.log(this.nivelSeleccionado4);
+  //   console.log(this.reporteSeleccionado);
 
+  // }
+
+  async printRG() {
+    const params = {
+      year: this.anioSeleccionado!,
+      scope: this.nivelSeleccionado4!,
+      type:  this.reporteSeleccionado!
+    };
+    console.log('ingresa:');
+    this.loadingRG = true;
+    try {
+      // if (params.type === 'EFM') {
+        this.listaRGP  = await this.estudianteService.obtenerDatosGenrales(params);
+        console.log('Coincidencias:', this.listaRGP);
+        this.printRGP();
+      // }
+    } catch (e) {
+      console.error('Error en obtenerDatosGenrales:', e);
+    } finally {
+      this.loadingRG = false;
+    }
+    // this.printRGP();
   }
+
+printRGP() {
+  this.today = new Date();
+  this.generandoPDF = true;
+
+  setTimeout(async () => {
+    try {
+      const content = this.pdfContentRGP.nativeElement;
+
+      const canvas = await html2canvas(content, {
+        scale: 2,
+        backgroundColor: '#FFFFFF',
+        useCORS: true,
+        allowTaint: false,
+        logging: false
+      });
+
+      // 👉 orientación en landscape
+      const pdf = new jsPDF('l', 'mm', 'letter');
+
+      // Dimensiones carta pero horizontal
+      const pageWidth  = pdf.internal.pageSize.getWidth();   // ~279.4 mm
+      const pageHeight = pdf.internal.pageSize.getHeight();  // ~215.9 mm
+
+      const margin   = 10;
+      const usableW  = pageWidth  - margin * 2;
+      const usableH  = pageHeight - margin * 2;
+
+      // Altura en píxeles del canvas que corresponde a una página
+      const pxPerPage = Math.floor(canvas.width * (usableH / usableW));
+
+      const pageCanvas = document.createElement('canvas');
+      const pageCtx = pageCanvas.getContext('2d')!;
+      pageCanvas.width  = canvas.width;
+      pageCanvas.height = pxPerPage;
+
+      let rendered = 0;
+      let isFirstPage = true;
+
+      while (rendered < canvas.height) {
+        pageCtx.clearRect(0, 0, pageCanvas.width, pageCanvas.height);
+        pageCtx.drawImage(
+          canvas,
+          0, rendered, canvas.width, pxPerPage,   // src
+          0, 0, pageCanvas.width, pageCanvas.height // dst
+        );
+
+        const pageImgData = pageCanvas.toDataURL('image/png');
+
+        if (!isFirstPage) {
+          pdf.addPage();
+        }
+
+        pdf.addImage(pageImgData, 'PNG', margin, margin, usableW, usableH);
+
+        isFirstPage = false;
+        rendered += pxPerPage;
+      }
+
+      pdf.save('ReporteGeneral.pdf');
+
+    } catch (err) {
+      console.error('Error al generar PDF de Reporte General:', err);
+    } finally {
+      this.generandoPDF = false;
+    }
+  }, 500);
+}
+
+
 
   // async printDiscipline() {
   //   this.today = new Date();
