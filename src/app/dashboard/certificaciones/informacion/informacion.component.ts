@@ -95,6 +95,7 @@ const ELEMENT_DATA2: PeriodicElement[] = [
 export interface DialogData {
   jefe: string;
   comandante: string;
+  responsable: string;
 }
 
 @Component({
@@ -112,6 +113,7 @@ export class InformacionComponent implements OnInit, OnDestroy{
   private subscription!: Subscription;
   readonly jefe = signal('');
   readonly comandante = signal('');
+  readonly responsable = signal('');
   // readonly name = model('');
   readonly dialog = inject(MatDialog);
   displayedColumns: string[] = ['position', 'semestre', 'promedio', 'literal'];
@@ -333,7 +335,7 @@ export class InformacionComponent implements OnInit, OnDestroy{
 
   openDialog(): void {
     const dialogRef = this.dialog.open(DialogOverviewExampleDialog, {
-      data: {jefe: this.jefe(), comandante: this.comandante()},
+      data: {jefe: this.jefe(), comandante: this.comandante(), responsable: this.responsable()},
       // data: {jefe: '', comandante: ''},
       width:'400px',
     });
@@ -343,6 +345,7 @@ export class InformacionComponent implements OnInit, OnDestroy{
       if (result) {
         this.jefe.set(result.jefe);
         this.comandante.set(result.comandante);
+        this.responsable.set(result.responsable);
       }
     });
   }
@@ -374,6 +377,7 @@ export class InformacionComponent implements OnInit, OnDestroy{
     if (firmas) {
       this.jefe.set(firmas['jefe']);
       this.comandante.set(firmas['comandante']);
+      this.responsable.set(firmas['responsable']);
       console.log("Firmas obtenidas:", firmas);
     } else {
       console.log("No se encontraron firmas en Firebase.");
@@ -434,6 +438,7 @@ export class DialogOverviewExampleDialog {
   // readonly comandante = model(this.data.comandante);
   jefe = this.data.jefe;
   comandante = this.data.comandante
+  responsable = this.data.responsable
 
   onNoClick(): void {
     this.dialogRef.close();
@@ -447,11 +452,11 @@ export class DialogOverviewExampleDialog {
   async save() {
     console.log("Guardando en Firebase:", this.jefe, this.comandante);
 
-    const success = await this.estudianteService.guardarFirmas(this.jefe, this.comandante);
+    const success = await this.estudianteService.guardarFirmas(this.jefe, this.comandante, this.responsable);
 
     if (success) {
       console.log("Datos guardados correctamente en Firebase");
-      this.dialogRef.close({ jefe: this.jefe, comandante: this.comandante });
+      this.dialogRef.close({ jefe: this.jefe, comandante: this.comandante, responsable: this.responsable });
     } else {
       console.error("Error al guardar en Firebase");
     }

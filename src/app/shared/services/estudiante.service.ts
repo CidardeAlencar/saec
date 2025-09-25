@@ -10,6 +10,25 @@ export interface ItemBase {
   creadoEn?: string | null;
 }
 
+export interface ReporteGeneralParams {
+  year: number;   // p.ej. 2026
+  scope: string;  // p.ej. 'primerSemestre'
+  type:  string;  // p.ej. 'fisico'
+}
+
+export interface ReporteGeneralItem {
+  ci: string;
+  grado?: string | null;
+  apMat?: string | null;
+  apPat?: string | null;
+  nombres?: string | null;
+  genero?: string | null;
+  scope: string;
+  type: string;
+  year: number;
+  efm: any; // datos del doc EFM (o el que corresponda)
+}
+
 export interface ItemConsejoDoc {
   codigo: string;
   label: string;
@@ -29,6 +48,38 @@ export interface NotasDisciplina {
   ultimoMerito?: string | null;
   ultimoDemerito?: string | null;
   ultimoConsejo?: string | null;
+}
+
+export interface ReporteDisciplinarioItem {
+  ci: string;
+  grado?: string | null;
+  apMat?: string | null;
+  apPat?: string | null;
+  nombres?: string | null;
+  genero?: string | null;
+  scope: string;
+  type: 'disciplinario';
+  year: number;
+  meritos: DiscCategoria;
+  demeritos: DiscCategoria;
+  consejo: DiscCategoria;
+}
+
+export interface DiscCategoria {
+  gestion?: number | null;      // la gestion del doc padre si existe
+  items: DiscItem[];            // ítems de la subcolección
+  totalValor: number;           // suma de 'valor' numérico
+}
+
+
+export interface DiscItem {
+  id: string;               // id del doc en 'items' (p.ej. 'MERITO 1')
+  codigo?: string | null;
+  creadoEn?: string | null; // ISO string si viene así
+  label?: string | null;
+  valor?: number | null;
+  // puedes agregar más campos si los necesitas...
+  [k: string]: any;
 }
 
 @Injectable({
@@ -67,10 +118,10 @@ export class EstudianteService {
   }
 
 
-  async guardarFirmas(jefe: string, comandante: string) {
+  async guardarFirmas(jefe: string, comandante: string, responsable: string) {
     try {
       const firmaRef = doc(this.firestore, 'firmas/1');
-      await setDoc(firmaRef, { jefe, comandante }, { merge: true });
+      await setDoc(firmaRef, { jefe, comandante, responsable }, { merge: true });
       console.log("Firmas guardadas en Firebase");
       return true;
     } catch (error) {
@@ -321,6 +372,208 @@ private async leerItemsBase(ci: string, nivel: string, contenedor: 'MERITOS' | '
     }
   }
 
+    async obtenerDatosGenrales(params: ReporteGeneralParams): Promise<Array<{
+      ci: string;
+      grado?: string | null;
+      apMat?: string | null;
+      apPat?: string | null;
+      nombres?: string | null;
+      genero?: string | null;
+      scope: string;
+      type: string;
+      year: number;
+      efm: any;             // datos del doc (EFM u otro)
+    }>> {
+      const { year, scope, type } = params;
 
+      // 1) Colección raíz de estudiantes
+      const estudiantesCol = collection(this.firestore, 'estudiante');
+      const estudiantesSnap = await getDocs(estudiantesCol);
+
+      // 2) Mapeo de tipo → nombre del documento
+      const docType = this.mapTypeToDoc(type); // 'fisico' -> 'EFM', etc.
+
+      const resultados: Array<{
+        ci: string;
+        grado: string;
+        apMat: string;
+        apPat: string;
+        nombres: string;
+        genero: string;
+        scope: string;
+        type: string;
+        year: number;
+        efm: any;
+      }> = [];
+
+      // 3) Iterar todos los estudiantes
+      const tareas = estudiantesSnap.docs.map(async (estuDoc) => {
+        const ci = estuDoc.id;
+        const estuData = estuDoc.data() as any;
+        console.log(estuData)
+        const grado   = estuData?.grado   ?? null;
+        const apMat   = estuData?.apMat   ?? null;
+        const apPat   = estuData?.apPat   ?? null;
+        const nombres = estuData?.nombres ?? null;
+        const genero  = estuData?.genero  ?? null;
+
+        // Ruta: estudiante/{ci}/{scope}/{docType}
+        const ref = doc(this.firestore, `estudiante/${ci}/${scope}/${docType}`);
+        const snap = await getDoc(ref);
+
+        if (!snap.exists()) return;
+
+        const data = snap.data() as any;
+
+        // Robustez: Gestion puede venir con may/min y como string/number
+        const gestionRaw = data?.Gestion ?? data?.gestion ?? data?.Gesti\u00f3n;
+        const gestionNum = Number(gestionRaw);
+
+        if (!Number.isFinite(gestionNum)) return;
+
+        if (gestionNum === Number(year)) {
+          resultados.push({
+            ci,
+            grado,
+            apMat,
+            apPat,
+            nombres,
+            genero,
+            scope,
+            type,
+            year,
+            efm: data,
+          });
+        }
+      });
+
+      await Promise.all(tareas);
+      return resultados;
+    }
+
+   async obtenerDatosGenralesD(params: ReporteGeneralParams): Promise<ReporteDisciplinarioItem[]> {
+    const { year, scope } = params;
+    const yearNum = Number(year);
+    if (!Number.isFinite(yearNum)) return [];
+
+    // 1) Leer todos los estudiantes
+    const estudiantesCol = collection(this.firestore, 'estudiante');
+    const estudiantesSnap = await getDocs(estudiantesCol);
+
+    const resultados: ReporteDisciplinarioItem[] = [];
+
+    // 2) Iterar estudiantes
+    const tareas = estudiantesSnap.docs.map(async (estuDoc) => {
+      const ci = estuDoc.id;
+      const estuData = estuDoc.data() as any;
+
+      const grado   = estuData?.grado   ?? null;
+      const apMat   = estuData?.apMat   ?? null;
+      const apPat   = estuData?.apPat   ?? null;
+      const nombres = estuData?.nombres ?? null;
+      const genero  = estuData?.genero  ?? null;
+
+      // 3) Cargar categorías (MERITOS, DEMERITOS, CONSEJO)
+      const [meritos, demeritos, consejo] = await Promise.all([
+        this._leerCategoriaDisc(ci, scope, 'MERITOS', yearNum),
+        this._leerCategoriaDisc(ci, scope, 'DEMERITOS', yearNum),
+        this._leerCategoriaDisc(ci, scope, 'CONSEJO', yearNum),
+      ]);
+
+      // Si ninguna categoría coincide con la gestión pedida, omitir
+      const hayAlgo =
+        (meritos.items.length > 0) ||
+        (demeritos.items.length > 0) ||
+        (consejo.items.length > 0);
+
+      if (!hayAlgo) return;
+
+      resultados.push({
+        ci,
+        grado,
+        apMat,
+        apPat,
+        nombres,
+        genero,
+        scope,
+        type: 'disciplinario',
+        year: yearNum,
+        meritos,
+        demeritos,
+        consejo,
+      });
+    });
+
+    await Promise.all(tareas);
+    return resultados;
+  }
+
+  /**
+   * Lee una categoría disciplinaria:
+   *   estudiante/{ci}/{scope}/{categoria} (DOC padre con campo Gestion)
+   *   └── items (SUBCOLECCIÓN con N documentos: MERITO 1, MERITO 2, ...)
+   * Si el doc padre no existe o su 'Gestion' != year, retorna vacío.
+   */
+  private async _leerCategoriaDisc(
+    ci: string,
+    scope: string,
+    categoria: 'MERITOS' | 'DEMERITOS' | 'CONSEJO',
+    yearNum: number
+  ): Promise<DiscCategoria> {
+    // Doc padre
+    const catRef = doc(this.firestore, `estudiante/${ci}/${scope}/${categoria}`);
+    const catSnap = await getDoc(catRef);
+    if (!catSnap.exists()) {
+      return { gestion: null, items: [], totalValor: 0 };
+    }
+
+    const catData = catSnap.data() as any;
+    const gestionRaw =
+      catData?.Gestion ?? catData?.gestion ?? catData?.Gesti\u00f3n ?? catData?.gestión;
+    const gestionNum = Number(gestionRaw);
+
+    // Si el doc padre no tiene Gestión o no coincide, no traemos items
+    if (!Number.isFinite(gestionNum) || gestionNum !== yearNum) {
+      return { gestion: Number.isFinite(gestionNum) ? gestionNum : null, items: [], totalValor: 0 };
+    }
+
+    // Subcolección 'items'
+    const itemsCol = collection(catRef, 'items');
+    const itemsSnap = await getDocs(itemsCol);
+
+    const items: DiscItem[] = itemsSnap.docs.map((d) => {
+      const data = d.data() as any;
+      const valorNum = Number(data?.valor);
+      return {
+        id: d.id,
+        codigo: data?.codigo ?? null,
+        creadoEn: data?.creadoEn ?? null,
+        label: data?.label ?? null,
+        valor: Number.isFinite(valorNum) ? valorNum : (data?.valor ?? null),
+        ...data, // conserva otros campos que puedan existir
+      };
+    });
+
+    // Orden (opcional): por creadoEn ascendente si existe
+    items.sort((a, b) => (a.creadoEn ?? '').localeCompare(b.creadoEn ?? ''));
+
+    // Total valor numérico
+    const totalValor = items.reduce((acc, it) => acc + ((typeof it.valor === 'number' || typeof it['valorConsejo']) === 'number' ? it.valor || it['valorConsejo']: 0), 0);
+
+    return { gestion: gestionNum, items, totalValor };
+  }
+
+  /** Mapea el 'type' de UI al nombre real del documento en Firestore */
+  private mapTypeToDoc(type: string): string {
+    switch ((type || '').toLowerCase()) {
+      case 'fisico':
+        return 'EFM';          // ← tu caso conocido
+      // case 'digital': return 'EDIG';   // <- ejemplo si más adelante hay otro doc
+      // case 'consolidado': return 'ECON'; // <- ejemplo
+      default:
+        // fallback: si quisieras derivar por convención
+        return (type || 'EFM').toUpperCase();
+    }
+  }
 
 }

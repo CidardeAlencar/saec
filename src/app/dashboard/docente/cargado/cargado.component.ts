@@ -13,6 +13,8 @@ import Swal from 'sweetalert2';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import {DialogOverviewExampleDialog} from '../../certificaciones/informacion/informacion.component';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 import {
   MAT_DIALOG_DATA,
   MatDialog,
@@ -59,6 +61,51 @@ interface MeritoItem {
 export interface DialogData {
   jefe: string;
   comandante: string;
+  responsable: string;
+}
+
+export interface ReporteGeneralItem {
+  ci: string;
+  grado?: string | null;
+  apMat?: string | null;
+  apPat?: string | null;
+  nombres?: string | null;
+  genero?: string | null;
+  scope: string;
+  type: string;
+  year: number;
+  efm: any;
+}
+
+export interface DiscItem {
+  id: string;               // id del doc en 'items' (p.ej. 'MERITO 1')
+  codigo?: string | null;
+  creadoEn?: string | null; // ISO string si viene así
+  label?: string | null;
+  valor?: number | null;
+  // puedes agregar más campos si los necesitas...
+  [k: string]: any;
+}
+
+export interface DiscCategoria {
+  gestion?: number | null;      // la gestion del doc padre si existe
+  items: DiscItem[];            // ítems de la subcolección
+  totalValor: number;           // suma de 'valor' numérico
+}
+
+export interface ReporteDisciplinarioItem {
+  ci: string;
+  grado?: string | null;
+  apMat?: string | null;
+  apPat?: string | null;
+  nombres?: string | null;
+  genero?: string | null;
+  scope: string;
+  type: 'disciplinario';
+  year: number;
+  meritos: DiscCategoria;
+  demeritos: DiscCategoria;
+  consejo: DiscCategoria;
 }
 
 type Grado = "3ER_AM" | "2DO_AM" | "1ER_AM";
@@ -69,7 +116,7 @@ import { AdminRoutingModule } from "../../admin/admin-routing.module";
 
 @Component({
   selector: 'app-cargado',
-  imports: [ReactiveFormsModule, MatProgressSpinnerModule, MatInputModule, MatFormFieldModule, MatSelectModule, FormsModule, MatButtonModule, CommonModule, MatIconModule, AdminRoutingModule],
+  imports: [MatNativeDateModule, MatDatepickerModule, ReactiveFormsModule, MatProgressSpinnerModule, MatInputModule, MatFormFieldModule, MatSelectModule, FormsModule, MatButtonModule, CommonModule, MatIconModule, AdminRoutingModule],
   templateUrl: './cargado.component.html',
   styleUrl: './cargado.component.scss'
 })
@@ -84,9 +131,14 @@ export class CargadoComponent implements OnInit, OnDestroy {
   sumaConsejo = 0;
   @ViewChild('pdfContentEFM', { static: false }) pdfContentEFM!: ElementRef;
   @ViewChild('pdfContentDiscipline', { static: false }) pdfContentDiscipline!: ElementRef;
+  @ViewChild('pdfContentRGP', { static: false }) pdfContentRGP!: ElementRef;
   generandoPDF = false;
+  loadingRG = false;
+  listaRGP: ReporteGeneralItem[] = [];
+  listaRGD: ReporteDisciplinarioItem[] = [];
   readonly jefe = signal('');
   readonly comandante = signal('');
+  readonly responsable = signal('');
   datosEFM: Record<string, any> = {};
   vistaSeleccionada: string = 'academico';
   today: Date = new Date();
@@ -99,6 +151,11 @@ export class CargadoComponent implements OnInit, OnDestroy {
     { value: 'sextoSemestre', viewValue: 'Sexto Semestre' },
     { value: 'basico', viewValue: 'Básico' },
     { value: 'avanzado', viewValue: 'Avanzado' }
+  ];
+  optionsReport: Option[] = [
+    { value: 'academico', viewValue: 'Academico' },
+    { value: 'fisico', viewValue: 'Fisico' },
+    { value: 'disciplinario', viewValue: 'Disciplinario' },
   ];
 
   tablaFlexionesM: TablaFlexiones = {
@@ -217,7 +274,7 @@ export class CargadoComponent implements OnInit, OnDestroy {
     2:   { "3ER_AM": 1,  "2DO_AM": 0,  "1ER_AM": 0 },
     0:   { "3ER_AM": 0,  "2DO_AM": 0,  "1ER_AM": 0 }
   };
-  
+
 tablaFlexionesBarraM: TablaFlexiones = {
   100:  { "3ER_AM": 11,  "2DO_AM": 10,  "1ER_AM": 9 },
   90:   { "3ER_AM": 10,  "2DO_AM": 9,   "1ER_AM": undefined},
@@ -1405,7 +1462,7 @@ consejoCatalogo: MeritoItem[] = [
   consejoSeleccionado: string | null = null;
   valorConsejoControl = new FormControl<number | null>(null);
   // obsConsejoControl   = new FormControl<string>('');
-  
+
   deshabilitarCampo(materia: { nombre: string }): boolean {
     const v = this.notasRegistradas[materia.nombre];
     if (typeof v === 'number') {
@@ -1492,9 +1549,14 @@ consejoCatalogo: MeritoItem[] = [
   nivelSeleccionado: string = '';
   nivelSeleccionado2: string = '';
   nivelSeleccionado3: string = '';
+  nivelSeleccionado4: string = '';
+  reporteSeleccionado: string = '';
   cargandoNotas: boolean = false;
   cargandoNotas2: boolean = false;
   cargandoNotas3: boolean = false;
+  cargandoNotas4: boolean = false;
+  anioSeleccionado: number | null = null;
+  minYearDate = new Date(2025, 0, 1);
   editarNotas: boolean = false;
   codigo1Generado = '';
   codigo2Generado = '';
@@ -1536,6 +1598,11 @@ consejoCatalogo: MeritoItem[] = [
 
   ngOnDestroy() {
     // this.subscription.unsubscribe();
+  }
+
+  onYearSelected(date: Date, dp: any) {
+    this.anioSeleccionado = date.getFullYear();
+    dp.close();
   }
 
   private normalize(text: string): string {
@@ -1624,6 +1691,7 @@ consejoCatalogo: MeritoItem[] = [
     if (firmas) {
       this.jefe.set(firmas['jefe']);
       this.comandante.set(firmas['comandante']);
+      this.responsable.set(firmas['responsable']);
       console.log("Firmas obtenidas:", firmas);
     } else {
       console.log("No se encontraron firmas en Firebase.");
@@ -1645,7 +1713,7 @@ parseHHMMSSToSeconds(t: string): number {
   throw new Error(`Formato no soportado: ${t}`);
 }
 
-tablaMarchaRapidaSec: Record<number, Partial<Record<Grado, number>>> = 
+tablaMarchaRapidaSec: Record<number, Partial<Record<Grado, number>>> =
   Object.fromEntries(
     Object.entries(this.tablaMarchaRapidaHH).map(([nota, porGrado]) => {
       const convertido: Partial<Record<Grado, number>> = {};
@@ -2035,7 +2103,7 @@ Gestion(
 
   openDialog(): void {
     const dialogRef = this.dialog.open(DialogOverviewExampleDialog, {
-      data: {jefe: this.jefe(), comandante: this.comandante()},
+      data: {jefe: this.jefe(), comandante: this.comandante(), responsable: this.responsable()},
       // data: {jefe: '', comandante: ''},
       width:'400px',
     });
@@ -2045,6 +2113,7 @@ Gestion(
       if (result) {
         this.jefe.set(result.jefe);
         this.comandante.set(result.comandante);
+        this.responsable.set(result.responsable);
       }
     });
   }
@@ -2215,6 +2284,19 @@ Gestion(
       showConfirmButton: false
     });
   }
+  calcularPromedioP(efm: any): number {
+    return (
+      (efm['Contextura Fisica'] * 0.09) +
+      (efm.Flexiones * 0.05) +
+      (efm.Abdominales * 0.05) +
+      (efm['Flexiones en barra'] * 0.1) +
+      (efm.Aerobica * 0.1) +
+      (efm['Ascenso a la cuerda'] * 0.05) +
+      (efm['Cruce de obstaculos'] * 0.15) +
+      (efm['Marcha rapida'] * 0.2) +
+      (efm['Natacion estilo crol'] * 0.2)
+    );
+  }
 
 async savePhysicist() {
   if (!this.estudiante?.id || !this.nivelSeleccionado2) {
@@ -2328,7 +2410,7 @@ for (const materia of this.pruebasFisicas) {
   } else if (n.includes('flexiones') || n.includes('abdominales')) {
     datosEFM[nombre] = this.calcularNotaFlexiones(valor, grado, genero);
     datosEFM[`${nombre}_cant`] = valor;
-  } 
+  }
   else  if (n.includes('cruce de obstaculos')){
     datosEFM[nombre] = this.calcularNotaJardin(valor, grado);
     datosEFM[`${nombre}_cant`] = valor;
@@ -2586,8 +2668,12 @@ private async guardarConsejo(ci: string, nivel: string): Promise<string> {
   }
 
   // Doc contenedor CONSEJO
+  const gestion = new Date().getFullYear();
   const contenedorRef = doc(this.firestore, `estudiante/${ci}/${nivel}/CONSEJO`);
-  await setDoc(contenedorRef, { actualizadoEn: new Date().toISOString() }, { merge: true });
+  await setDoc(contenedorRef, {
+    actualizadoEn: new Date().toISOString(),
+    gestion: gestion
+  }, { merge: true });
 
   // Subcolección e índice
   const itemsPath = `estudiante/${ci}/${nivel}/CONSEJO/items`;
@@ -2620,8 +2706,10 @@ private async guardarItemDisciplina(opts: {
   const { ci, nivel, contenedor, prefix, item } = opts;
 
   // doc contenedor (útil para metadatos)
+  const gestion = new Date().getFullYear();
   const contenedorRef = doc(this.firestore, `estudiante/${ci}/${nivel}/${contenedor}`);
-  await setDoc(contenedorRef, { actualizadoEn: new Date().toISOString() }, { merge: true });
+  await setDoc(contenedorRef, { actualizadoEn: new Date().toISOString(), gestion: gestion }, { merge: true });
+
 
   const itemsPath = `estudiante/${ci}/${nivel}/${contenedor}/items`;
   const nextIndex = await this.getNextIndex(itemsPath, prefix);
@@ -2873,30 +2961,206 @@ validarRango(event: Event, materiaNombre: string, fase: 'input' | 'blur' = 'inpu
     }, 500);
   }
 
-  async printDiscipline() {
-    this.today = new Date();
-    this.generandoPDF = true;
-    setTimeout(async () => {
-      const content = this.pdfContentDiscipline.nativeElement; // 👈 referencia nueva
+  // async printRG(){
+
+  //   console.log(this.anioSeleccionado);
+  //   console.log(this.nivelSeleccionado4);
+  //   console.log(this.reporteSeleccionado);
+
+  // }
+
+  async printRG() {
+    const params = {
+      year: this.anioSeleccionado!,
+      scope: this.nivelSeleccionado4!,
+      type:  this.reporteSeleccionado!
+    };
+    this.loadingRG = true;
+    try {
+      if (params.type === 'fisico') {
+        this.listaRGP  = await this.estudianteService.obtenerDatosGenrales(params);
+        console.log('Coincidencias:', this.listaRGP);
+        this.printRGP();
+      } else if (params.type === 'disciplinario') {
+        console.log('disciplinario');
+        this.listaRGD  = await this.estudianteService.obtenerDatosGenralesD(params);
+        console.log('Coincidencias:', this.listaRGD);
+      }
+    } catch (e) {
+      console.error('Error en obtenerDatosGenrales:', e);
+    } finally {
+      this.loadingRG = false;
+    }
+    // this.printRGP();
+  }
+
+printRGP() {
+  this.today = new Date();
+  this.generandoPDF = true;
+
+  setTimeout(async () => {
+    try {
+      const content = this.pdfContentRGP.nativeElement;
+
       const canvas = await html2canvas(content, {
         scale: 2,
         backgroundColor: '#FFFFFF',
-        useCORS: true
+        useCORS: true,
+        allowTaint: false,
+        logging: false
       });
 
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'letter');
+      // 👉 orientación en landscape
+      const pdf = new jsPDF('l', 'mm', 'letter');
 
-      const pageWidth = 215.9; // carta
-      const pageHeight = 279.4;
-      const imgHeight = (canvas.height * pageWidth) / canvas.width;
+      // Dimensiones carta pero horizontal
+      const pageWidth  = pdf.internal.pageSize.getWidth();   // ~279.4 mm
+      const pageHeight = pdf.internal.pageSize.getHeight();  // ~215.9 mm
 
-      pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, imgHeight);
-      pdf.save('Diciplina.pdf');
+      const margin   = 10;
+      const usableW  = pageWidth  - margin * 2;
+      const usableH  = pageHeight - margin * 2;
 
+      // Altura en píxeles del canvas que corresponde a una página
+      const pxPerPage = Math.floor(canvas.width * (usableH / usableW));
+
+      const pageCanvas = document.createElement('canvas');
+      const pageCtx = pageCanvas.getContext('2d')!;
+      pageCanvas.width  = canvas.width;
+      pageCanvas.height = pxPerPage;
+
+      let rendered = 0;
+      let isFirstPage = true;
+
+      while (rendered < canvas.height) {
+        pageCtx.clearRect(0, 0, pageCanvas.width, pageCanvas.height);
+        pageCtx.drawImage(
+          canvas,
+          0, rendered, canvas.width, pxPerPage,   // src
+          0, 0, pageCanvas.width, pageCanvas.height // dst
+        );
+
+        const pageImgData = pageCanvas.toDataURL('image/png');
+
+        if (!isFirstPage) {
+          pdf.addPage();
+        }
+
+        pdf.addImage(pageImgData, 'PNG', margin, margin, usableW, usableH);
+
+        isFirstPage = false;
+        rendered += pxPerPage;
+      }
+
+      pdf.save('ReporteGeneral.pdf');
+
+    } catch (err) {
+      console.error('Error al generar PDF de Reporte General:', err);
+    } finally {
       this.generandoPDF = false;
+    }
+  }, 500);
+}
+
+
+
+  // async printDiscipline() {
+  //   this.today = new Date();
+  //   this.generandoPDF = true;
+  //   setTimeout(async () => {
+  //     const content = this.pdfContentDiscipline.nativeElement; // 👈 referencia nueva
+  //     const canvas = await html2canvas(content, {
+  //       scale: 2,
+  //       backgroundColor: '#FFFFFF',
+  //       useCORS: true
+  //     });
+
+  //     const imgData = canvas.toDataURL('image/png');
+  //     const pdf = new jsPDF('p', 'mm', 'letter');
+
+  //     const pageWidth = 215.9; // carta
+  //     const pageHeight = 279.4;
+  //     const imgHeight = (canvas.height * pageWidth) / canvas.width;
+
+  //     pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, imgHeight);
+  //     pdf.save('Diciplina.pdf');
+
+  //     this.generandoPDF = false;
+  //   }, 500);
+  // }
+
+  async printDiscipline() {
+    this.today = new Date();
+    this.generandoPDF = true;
+
+    setTimeout(async () => {
+      try {
+        const content = this.pdfContentDiscipline.nativeElement;
+
+        const canvas = await html2canvas(content, {
+          scale: 2,
+          backgroundColor: '#FFFFFF',
+          useCORS: true,
+          allowTaint: false,
+          logging: false
+        });
+
+        const pdf = new jsPDF('p', 'mm', 'letter');
+
+        // Tamaño carta en mm
+        const pageWidth  = pdf.internal.pageSize.getWidth();   // ~215.9
+        const pageHeight = pdf.internal.pageSize.getHeight();  // ~279.4
+
+        // Márgenes y área útil (ajusta si quieres márgenes distintos)
+        const margin   = 10;   // mm
+        const usableW  = pageWidth  - margin * 2;
+        const usableH  = pageHeight - margin * 2;
+
+        // Altura (en píxeles del canvas) equivalente a una página del PDF
+        // Se respeta la proporción usando el ancho útil
+        const pxPerPage = Math.floor(canvas.width * (usableH / usableW));
+
+        // Canvas “por página” para ir recortando porciones verticales
+        const pageCanvas = document.createElement('canvas');
+        const pageCtx = pageCanvas.getContext('2d')!;
+        pageCanvas.width  = canvas.width;
+        pageCanvas.height = pxPerPage;
+
+        let rendered = 0;
+        let isFirstPage = true;
+
+        while (rendered < canvas.height) {
+          // Recortar la porción visible
+          pageCtx.clearRect(0, 0, pageCanvas.width, pageCanvas.height);
+          pageCtx.drawImage(
+            canvas,
+            0, rendered, canvas.width, pxPerPage,   // src (recorte)
+            0, 0, pageCanvas.width, pageCanvas.height // dst
+          );
+
+          const pageImgData = pageCanvas.toDataURL('image/png');
+
+          if (!isFirstPage) {
+            pdf.addPage();
+          }
+
+          // Agregar imagen a la página respetando márgenes y área útil
+          pdf.addImage(pageImgData, 'PNG', margin, margin, usableW, usableH);
+
+          isFirstPage = false;
+          rendered += pxPerPage;
+        }
+
+        pdf.save('Disciplina.pdf'); // (corrijo el nombre)
+
+      } catch (err) {
+        console.error('Error al generar PDF de Disciplina:', err);
+      } finally {
+        this.generandoPDF = false;
+      }
     }, 500);
   }
+
 
 
 }

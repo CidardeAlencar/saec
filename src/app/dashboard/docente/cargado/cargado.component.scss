@@ -86,7 +86,7 @@
   min-height: 100vh;
   // background-color: var(--color-background-light);
   // background-image: url('../../../assets/background.jpeg');
-  background-image: 
+  background-image:
     linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), /* capa oscura */
     url('../../../assets/background3.jpeg');
   background-size: cover;
@@ -95,6 +95,9 @@
   width: 100%;
   box-sizing: border-box;
 }
+  .logo{
+    max-width: 70px;
+  }
 .table {
   min-width: 80% !important;
 }
