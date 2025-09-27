@@ -558,7 +558,15 @@ private async leerItemsBase(ci: string, nivel: string, contenedor: 'MERITOS' | '
     items.sort((a, b) => (a.creadoEn ?? '').localeCompare(b.creadoEn ?? ''));
 
     // Total valor numérico
-    const totalValor = items.reduce((acc, it) => acc + ((typeof it.valor === 'number' || typeof it['valorConsejo']) === 'number' ? it.valor || it['valorConsejo']: 0), 0);
+    const totalValor = items.reduce((acc, it) => {
+        if (typeof it.valor === 'number') {
+          return acc + it.valor;
+        } else if (typeof it['valorConsejo'] === 'number') {
+          return acc + it['valorConsejo'];
+        } else {
+          return acc;
+        }
+      }, 0);
 
     return { gestion: gestionNum, items, totalValor };
   }
