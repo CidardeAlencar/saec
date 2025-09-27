@@ -132,6 +132,7 @@ export class CargadoComponent implements OnInit, OnDestroy {
   @ViewChild('pdfContentEFM', { static: false }) pdfContentEFM!: ElementRef;
   @ViewChild('pdfContentDiscipline', { static: false }) pdfContentDiscipline!: ElementRef;
   @ViewChild('pdfContentRGP', { static: false }) pdfContentRGP!: ElementRef;
+  @ViewChild('pdfContentRGD', { static: false }) pdfContentRGD!: ElementRef;
   generandoPDF = false;
   loadingRG = false;
   listaRGP: ReporteGeneralItem[] = [];
@@ -2981,10 +2982,12 @@ validarRango(event: Event, materiaNombre: string, fase: 'input' | 'blur' = 'inpu
         this.listaRGP  = await this.estudianteService.obtenerDatosGenrales(params);
         console.log('Coincidencias:', this.listaRGP);
         this.printRGP();
-      } else if (params.type === 'disciplinario') {
+      } 
+      if (params.type === 'disciplinario') {
         console.log('disciplinario');
         this.listaRGD  = await this.estudianteService.obtenerDatosGenralesD(params);
         console.log('Coincidencias:', this.listaRGD);
+        this.printRGD();
       }
     } catch (e) {
       console.error('Error en obtenerDatosGenrales:', e);
@@ -3056,6 +3059,74 @@ printRGP() {
 
     } catch (err) {
       console.error('Error al generar PDF de Reporte General:', err);
+    } finally {
+      this.generandoPDF = false;
+    }
+  }, 500);
+}
+
+printRGD() {
+  this.today = new Date();
+  this.generandoPDF = true;
+
+  setTimeout(async () => {
+    try {
+      const content = this.pdfContentRGD.nativeElement;
+
+      const canvas = await html2canvas(content, {
+        scale: 2,
+        backgroundColor: '#FFFFFF',
+        useCORS: true,
+        allowTaint: false,
+        logging: false
+      });
+
+      // 👉 orientación VERTICAL (portrait)
+      const pdf = new jsPDF('p', 'mm', 'letter');
+
+      // Dimensiones carta vertical
+      const pageWidth  = pdf.internal.pageSize.getWidth();   // ~215.9 mm
+      const pageHeight = pdf.internal.pageSize.getHeight();  // ~279.4 mm
+
+      const margin   = 10;
+      const usableW  = pageWidth  - margin * 2;
+      const usableH  = pageHeight - margin * 2;
+
+      // Altura en píxeles del canvas equivalente a una página, manteniendo proporción por ancho útil
+      const pxPerPage = Math.floor(canvas.width * (usableH / usableW));
+
+      const pageCanvas = document.createElement('canvas');
+      const pageCtx = pageCanvas.getContext('2d')!;
+      pageCanvas.width  = canvas.width;
+      pageCanvas.height = pxPerPage;
+
+      let rendered = 0;
+      let isFirstPage = true;
+
+      while (rendered < canvas.height) {
+        pageCtx.clearRect(0, 0, pageCanvas.width, pageCanvas.height);
+        pageCtx.drawImage(
+          canvas,
+          0, rendered, canvas.width, pxPerPage,   // src
+          0, 0, pageCanvas.width, pageCanvas.height // dst
+        );
+
+        const pageImgData = pageCanvas.toDataURL('image/png');
+
+        if (!isFirstPage) {
+          // fuerza nueva página en VERTICAL
+          pdf.addPage('letter', 'p');
+        }
+
+        pdf.addImage(pageImgData, 'PNG', margin, margin, usableW, usableH);
+
+        isFirstPage = false;
+        rendered += pxPerPage;
+      }
+
+      pdf.save('ReporteGeneralDisciplina.pdf');
+    } catch (err) {
+      console.error('Error al generar PDF de Reporte General Disciplina:', err);
     } finally {
       this.generandoPDF = false;
     }
