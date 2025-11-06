@@ -14,7 +14,7 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import {DialogOverviewExampleDialog} from '../../certificaciones/informacion/informacion.component';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatNativeDateModule, MAT_DATE_FORMATS } from '@angular/material/core';
 import {
   MAT_DIALOG_DATA,
   MatDialog,
@@ -71,6 +71,7 @@ export interface ReporteGeneralItem {
   apPat?: string | null;
   nombres?: string | null;
   genero?: string | null;
+  edad?: number | null;
   scope: string;
   type: string;
   year: number;
@@ -114,11 +115,24 @@ type Genero = "Masculino" | "Femenino";
 import { MatIconModule } from '@angular/material/icon';
 import { AdminRoutingModule } from "../../admin/admin-routing.module";
 
+const YEAR_ONLY_FORMATS = {
+  parse: {
+    dateInput: 'yyyy',
+  },
+  display: {
+    dateInput: 'yyyy',
+    monthYearLabel: 'yyyy',
+    dateA11yLabel: 'yyyy',
+    monthYearA11yLabel: 'yyyy',
+  },
+};
+
 @Component({
   selector: 'app-cargado',
   imports: [MatNativeDateModule, MatDatepickerModule, ReactiveFormsModule, MatProgressSpinnerModule, MatInputModule, MatFormFieldModule, MatSelectModule, FormsModule, MatButtonModule, CommonModule, MatIconModule, AdminRoutingModule],
   templateUrl: './cargado.component.html',
-  styleUrl: './cargado.component.scss'
+  styleUrl: './cargado.component.scss',
+  providers: [{ provide: MAT_DATE_FORMATS, useValue: YEAR_ONLY_FORMATS }]
 })
 
 export class CargadoComponent implements OnInit, OnDestroy {
@@ -1557,6 +1571,7 @@ consejoCatalogo: MeritoItem[] = [
   cargandoNotas3: boolean = false;
   cargandoNotas4: boolean = false;
   anioSeleccionado: number | null = null;
+  anioSeleccionadoDate: Date | null = null;
   minYearDate = new Date(2025, 0, 1);
   editarNotas: boolean = false;
   codigo1Generado = '';
@@ -1634,9 +1649,26 @@ consejoCatalogo: MeritoItem[] = [
 
 
   onYearSelected(date: Date, dp: any) {
-    this.anioSeleccionado = date.getFullYear();
+    // this.anioSeleccionado = date.getFullYear();
+    const year = date.getFullYear();
+    this.anioSeleccionado = year;
+    this.anioSeleccionadoDate = new Date(year, 0, 1);
+
+    if (!this.notasRegistradas) {
+      this.notasRegistradas = {};
+    }
+    this.notasRegistradas['Gestion'] = year;
+
+    const input = document.getElementById('nota_Gestion') as HTMLInputElement | null;
+    if (input) {
+      input.value = String(year);
+    }
+
+    if (dp && typeof dp.select === 'function') {
+      dp.select(new Date(year, 0, 1));
+    }
     dp.close();
-    // this.notasRegistradas['Gestion'] = this.anioSeleccionado;
+    this.notasRegistradas['Gestion'] = this.anioSeleccionado;
   }
 
   private normalize(text: string): string {
@@ -2569,12 +2601,27 @@ async obtenerNotasFisico() {
       this.cantidadesRegistradas[`${nombre}_cant`] = datos[`${nombre}_cant`] ?? null;
     }
 
+    const gestionValor = datos['Gestion'] ?? datos['gestion'] ?? datos['Gesti\u00f3n'] ?? null;
+    const gestionNumero = Number(gestionValor);
+
+    if (Number.isFinite(gestionNumero)) {
+      this.anioSeleccionado = gestionNumero;
+      this.anioSeleccionadoDate = new Date(gestionNumero, 0, 1);
+      this.notasRegistradas['Gestion'] = gestionNumero;
+    } else {
+      this.anioSeleccionado = null;
+      this.anioSeleccionadoDate = null;
+      this.notasRegistradas['Gestion'] = null;
+    }
+
     console.log("Notas físicas obtenidas:", this.notasRegistradas);
     console.log("Cantidades físicas obtenidas:", this.cantidadesRegistradas);
     } catch (error) {
       console.error("Error al procesar notas físicas:", error);
       this.notasRegistradas = {};
       this.cantidadesRegistradas = {};
+      this.anioSeleccionado = null;
+      this.anioSeleccionadoDate = null;
     } finally {
       this.cargandoNotas2 = false;
     }

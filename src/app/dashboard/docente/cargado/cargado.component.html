@@ -206,28 +206,25 @@
                   <mat-label>{{ materia.nombre }}</mat-label>
 
                   <!-- Caso especial: GESTIÓN -->
-                  <ng-container *ngIf="materia.nombre === 'Gestion'; else inputNormal" style="display: flex !important; flex-direction: column;">
+                   <!-- [value]="anioSeleccionado ? anioSeleccionado.toString() : ''" -->
+                  <ng-container *ngIf="materia.nombre === 'Gestion'; else inputNormal" style="display: inline-flex;">
                     <input
+                      [id]="'nota_' + materia.nombre.split(' ').join('_')"
                       matInput
-                      [value]="anioSeleccionado ? anioSeleccionado.toString() : ''"
+                      [matDatepicker]="gestionYearPicker"
+                      [(ngModel)]="anioSeleccionado"
+                      [ngModelOptions]="{ standalone: true }"
                       placeholder="Seleccione un año"
                       readonly
-                      (click)="picker.open()"
-                    />
-                    <input
-                      matInput
-                      [matDatepicker]="picker"
-                      [min]="minYearDate"
-                      style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;"
-                      tabindex="-1"
-                      aria-hidden="true"
+                      (focus)="gestionYearPicker.open()"
+                      (click)="gestionYearPicker.open()"
                     />
                     <mat-datepicker
-                      #picker
+                      #gestionYearPicker
                       startView="multi-year"
-                      (yearSelected)="onYearSelected($event, picker)"
+                      (yearSelected)="onYearSelected($event, gestionYearPicker)"
                     ></mat-datepicker>
-                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker-toggle matSuffix [for]="gestionYearPicker"></mat-datepicker-toggle>
                   </ng-container>
                   <!-- Caso general: todos los demás inputs -->
                   <ng-template #inputNormal>
@@ -802,7 +799,8 @@
                 <td>{{ item.grado }}</td>
                 <td>{{ item.apPat }} {{ item.apMat }}</td>
                 <td>{{ item.nombres }}</td>
-                <td> Edad </td>
+                <!-- <td> Edad </td> -->
+                <td>{{ item.edad ?? 'N/D' }}</td>
                 <td>{{ item.genero }}</td>
                 <td>{{ item.efm.Talla }}</td>
                 <td>{{ item.efm.Peso }}</td>

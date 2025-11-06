@@ -23,6 +23,7 @@ export interface ReporteGeneralItem {
   apPat?: string | null;
   nombres?: string | null;
   genero?: string | null;
+  edad?: number | null;
   scope: string;
   type: string;
   year: number;
@@ -372,84 +373,176 @@ private async leerItemsBase(ci: string, nivel: string, contenedor: 'MERITOS' | '
     }
   }
 
-    async obtenerDatosGenrales(params: ReporteGeneralParams): Promise<Array<{
-      ci: string;
-      grado?: string | null;
-      apMat?: string | null;
-      apPat?: string | null;
-      nombres?: string | null;
-      genero?: string | null;
-      scope: string;
-      type: string;
-      year: number;
-      efm: any;             // datos del doc (EFM u otro)
-    }>> {
-      const { year, scope, type } = params;
+  // async obtenerDatosGenrales(params: ReporteGeneralParams): Promise<Array<{
+  //   ci: string;
+  //   grado?: string | null;
+  //   apMat?: string | null;
+  //   apPat?: string | null;
+  //   nombres?: string | null;
+  //   genero?: string | null;
+  //   scope: string;
+  //   type: string;
+  //   year: number;
+  //   efm: any;             // datos del doc (EFM u otro)
+  // }>> {
+  //   const { year, scope, type } = params;
 
-      // 1) Colección raíz de estudiantes
-      const estudiantesCol = collection(this.firestore, 'estudiante');
-      const estudiantesSnap = await getDocs(estudiantesCol);
+  //   // 1) Colección raíz de estudiantes
+  //   const estudiantesCol = collection(this.firestore, 'estudiante');
+  //   const estudiantesSnap = await getDocs(estudiantesCol);
 
-      // 2) Mapeo de tipo → nombre del documento
-      const docType = this.mapTypeToDoc(type); // 'fisico' -> 'EFM', etc.
+  //   // 2) Mapeo de tipo → nombre del documento
+  //   const docType = this.mapTypeToDoc(type); // 'fisico' -> 'EFM', etc.
 
-      const resultados: Array<{
-        ci: string;
-        grado: string;
-        apMat: string;
-        apPat: string;
-        nombres: string;
-        genero: string;
-        scope: string;
-        type: string;
-        year: number;
-        efm: any;
-      }> = [];
+  //   const resultados: Array<{
+  //     ci: string;
+  //     grado: string;
+  //     apMat: string;
+  //     apPat: string;
+  //     nombres: string;
+  //     genero: string;
+  //     scope: string;
+  //     type: string;
+  //     year: number;
+  //     efm: any;
+  //   }> = [];
 
-      // 3) Iterar todos los estudiantes
-      const tareas = estudiantesSnap.docs.map(async (estuDoc) => {
-        const ci = estuDoc.id;
-        const estuData = estuDoc.data() as any;
-        console.log(estuData)
-        const grado   = estuData?.grado   ?? null;
-        const apMat   = estuData?.apMat   ?? null;
-        const apPat   = estuData?.apPat   ?? null;
-        const nombres = estuData?.nombres ?? null;
-        const genero  = estuData?.genero  ?? null;
+  //   // 3) Iterar todos los estudiantes
+  //   const tareas = estudiantesSnap.docs.map(async (estuDoc) => {
+  //     const ci = estuDoc.id;
+  //     const estuData = estuDoc.data() as any;
+  //     console.log(estuData)
+  //     const grado   = estuData?.grado   ?? null;
+  //     const apMat   = estuData?.apMat   ?? null;
+  //     const apPat   = estuData?.apPat   ?? null;
+  //     const nombres = estuData?.nombres ?? null;
+  //     const genero  = estuData?.genero  ?? null;
 
-        // Ruta: estudiante/{ci}/{scope}/{docType}
-        const ref = doc(this.firestore, `estudiante/${ci}/${scope}/${docType}`);
-        const snap = await getDoc(ref);
+  //     // Ruta: estudiante/{ci}/{scope}/{docType}
+  //     const ref = doc(this.firestore, `estudiante/${ci}/${scope}/${docType}`);
+  //     const snap = await getDoc(ref);
 
-        if (!snap.exists()) return;
+  //     if (!snap.exists()) return;
 
-        const data = snap.data() as any;
+  //     const data = snap.data() as any;
 
-        // Robustez: Gestion puede venir con may/min y como string/number
-        const gestionRaw = data?.Gestion ?? data?.gestion ?? data?.Gesti\u00f3n;
-        const gestionNum = Number(gestionRaw);
+  //     // Robustez: Gestion puede venir con may/min y como string/number
+  //     const gestionRaw = data?.Gestion ?? data?.gestion ?? data?.Gesti\u00f3n;
+  //     const gestionNum = Number(gestionRaw);
 
-        if (!Number.isFinite(gestionNum)) return;
+  //     if (!Number.isFinite(gestionNum)) return;
 
-        if (gestionNum === Number(year)) {
-          resultados.push({
-            ci,
-            grado,
-            apMat,
-            apPat,
-            nombres,
-            genero,
-            scope,
-            type,
-            year,
-            efm: data,
-          });
-        }
-      });
+  //     if (gestionNum === Number(year)) {
+  //       resultados.push({
+  //         ci,
+  //         grado,
+  //         apMat,
+  //         apPat,
+  //         nombres,
+  //         genero,
+  //         scope,
+  //         type,
+  //         year,
+  //         efm: data,
+  //       });
+  //     }
+  //   });
+  async obtenerDatosGenrales(params: ReporteGeneralParams): Promise<ReporteGeneralItem[]> {
+    const { year, scope, type } = params;
 
-      await Promise.all(tareas);
-      return resultados;
+    // 1) Colección raíz de estudiantes
+    const estudiantesCol = collection(this.firestore, 'estudiante');
+    const estudiantesSnap = await getDocs(estudiantesCol);
+
+    // 2) Mapeo de tipo → nombre del documento
+    const docType = this.mapTypeToDoc(type); // 'fisico' -> 'EFM', etc.
+
+    const resultados: ReporteGeneralItem[] = [];
+
+    // 3) Iterar todos los estudiantes
+    const tareas = estudiantesSnap.docs.map(async (estuDoc) => {
+      const ci = estuDoc.id;
+      const estuData = estuDoc.data() as any;
+      console.log(estuData)
+      const grado   = estuData?.grado   ?? null;
+      const apMat   = estuData?.apMat   ?? null;
+      const apPat   = estuData?.apPat   ?? null;
+      const nombres = estuData?.nombres ?? null;
+      const genero  = estuData?.genero  ?? null;
+      const edad    = this.calcularEdad(estuData?.fechaNacimiento ?? null);
+
+      // Ruta: estudiante/{ci}/{scope}/{docType}
+      const ref = doc(this.firestore, `estudiante/${ci}/${scope}/${docType}`);
+      const snap = await getDoc(ref);
+
+      if (!snap.exists()) return;
+
+      const data = snap.data() as any;
+
+      // Robustez: Gestion puede venir con may/min y como string/number
+      const gestionRaw = data?.Gestion ?? data?.gestion ?? data?.Gesti\u00f3n;
+      const gestionNum = Number(gestionRaw);
+
+      if (!Number.isFinite(gestionNum)) return;
+
+      if (gestionNum === Number(year)) {
+        resultados.push({
+          ci,
+          grado,
+          apMat,
+          apPat,
+          nombres,
+          genero,
+          edad,
+          scope,
+          type,
+          year,
+          efm: data,
+        });
+      }
+    });
+
+    await Promise.all(tareas);
+    return resultados;
+  }
+  
+  calcularEdad(fechaNacimiento: unknown): number | null {
+    if (!fechaNacimiento) {
+      return null;
     }
+
+    let fecha: Date | null = null;
+
+    if (fechaNacimiento instanceof Date) {
+      fecha = fechaNacimiento;
+    } else if (typeof fechaNacimiento === 'string') {
+      const parsed = new Date(fechaNacimiento);
+      if (!Number.isNaN(parsed.getTime())) {
+        fecha = parsed;
+      }
+    } else if (typeof fechaNacimiento === 'object') {
+      const maybeTimestamp = fechaNacimiento as { toDate?: () => Date; seconds?: number; nanoseconds?: number };
+      if (maybeTimestamp?.toDate) {
+        fecha = maybeTimestamp.toDate();
+      } else if (typeof maybeTimestamp?.seconds === 'number') {
+        fecha = new Date(maybeTimestamp.seconds * 1000);
+      }
+    }
+
+    if (!fecha) {
+      return null;
+    }
+
+    const hoy = new Date();
+    let edad = hoy.getFullYear() - fecha.getFullYear();
+    const mes = hoy.getMonth() - fecha.getMonth();
+
+    if (mes < 0 || (mes === 0 && hoy.getDate() < fecha.getDate())) {
+      edad--;
+    }
+
+    return edad >= 0 ? edad : null;
+  }
 
    async obtenerDatosGenralesD(params: ReporteGeneralParams): Promise<ReporteDisciplinarioItem[]> {
     const { year, scope } = params;

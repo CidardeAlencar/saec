@@ -12,7 +12,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 
 @Component({
   selector: 'app-profile',
-  imports: [MatFormFieldModule, ReactiveFormsModule, MatInputModule, MatButtonModule, MatSelectModule, MatDatepickerModule],
+  imports: [MatFormFieldModule, ReactiveFormsModule, MatInputModule, MatButtonModule, MatSelectModule, MatDatepickerModule, MatNativeDateModule,],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss'
 })
@@ -66,7 +66,8 @@ export class ProfileComponent {
         this.grado.invalid ||
         this.genero.invalid ||
         this.correo.invalid ||
-        this.contrasena.invalid
+        this.contrasena.invalid ||
+        this.fechaNacimiento.invalid
       );
     }
 
@@ -80,6 +81,7 @@ export class ProfileComponent {
       this.genero.reset();
       this.correo.reset();
       this.contrasena.reset();
+      this.fechaNacimiento.reset();
     }
 
     async registerStudent(){
@@ -111,6 +113,7 @@ export class ProfileComponent {
             genero: this.genero.value,
             email: this.correo.value,
             contrasenia: this.contrasena.value,
+            fechaNacimiento: this.fechaNacimiento.value,
             uid: uid
           };
 
