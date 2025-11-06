@@ -183,8 +183,7 @@
               <p style="font-weight: bold;">Cargando notas...</p>
             </div>
             <div class="notas" *ngIf="nivelSeleccionado2 != '' && !cargandoNotas2">
-              <ng-container *ngFor="let materia of pruebasFisicas">
-                <!-- <p> -->
+              <!-- <ng-container *ngFor="let materia of pruebasFisicas">
                   <mat-form-field appearance="outline">
                     <mat-label>{{ materia.nombre }}</mat-label>
                     <input
@@ -192,7 +191,7 @@
                       matInput
                       [type]="materia.nombre === 'Marcha rapida' ? 'text' : 'number'"
                       [placeholder]="materia.nombre === 'Marcha rapida' ? 'HH:mm:ss' : 'Ingresa el registro'"
-
+                      [placeholder]="getPlaceholder(materia)"
 
                       [pattern]="materia.nombre === 'Marcha rapida'
                         ? '^([0-1]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$'
@@ -200,16 +199,60 @@
                       [value]="notasRegistradas[materia.nombre] ?? ''"
                       [disabled]="materia.nombre === 'Contextura Fisica' || (notasRegistradas[materia.nombre] != null && notasRegistradas[materia.nombre]! >= 0 && notasRegistradas[materia.nombre]! <= 3000) "
                       >
-                    <!-- <mat-hint [id]="getHintId(materia.codigo)">
-                      {{ materia.nombre }}
-                    </mat-hint> -->
-                    <!-- min="0"
-                      max="100" -->
-                      <!-- (input)="validarRango($event, materia.nombre)" -->
-                    <!-- agregar boton de guardado y guardar en solo un documento toda las notas del semestre en fisico -->
                   </mat-form-field>
-                <!-- </p> -->
+              </ng-container> -->
+              <ng-container *ngFor="let materia of pruebasFisicas">
+                <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>{{ materia.nombre }}</mat-label>
+
+                  <!-- Caso especial: GESTIÓN -->
+                  <ng-container *ngIf="materia.nombre === 'Gestion'; else inputNormal" style="display: flex !important; flex-direction: column;">
+                    <input
+                      matInput
+                      [value]="anioSeleccionado ? anioSeleccionado.toString() : ''"
+                      placeholder="Seleccione un año"
+                      readonly
+                      (click)="picker.open()"
+                    />
+                    <input
+                      matInput
+                      [matDatepicker]="picker"
+                      [min]="minYearDate"
+                      style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;"
+                      tabindex="-1"
+                      aria-hidden="true"
+                    />
+                    <mat-datepicker
+                      #picker
+                      startView="multi-year"
+                      (yearSelected)="onYearSelected($event, picker)"
+                    ></mat-datepicker>
+                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                  </ng-container>
+                  <!-- Caso general: todos los demás inputs -->
+                  <ng-template #inputNormal>
+                    <input
+                      [id]="'nota_' + materia.nombre.split(' ').join('_')"
+                      matInput
+                      [type]="materia.nombre === 'Marcha rapida' ? 'text' : 'number'"
+                      [placeholder]="getPlaceholder(materia)"
+                      [pattern]="
+                        materia.nombre === 'Marcha rapida'
+                          ? '^([0-1]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$'
+                          : null
+                      "
+                      [value]="notasRegistradas[materia.nombre] ?? ''"
+                      [disabled]="
+                        materia.nombre === 'Contextura Fisica' ||
+                        (notasRegistradas[materia.nombre] != null &&
+                          notasRegistradas[materia.nombre]! >= 0 &&
+                          notasRegistradas[materia.nombre]! <= 3000)
+                      "
+                    />
+                  </ng-template>
+                </mat-form-field>
               </ng-container>
+
             </div>
             <div class="buttons">
               <button
@@ -340,7 +383,7 @@
             <mat-form-field class="nivel">
               <mat-label>Seleccione el curso</mat-label>
               <!-- <mat-select [(ngModel)]="nivelSeleccionado3" (selectionChange)="onNivelChangeDiscipline()"> -->
-              <mat-select [(ngModel)]="nivelSeleccionado3" (selectionChange)="onNivelChangeDiscipline()">
+              <mat-select [(ngModel)]="nivelSeleccionado3">
                 <mat-option *ngFor="let option of options.slice(0, 6)" [value]="option.value">
                   {{ option.viewValue }}
                 </mat-option>
@@ -763,7 +806,7 @@
                 <td>{{ item.genero }}</td>
                 <td>{{ item.efm.Talla }}</td>
                 <td>{{ item.efm.Peso }}</td>
-                <td>{{ item.efm['Contextura Fisica'] === '100' ? 'NORMAL' : 'NO NORMAL' }}</td>
+                <td>{{ item.efm['Contextura Fisica'] === '100' ? 'NORMAL' : 'NO CUMPLE' }}</td>
                 <td>{{ item.efm['Contextura Fisica'] }}</td>
                 <td style="background-color: lime;">{{ (item.efm['Contextura Fisica'] * 0.05) | number:'1.0-2' }}</td>
                 <td>{{ item.efm.Flexiones_cant}}</td>
@@ -802,14 +845,16 @@
               </tr> -->
             </table>
             <div class="firmas">
-              <p class="ind">
-              <span>{{ responsable() || "No disponible" }}</span>
-              <span><strong>JEFE DE EFM. Y DEPORTES DE LA E.M.T.E. - E.P.S.S.T.</strong></span>
-              </p>
-              <p class="ind">
-              <span>{{ jefe() || "No disponible" }}</span>
-              <span><strong>2DO. CMTE. Y JEFE DE ESTUDIOS DE LA E.M.T.E. - E.P.S.S.T.</strong></span>
-              </p>
+              <div class="primary">
+                <p class="ind">
+                <span>{{ responsable() || "No disponible" }}</span>
+                <span><strong>JEFE DE EFM. Y DEPORTES DE LA E.M.T.E. - E.P.S.S.T.</strong></span>
+                </p>
+                <p class="ind">
+                <span>{{ jefe() || "No disponible" }}</span>
+                <span><strong>2DO. CMTE. Y JEFE DE ESTUDIOS DE LA E.M.T.E. - E.P.S.S.T.</strong></span>
+                </p>
+              </div>
               <p><strong>Vo.Bo.</strong></p>
               <p class="ind">
                 <span>{{ comandante() || "No disponible" }}</span>
@@ -856,7 +901,7 @@
                 <td>{{ item.meritos.totalValor }}</td>
                 <td>{{ item.demeritos.totalValor + item.consejo.totalValor}}</td>
                 <td>{{ item.meritos.totalValor + item.demeritos.totalValor + item.consejo.totalValor}}</td>
-                <td>{{100 - (item.meritos.totalValor + item.demeritos.totalValor + item.consejo.totalValor) }}</td>
+                <td>{{100 - Math.abs(item.meritos.totalValor + item.demeritos.totalValor + item.consejo.totalValor) }}</td>
               </tr>
               <!-- <tr *ngIf="!listaConsejo?.length">
                 <td colspan="4" class="text-center">Sin registros</td>
@@ -867,14 +912,16 @@
               </tr> -->
             </table>
             <div class="firmas">
-              <p class="ind">
-              <span>{{ responsable() || "No disponible" }}</span>
-              <span><strong>JEFE DE EFM. Y DEPORTES DE LA E.M.T.E. - E.P.S.S.T.</strong></span>
-              </p>
-              <p class="ind">
-              <span>{{ jefe() || "No disponible" }}</span>
-              <span><strong>2DO. CMTE. Y JEFE DE ESTUDIOS DE LA E.M.T.E. - E.P.S.S.T.</strong></span>
-              </p>
+              <div class="primary">
+                <p class="ind"> 
+                <span>{{ responsable() || "No disponible" }}</span>
+                <span><strong>JEFE DE EFM. Y DEPORTES DE LA E.M.T.E. - E.P.S.S.T.</strong></span>
+                </p>
+                <p class="ind">
+                <span>{{ jefe() || "No disponible" }}</span>
+                <span><strong>2DO. CMTE. Y JEFE DE ESTUDIOS DE LA E.M.T.E. - E.P.S.S.T.</strong></span>
+                </p>
+              </div>
               <p><strong>Vo.Bo.</strong></p>
               <p class="ind">
                 <span>{{ comandante() || "No disponible" }}</span>

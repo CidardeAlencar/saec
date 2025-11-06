@@ -50,6 +50,20 @@
           (keydown.enter)="preventSubmit($event)"
           />
       </mat-form-field>
+
+      <!-- <mat-form-field appearance="outline">
+        <mat-label>Fecha de nacimiento</mat-label>
+        <input
+          matInput
+          [matDatepicker]="pickerNacimiento"
+          placeholder="Selecciona tu fecha de nacimiento"
+          [formControl]="fechaNacimiento"
+          (keydown.enter)="preventSubmit($event)"
+        />
+        <mat-datepicker-toggle matSuffix [for]="pickerNacimiento"></mat-datepicker-toggle>
+        <mat-datepicker #pickerNacimiento startView="multi-year"></mat-datepicker>
+      </mat-form-field> -->
+
       <mat-form-field appearance="outline">
         <mat-label>Celular</mat-label>
         <input
