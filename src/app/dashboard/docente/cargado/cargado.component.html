@@ -207,24 +207,26 @@
 
                   <!-- Caso especial: GESTIÓN -->
                    <!-- [value]="anioSeleccionado ? anioSeleccionado.toString() : ''" -->
-                  <ng-container *ngIf="materia.nombre === 'Gestion'; else inputNormal" style="display: inline-flex;">
-                    <input
-                      [id]="'nota_' + materia.nombre.split(' ').join('_')"
-                      matInput
-                      [matDatepicker]="gestionYearPicker"
-                      [(ngModel)]="anioSeleccionado"
-                      [ngModelOptions]="{ standalone: true }"
-                      placeholder="Seleccione un año"
-                      readonly
-                      (focus)="gestionYearPicker.open()"
-                      (click)="gestionYearPicker.open()"
-                    />
-                    <mat-datepicker
-                      #gestionYearPicker
-                      startView="multi-year"
-                      (yearSelected)="onYearSelected($event, gestionYearPicker)"
-                    ></mat-datepicker>
-                    <mat-datepicker-toggle matSuffix [for]="gestionYearPicker"></mat-datepicker-toggle>
+                  <ng-container *ngIf="materia.nombre === 'Gestion'; else inputNormal">
+                    <div style="display: flex;">
+                      <input
+                        [id]="'nota_' + materia.nombre.split(' ').join('_')"
+                        matInput
+                        [matDatepicker]="gestionYearPicker"
+                        [(ngModel)]="anioSeleccionado"
+                        [ngModelOptions]="{ standalone: true }"
+                        placeholder="Seleccione un año"
+                        readonly
+                        (focus)="gestionYearPicker.open()"
+                        (click)="gestionYearPicker.open()"
+                      />
+                      <mat-datepicker
+                        #gestionYearPicker
+                        startView="multi-year"
+                        (yearSelected)="onYearSelected($event, gestionYearPicker)"
+                      ></mat-datepicker>
+                      <mat-datepicker-toggle matSuffix [for]="gestionYearPicker"></mat-datepicker-toggle>
+                    </div>
                   </ng-container>
                   <!-- Caso general: todos los demás inputs -->
                   <ng-template #inputNormal>
