@@ -106,26 +106,50 @@
               </ng-container>
             </div>
             <div class="notas" *ngIf="nivelSeleccionado === 'primerSemestre' && !cargandoNotas">
-              <ng-container *ngFor="let materia of materiasPrimerSemestre">
-                <p>
-                  <mat-form-field appearance="outline">
-                    <mat-label>{{ materia.codigo }}</mat-label>
-                    <input
-                      [id]="getInputId(materia.codigo)"
-                      matInput
-                      type="number"
-                      min="0"
-                      max="100"
-                      placeholder="Ingresa la nota"
-                      [value]="notasRegistradas[materia.codigo] ?? ''"
-                      [disabled]="(notasRegistradas[materia.codigo] != null) && !puedeEditarTodo"
-                      (input)="debeValidarRango(materia.codigo) && validarRango($event, materia.nombre)">
-                    <mat-hint [id]="getHintId(materia.codigo)">
-                      {{ materia.nombre }}
-                    </mat-hint>
-                  </mat-form-field>
-                </p>
+              <p class="tittleNotas">FORMACION MILITAR</p>
+              <ng-container *ngFor="let materia of materiasPrimerSemestreMilitares">  
+                <div class="itemNotas">
+                  <p>{{ materia.nombre }} ({{ materia.codigo }})</p>
+                  <div class="itemMaterias">
+                    <div *ngFor="let evaluacion of materia.evaluaciones; let i = index" >
+                      <mat-form-field appearance="outline">
+                        <mat-label>{{ evaluacion }}</mat-label>
+                        <input
+                          [id]="getInputId(materia.codigo + '-' + i)"
+                          matInput
+                          type="number"
+                          min="0"
+                          max="100"
+                          placeholder="Ingresa la nota de {{ evaluacion }}"
+                          [value]="notasRegistradas[materia.codigo + '-' + i] ?? ''"
+                          [disabled]="(notasRegistradas[materia.codigo + '-' + i] != null) && !puedeEditarTodo"
+                          (input)="debeValidarRango(materia.codigo) && validarRango($event, materia.nombre)">
+                        <!-- <mat-hint [id]="getHintId(materia.codigo)">
+                          {{ materia.nombre }}
+                        </mat-hint> -->
+                      </mat-form-field>
+                    </div>
+                    <div class="campoEvaluacion final">
+                      <mat-form-field appearance="outline" color="primary">
+                        <mat-label>Nota Final</mat-label>
+                        <input
+                          matInput
+                          type="number"
+                          min="0"
+                          max="100"
+                          placeholder="Calculada o ingresada manualmente"
+                          [id]="materia.codigo + '-final'"
+                          [value]="notasRegistradas[materia.codigo + '-final'] ?? ''"
+                          disabled
+                        />
+                        <mat-hint>Resultado final</mat-hint>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                </div>
               </ng-container>
+              <p class="tittleNotas">FORMACION TECNICA</p>
+              <p class="tittleNotas">FORMACION COMPLEMENTARIA</p>
             </div>
             <div class="notas" *ngIf="nivelSeleccionado === 'segundoSemestre'">
               <!-- ...existing code for segundoSemestre... -->

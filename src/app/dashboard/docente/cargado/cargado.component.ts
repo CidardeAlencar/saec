@@ -1536,27 +1536,23 @@ consejoCatalogo: MeritoItem[] = [
     { codigo: 'gestionAvanzado', nombre: 'Gestión Avanzado' }
   ];
 
-  materiasPrimerSemestre = [
-    { codigo: 'BAS-ASI-01-02', nombre: 'Asignatura Militar I' },
-    { codigo: 'BAS-ASO-01-03', nombre: 'Asignatura Operativa' },
-    { codigo: 'BAS-ASP-01-01', nombre: 'Asignatura Profesional' },
-    { codigo: 'BAS-PICB-01-07', nombre: 'Plan Integral de Capacitación Básica' },
-    { codigo: 'COM-CPM-01-01', nombre: 'Comunicación para el Mando' },
-    { codigo: 'COM-SSU-01-02', nombre: 'Seguridad y Soporte de Unidades' },
-    { codigo: 'EJT-AEM-01-01', nombre: 'Ejercicio de Aplicación Militar' },
-    { codigo: 'PFD-EFM-01-01', nombre: 'Educación Física Militar' },
-    { codigo: 'TEC-BDG-01-06', nombre: 'Base de Datos Geográficos' },
-    { codigo: 'TEC-CTE-01-09', nombre: 'Cartografía Temática' },
-    { codigo: 'TEC-GPR-01-04', nombre: 'Gestión de Proyectos' },
-    { codigo: 'TEC-SCT-01-08', nombre: 'Sistemas de Control Topográfico' },
-    { codigo: 'TEC-TIN-01-07', nombre: 'Tecnología de Información' },
-    { codigo: 'TIT-TTE-01-01', nombre: 'Trabajo de Titulación' },
-    { codigo: 'promedioDisciplina', nombre: 'Promedio disciplina' },
-    { codigo: 'promedioFisico', nombre: 'Promedio fisico' },
-    { codigo: 'ordenMerito', nombre: 'Orden de Merito' },
-    { codigo: 'ordenTotal', nombre: 'Total Efectivo' },
-    { codigo: 'gestionAvanzado', nombre: 'Gestión Avanzado' }
-  ];
+materiasPrimerSemestreMilitares = [
+  { codigo: 'FOR-FM-01-01', nombre: 'ORDEN CERRADO I', evaluaciones: ['Parcial'] },
+  { codigo: 'FOR-FM-01-02', nombre: 'TÉCNICA DE ARMAS', evaluaciones: ['Parcial'] },
+  { codigo: 'FOR-FM-01-03', nombre: 'TIRO I', evaluaciones: ['Parcial'] },
+  { codigo: 'FOR-FM-01-04', nombre: 'INSTRUCCIÓN TÁCTICA DIURNA', evaluaciones: ['Parcial'] },
+  { codigo: 'FOR-FM-01-05', nombre: 'INSTRUCCIÓN TÁCTICA NOCTURNA', evaluaciones: ['Parcial'] },
+  { codigo: 'FOR-FM-02-01', nombre: 'REGLAMENTACIÓN', evaluaciones: ['Parcial'] },
+  { codigo: 'FOR-FM-02-02', nombre: 'HISTORIA MILITAR', evaluaciones: ['Parcial 1', 'Parcial 2', 'Trabajo Práctico'] },
+  { codigo: 'FOR-FM-02-03', nombre: 'GEOGRAFÍA MILITAR', evaluaciones: ['Parcial'] },
+  { codigo: 'FOR-FT-01-01', nombre: 'ÁLGEBRA', evaluaciones: ['Parcial'] },
+  { codigo: 'FOR-FT-01-02', nombre: 'CÁLCULO', evaluaciones: ['Parcial'] },
+  { codigo: 'FOR-FT-01-03', nombre: 'FÍSICA', evaluaciones: ['Parcial'] },
+  { codigo: 'FOR-FT-01-04', nombre: 'TRIGONOMETRÍA', evaluaciones: ['Parcial'] },
+  { codigo: 'FOR-FC-01-01', nombre: 'LENGUAJE', evaluaciones: ['Parcial'] },
+  { codigo: 'FOR-FC-02-01', nombre: 'INGLÉS I', evaluaciones: ['Parcial'] }
+];
+
 
   notasRegistradas: { [codigo: string]: number | null } = {};
   cantidadesRegistradas: { [codigo: string]: number | null } = {};
