@@ -1668,7 +1668,7 @@ consejoCatalogo: MeritoItem[] = [
       dp.select(new Date(year, 0, 1));
     }
     dp.close();
-    this.notasRegistradas['Gestion'] = this.anioSeleccionado;
+    // this.notasRegistradas['Gestion'] = this.anioSeleccionado;
   }
 
   private normalize(text: string): string {
@@ -2119,22 +2119,57 @@ calcularNotaNatacion(
 }
 
 Gestion(
-  valor: number | string
-): number {
-  if (!valor) {
-    console.warn("Gestión vacía o inválida:", valor);
-    return 0;
+//   valor: number | string
+// ): number {
+//   if (!valor) {
+//     console.warn("Gestión vacía o inválida:", valor);
+//     return 0;
+   valor: number | string | Date | null | undefined
+  ): number | null {
+    const fallbackYear = this.anioSeleccionado ?? this.anioSeleccionadoDate?.getFullYear() ?? null;
+
+    if (valor instanceof Date) {
+      const year = valor.getFullYear();
+      return Number.isFinite(year) ? year : fallbackYear;
+    }
+
+    if (typeof valor === 'number' && Number.isFinite(valor)) {
+      const year = Math.trunc(valor);
+      return year >= 1900 && year <= 3000 ? year : fallbackYear;
   }
 
   // Si viene como string, conviértelo a número
-  const anio = typeof valor === "string" ? parseInt(valor, 10) : valor;
+  // const anio = typeof valor === "string" ? parseInt(valor, 10) : valor;
+  const texto = typeof valor === 'string' ? valor.trim() : '';
 
-  if (isNaN(anio)) {
-    console.warn("Gestión no es un número válido:", valor);
-    return 0;
+  // if (isNaN(anio)) {
+  //   console.warn("Gestión no es un número válido:", valor);
+  //   return 0;
+    if (texto) {
+    const matchCuatroDigitos = texto.match(/\d{4}/);
+    if (matchCuatroDigitos) {
+      const year = Number(matchCuatroDigitos[0]);
+      if (Number.isFinite(year)) {
+        return year;
+      }
+    }
+
+    const parsedDate = new Date(texto);
+    if (!Number.isNaN(parsedDate.getTime())) {
+      return parsedDate.getFullYear();
+    }
+
+    const numeric = Number(texto);
+    if (Number.isFinite(numeric)) {
+      const year = Math.trunc(numeric);
+      if (year >= 1900 && year <= 3000) {
+        return year;
+      }
+    }
   }
 
-  return anio; // 👈 devuelve el año tal cual, sin cálculo
+  // return anio; // 👈 devuelve el año tal cual, sin cálculo
+  return fallbackYear;
 }
 
   promPruebas(): number {
@@ -2459,6 +2494,16 @@ for (const materia of this.pruebasFisicas) {
     continue;
   }
 
+    if (n.includes('gestion')) {
+    const gestionYear = this.Gestion(raw);
+    if (gestionYear != null) {
+      datosEFM[nombre] = gestionYear;
+    } else {
+      console.warn('No se pudo determinar la gestión a partir de:', raw);
+    }
+    continue;
+  }
+
   const valor = parseFloat(raw.replace(',', '.'));
 
   if (Number.isNaN(valor)) continue;
@@ -2492,13 +2537,13 @@ for (const materia of this.pruebasFisicas) {
   }else if (n.includes('talla')) {
     altura = valor
     datosEFM[nombre] = valor;
-  }
+  // }
   // else if (n.includes('contextura fisica')) {
   //   // requiereContextura = true;
   //   datosEFM[nombre] = this.calcularPuntajeContextura(altura!,peso!);
   // }
-  else if (n.includes('gestion')) {
-    datosEFM[nombre] = this.Gestion(valor);
+  // else if (n.includes('gestion')) {
+  //   datosEFM[nombre] = this.Gestion(valor);
   } else{
     datosEFM[nombre] = valor;
   }
