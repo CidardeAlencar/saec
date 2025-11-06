@@ -165,21 +165,69 @@
     text-align: center;
   }
 
-  .firmas {
-    margin-top: 150px;
-    text-align: left;
-    padding-left: 50px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    .ind{
+.firmas {
+  margin-top: 150px;
+  padding: 0 50px;       // más consistente que solo padding-left
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .primary {
+    display: flex;       // 👉 necesario para que funcione space-between
+    justify-content: space-between;
+    width: 100%;         // asegura que ocupen todo el ancho
+    margin-bottom: 80px; // separación con el bloque Vo.Bo.
+
+    .ind {
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
-      padding:100px 0;
+      text-align: center;
+      padding: 0;        // quité padding vertical grande para que no se estire de más
     }
   }
+
+  .ind {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 100px 0;
+  }
+}
+.firmas {
+  margin-top: 150px;
+  padding: 0 50px;       // más consistente que solo padding-left
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .primary {
+    display: flex;       // 👉 necesario para que funcione space-between
+    justify-content: space-between;
+    width: 100%;         // asegura que ocupen todo el ancho
+    margin-bottom: 80px; // separación con el bloque Vo.Bo.
+
+    .ind {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 0;        // quité padding vertical grande para que no se estire de más
+    }
+  }
+
+  .ind {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 100px 0;
+  }
+}
+
   .title{
     display: flex;
     justify-content: space-between;

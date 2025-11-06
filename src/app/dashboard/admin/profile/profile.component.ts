@@ -7,10 +7,12 @@ import {MatSelectModule} from '@angular/material/select';
 import { AuthService } from '../../../shared/services/auth.service';
 import { EstudianteService } from '../../../shared/services/estudiante.service';
 import Swal from 'sweetalert2';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 @Component({
   selector: 'app-profile',
-  imports: [MatFormFieldModule, ReactiveFormsModule, MatInputModule, MatButtonModule, MatSelectModule],
+  imports: [MatFormFieldModule, ReactiveFormsModule, MatInputModule, MatButtonModule, MatSelectModule, MatDatepickerModule],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss'
 })
@@ -24,6 +26,7 @@ export class ProfileComponent {
   genero = new FormControl('', [Validators.required]);
   correo = new FormControl('', [Validators.required, Validators.email]);
   contrasena = new FormControl('', [Validators.required, Validators.minLength(6)]);
+  fechaNacimiento = new FormControl<Date | null>(null, [Validators.required]);
 
   constructor( private authService:AuthService, private estudianteService: EstudianteService){
 

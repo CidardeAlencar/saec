@@ -125,7 +125,7 @@ export class CargadoComponent implements OnInit, OnDestroy {
   listaMeritos: ItemBase[] = [];
   listaDemeritos: ItemBase[] = [];
   listaConsejo: ItemConsejoDoc[] = [];
-
+  Math = Math;
   sumaMeritos = 0;
   sumaDemeritos = 0;
   sumaConsejo = 0;
@@ -1601,9 +1601,42 @@ consejoCatalogo: MeritoItem[] = [
     // this.subscription.unsubscribe();
   }
 
+  getPlaceholder(materia: any): string {
+    switch (materia.nombre.toLowerCase()) {
+      case 'marcha rapida':
+        return 'HH:mm:ss (ej. 00:12:30)';
+      case 'peso':
+        return 'Peso en kg (ej. 71.5)';
+      case 'talla':
+        return 'Talla en cm (ej. 175)';
+      case 'aerobica':
+        return 'Tiempo en minutos (ej. 13.21)';
+      case 'cruce de obstaculos':
+        return 'Tiempo en minutos (ej. 4.18)';
+      case 'ascenso a la cuerda':
+        return 'Tiempo en segundos (ej. 35.5)';
+      case 'flexiones':
+        return 'Cantidad de repeticiones (ej. 40)';
+      case 'flexiones en barra':
+        return 'Cantidad de repeticiones (ej. 10)';
+      case 'abdominales':
+        return 'Cantidad de repeticiones (ej. 50)';
+      case 'natacion estilo crol':
+        return 'Tiempo minutos (ej. 2.26)';
+      case 'contextura fisica':
+        return 'Se calcula automáticamente';
+      case 'gestion':
+        return 'Ej. 2025';
+      default:
+        return 'Ingresa el registro';
+    }
+  }
+
+
   onYearSelected(date: Date, dp: any) {
     this.anioSeleccionado = date.getFullYear();
     dp.close();
+    // this.notasRegistradas['Gestion'] = this.anioSeleccionado;
   }
 
   private normalize(text: string): string {
@@ -2601,11 +2634,11 @@ async obtenerNotasFisico() {
     }
   }
 
-  onNivelChangeDiscipline() {
-    if (this.estudiante?.id && this.nivelSeleccionado3) {
-      this.obtenerNotasDiciplina();
-    }
-  }
+  // onNivelChangeDiscipline() {
+  //   if (this.estudiante?.id && this.nivelSeleccionado3) {
+  //     this.obtenerNotasDiciplina();
+  //   }
+  // }
 
   private meritoSeleccionado: string | number | null = null;
 
@@ -2956,7 +2989,7 @@ validarRango(event: Event, materiaNombre: string, fase: 'input' | 'blur' = 'inpu
       const imgHeight = (canvas.height * pageWidth) / canvas.width;
 
       pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, imgHeight);
-      pdf.save('efm.pdf');
+      pdf.save('Reporte_Individual_Fisico.pdf');
 
       this.generandoPDF = false;
     }, 500);
@@ -2980,12 +3013,14 @@ validarRango(event: Event, materiaNombre: string, fase: 'input' | 'blur' = 'inpu
     try {
       if (params.type === 'fisico') {
         this.listaRGP  = await this.estudianteService.obtenerDatosGenrales(params);
+        this.listaRGP.sort((a, b) => (a.apPat ?? '').localeCompare(b.apPat ?? ''));
         console.log('Coincidencias:', this.listaRGP);
         this.printRGP();
       } 
       if (params.type === 'disciplinario') {
         console.log('disciplinario');
         this.listaRGD  = await this.estudianteService.obtenerDatosGenralesD(params);
+        this.listaRGD.sort((a, b) => (a.apPat ?? '').localeCompare(b.apPat ?? ''));
         console.log('Coincidencias:', this.listaRGD);
         this.printRGD();
       }
@@ -3055,7 +3090,7 @@ printRGP() {
         rendered += pxPerPage;
       }
 
-      pdf.save('ReporteGeneral.pdf');
+      pdf.save('Reporte_General_Fisico.pdf');
 
     } catch (err) {
       console.error('Error al generar PDF de Reporte General:', err);
@@ -3124,7 +3159,7 @@ printRGD() {
         rendered += pxPerPage;
       }
 
-      pdf.save('ReporteGeneralDisciplina.pdf');
+      pdf.save('Reporte_General_Disciplina.pdf');
     } catch (err) {
       console.error('Error al generar PDF de Reporte General Disciplina:', err);
     } finally {
@@ -3161,6 +3196,7 @@ printRGD() {
   // }
 
   async printDiscipline() {
+    await this.obtenerNotasDiciplina();
     this.today = new Date();
     this.generandoPDF = true;
 
@@ -3222,7 +3258,7 @@ printRGD() {
           rendered += pxPerPage;
         }
 
-        pdf.save('Disciplina.pdf'); // (corrijo el nombre)
+        pdf.save('Reporte_Individual_Disciplina.pdf'); // (corrijo el nombre)
 
       } catch (err) {
         console.error('Error al generar PDF de Disciplina:', err);
