@@ -106,26 +106,50 @@
               </ng-container>
             </div>
             <div class="notas" *ngIf="nivelSeleccionado === 'primerSemestre' && !cargandoNotas">
-              <ng-container *ngFor="let materia of materiasPrimerSemestre">
-                <p>
-                  <mat-form-field appearance="outline">
-                    <mat-label>{{ materia.codigo }}</mat-label>
-                    <input
-                      [id]="getInputId(materia.codigo)"
-                      matInput
-                      type="number"
-                      min="0"
-                      max="100"
-                      placeholder="Ingresa la nota"
-                      [value]="notasRegistradas[materia.codigo] ?? ''"
-                      [disabled]="(notasRegistradas[materia.codigo] != null) && !puedeEditarTodo"
-                      (input)="debeValidarRango(materia.codigo) && validarRango($event, materia.nombre)">
-                    <mat-hint [id]="getHintId(materia.codigo)">
-                      {{ materia.nombre }}
-                    </mat-hint>
-                  </mat-form-field>
-                </p>
+              <p class="tittleNotas">FORMACION MILITAR</p>
+              <ng-container *ngFor="let materia of materiasPrimerSemestreMilitares">  
+                <div class="itemNotas">
+                  <p>{{ materia.nombre }} ({{ materia.codigo }})</p>
+                  <div class="itemMaterias">
+                    <div *ngFor="let evaluacion of materia.evaluaciones; let i = index" >
+                      <mat-form-field appearance="outline">
+                        <mat-label>{{ evaluacion }}</mat-label>
+                        <input
+                          [id]="getInputId(materia.codigo + '-' + i)"
+                          matInput
+                          type="number"
+                          min="0"
+                          max="100"
+                          placeholder="Ingresa la nota de {{ evaluacion }}"
+                          [value]="notasRegistradas[materia.codigo + '-' + i] ?? ''"
+                          [disabled]="(notasRegistradas[materia.codigo + '-' + i] != null) && !puedeEditarTodo"
+                          (input)="debeValidarRango(materia.codigo) && validarRango($event, materia.nombre)">
+                        <!-- <mat-hint [id]="getHintId(materia.codigo)">
+                          {{ materia.nombre }}
+                        </mat-hint> -->
+                      </mat-form-field>
+                    </div>
+                    <div class="campoEvaluacion final">
+                      <mat-form-field appearance="outline" color="primary">
+                        <mat-label>Nota Final</mat-label>
+                        <input
+                          matInput
+                          type="number"
+                          min="0"
+                          max="100"
+                          placeholder="Calculada o ingresada manualmente"
+                          [id]="materia.codigo + '-final'"
+                          [value]="notasRegistradas[materia.codigo + '-final'] ?? ''"
+                          disabled
+                        />
+                        <mat-hint>Resultado final</mat-hint>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                </div>
               </ng-container>
+              <p class="tittleNotas">FORMACION TECNICA</p>
+              <p class="tittleNotas">FORMACION COMPLEMENTARIA</p>
             </div>
             <div class="notas" *ngIf="nivelSeleccionado === 'segundoSemestre'">
               <!-- ...existing code for segundoSemestre... -->
@@ -206,28 +230,27 @@
                   <mat-label>{{ materia.nombre }}</mat-label>
 
                   <!-- Caso especial: GESTIÓN -->
-                  <ng-container *ngIf="materia.nombre === 'Gestion'; else inputNormal" style="display: flex !important; flex-direction: column;">
-                    <input
-                      matInput
-                      [value]="anioSeleccionado ? anioSeleccionado.toString() : ''"
-                      placeholder="Seleccione un año"
-                      readonly
-                      (click)="picker.open()"
-                    />
-                    <input
-                      matInput
-                      [matDatepicker]="picker"
-                      [min]="minYearDate"
-                      style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;"
-                      tabindex="-1"
-                      aria-hidden="true"
-                    />
-                    <mat-datepicker
-                      #picker
-                      startView="multi-year"
-                      (yearSelected)="onYearSelected($event, picker)"
-                    ></mat-datepicker>
-                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                   <!-- [value]="anioSeleccionado ? anioSeleccionado.toString() : ''" -->
+                  <ng-container *ngIf="materia.nombre === 'Gestion'; else inputNormal">
+                    <div style="display: flex;">
+                      <input
+                        [id]="'nota_' + materia.nombre.split(' ').join('_')"
+                        matInput
+                        [matDatepicker]="gestionYearPicker"
+                        [(ngModel)]="anioSeleccionado"
+                        [ngModelOptions]="{ standalone: true }"
+                        placeholder="Seleccione un año"
+                        readonly
+                        (focus)="gestionYearPicker.open()"
+                        (click)="gestionYearPicker.open()"
+                      />
+                      <mat-datepicker
+                        #gestionYearPicker
+                        startView="multi-year"
+                        (yearSelected)="onYearSelected($event, gestionYearPicker)"
+                      ></mat-datepicker>
+                      <mat-datepicker-toggle matSuffix [for]="gestionYearPicker"></mat-datepicker-toggle>
+                    </div>
                   </ng-container>
                   <!-- Caso general: todos los demás inputs -->
                   <ng-template #inputNormal>
@@ -802,7 +825,8 @@
                 <td>{{ item.grado }}</td>
                 <td>{{ item.apPat }} {{ item.apMat }}</td>
                 <td>{{ item.nombres }}</td>
-                <td> Edad </td>
+                <!-- <td> Edad </td> -->
+                <td>{{ item.edad ?? 'N/D' }}</td>
                 <td>{{ item.genero }}</td>
                 <td>{{ item.efm.Talla }}</td>
                 <td>{{ item.efm.Peso }}</td>

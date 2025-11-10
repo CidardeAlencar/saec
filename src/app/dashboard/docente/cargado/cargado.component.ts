@@ -14,7 +14,7 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import {DialogOverviewExampleDialog} from '../../certificaciones/informacion/informacion.component';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatNativeDateModule, MAT_DATE_FORMATS } from '@angular/material/core';
 import {
   MAT_DIALOG_DATA,
   MatDialog,
@@ -71,6 +71,7 @@ export interface ReporteGeneralItem {
   apPat?: string | null;
   nombres?: string | null;
   genero?: string | null;
+  edad?: number | null;
   scope: string;
   type: string;
   year: number;
@@ -114,11 +115,24 @@ type Genero = "Masculino" | "Femenino";
 import { MatIconModule } from '@angular/material/icon';
 import { AdminRoutingModule } from "../../admin/admin-routing.module";
 
+const YEAR_ONLY_FORMATS = {
+  parse: {
+    dateInput: 'yyyy',
+  },
+  display: {
+    dateInput: 'yyyy',
+    monthYearLabel: 'yyyy',
+    dateA11yLabel: 'yyyy',
+    monthYearA11yLabel: 'yyyy',
+  },
+};
+
 @Component({
   selector: 'app-cargado',
   imports: [MatNativeDateModule, MatDatepickerModule, ReactiveFormsModule, MatProgressSpinnerModule, MatInputModule, MatFormFieldModule, MatSelectModule, FormsModule, MatButtonModule, CommonModule, MatIconModule, AdminRoutingModule],
   templateUrl: './cargado.component.html',
-  styleUrl: './cargado.component.scss'
+  styleUrl: './cargado.component.scss',
+  providers: [{ provide: MAT_DATE_FORMATS, useValue: YEAR_ONLY_FORMATS }]
 })
 
 export class CargadoComponent implements OnInit, OnDestroy {
@@ -1522,27 +1536,23 @@ consejoCatalogo: MeritoItem[] = [
     { codigo: 'gestionAvanzado', nombre: 'Gestión Avanzado' }
   ];
 
-  materiasPrimerSemestre = [
-    { codigo: 'BAS-ASI-01-02', nombre: 'Asignatura Militar I' },
-    { codigo: 'BAS-ASO-01-03', nombre: 'Asignatura Operativa' },
-    { codigo: 'BAS-ASP-01-01', nombre: 'Asignatura Profesional' },
-    { codigo: 'BAS-PICB-01-07', nombre: 'Plan Integral de Capacitación Básica' },
-    { codigo: 'COM-CPM-01-01', nombre: 'Comunicación para el Mando' },
-    { codigo: 'COM-SSU-01-02', nombre: 'Seguridad y Soporte de Unidades' },
-    { codigo: 'EJT-AEM-01-01', nombre: 'Ejercicio de Aplicación Militar' },
-    { codigo: 'PFD-EFM-01-01', nombre: 'Educación Física Militar' },
-    { codigo: 'TEC-BDG-01-06', nombre: 'Base de Datos Geográficos' },
-    { codigo: 'TEC-CTE-01-09', nombre: 'Cartografía Temática' },
-    { codigo: 'TEC-GPR-01-04', nombre: 'Gestión de Proyectos' },
-    { codigo: 'TEC-SCT-01-08', nombre: 'Sistemas de Control Topográfico' },
-    { codigo: 'TEC-TIN-01-07', nombre: 'Tecnología de Información' },
-    { codigo: 'TIT-TTE-01-01', nombre: 'Trabajo de Titulación' },
-    { codigo: 'promedioDisciplina', nombre: 'Promedio disciplina' },
-    { codigo: 'promedioFisico', nombre: 'Promedio fisico' },
-    { codigo: 'ordenMerito', nombre: 'Orden de Merito' },
-    { codigo: 'ordenTotal', nombre: 'Total Efectivo' },
-    { codigo: 'gestionAvanzado', nombre: 'Gestión Avanzado' }
-  ];
+materiasPrimerSemestreMilitares = [
+  { codigo: 'FOR-FM-01-01', nombre: 'ORDEN CERRADO I', evaluaciones: ['Parcial'] },
+  { codigo: 'FOR-FM-01-02', nombre: 'TÉCNICA DE ARMAS', evaluaciones: ['Parcial'] },
+  { codigo: 'FOR-FM-01-03', nombre: 'TIRO I', evaluaciones: ['Parcial'] },
+  { codigo: 'FOR-FM-01-04', nombre: 'INSTRUCCIÓN TÁCTICA DIURNA', evaluaciones: ['Parcial'] },
+  { codigo: 'FOR-FM-01-05', nombre: 'INSTRUCCIÓN TÁCTICA NOCTURNA', evaluaciones: ['Parcial'] },
+  { codigo: 'FOR-FM-02-01', nombre: 'REGLAMENTACIÓN', evaluaciones: ['Parcial'] },
+  { codigo: 'FOR-FM-02-02', nombre: 'HISTORIA MILITAR', evaluaciones: ['Parcial 1', 'Parcial 2', 'Trabajo Práctico'] },
+  { codigo: 'FOR-FM-02-03', nombre: 'GEOGRAFÍA MILITAR', evaluaciones: ['Parcial'] },
+  { codigo: 'FOR-FT-01-01', nombre: 'ÁLGEBRA', evaluaciones: ['Parcial'] },
+  { codigo: 'FOR-FT-01-02', nombre: 'CÁLCULO', evaluaciones: ['Parcial'] },
+  { codigo: 'FOR-FT-01-03', nombre: 'FÍSICA', evaluaciones: ['Parcial'] },
+  { codigo: 'FOR-FT-01-04', nombre: 'TRIGONOMETRÍA', evaluaciones: ['Parcial'] },
+  { codigo: 'FOR-FC-01-01', nombre: 'LENGUAJE', evaluaciones: ['Parcial'] },
+  { codigo: 'FOR-FC-02-01', nombre: 'INGLÉS I', evaluaciones: ['Parcial'] }
+];
+
 
   notasRegistradas: { [codigo: string]: number | null } = {};
   cantidadesRegistradas: { [codigo: string]: number | null } = {};
@@ -1557,6 +1567,7 @@ consejoCatalogo: MeritoItem[] = [
   cargandoNotas3: boolean = false;
   cargandoNotas4: boolean = false;
   anioSeleccionado: number | null = null;
+  anioSeleccionadoDate: Date | null = null;
   minYearDate = new Date(2025, 0, 1);
   editarNotas: boolean = false;
   codigo1Generado = '';
@@ -1634,7 +1645,24 @@ consejoCatalogo: MeritoItem[] = [
 
 
   onYearSelected(date: Date, dp: any) {
-    this.anioSeleccionado = date.getFullYear();
+    // this.anioSeleccionado = date.getFullYear();
+    const year = date.getFullYear();
+    this.anioSeleccionado = year;
+    this.anioSeleccionadoDate = new Date(year, 0, 1);
+
+    if (!this.notasRegistradas) {
+      this.notasRegistradas = {};
+    }
+    this.notasRegistradas['Gestion'] = year;
+
+    const input = document.getElementById('nota_Gestion') as HTMLInputElement | null;
+    if (input) {
+      input.value = String(year);
+    }
+
+    if (dp && typeof dp.select === 'function') {
+      dp.select(new Date(year, 0, 1));
+    }
     dp.close();
     // this.notasRegistradas['Gestion'] = this.anioSeleccionado;
   }
@@ -2087,22 +2115,57 @@ calcularNotaNatacion(
 }
 
 Gestion(
-  valor: number | string
-): number {
-  if (!valor) {
-    console.warn("Gestión vacía o inválida:", valor);
-    return 0;
+//   valor: number | string
+// ): number {
+//   if (!valor) {
+//     console.warn("Gestión vacía o inválida:", valor);
+//     return 0;
+   valor: number | string | Date | null | undefined
+  ): number | null {
+    const fallbackYear = this.anioSeleccionado ?? this.anioSeleccionadoDate?.getFullYear() ?? null;
+
+    if (valor instanceof Date) {
+      const year = valor.getFullYear();
+      return Number.isFinite(year) ? year : fallbackYear;
+    }
+
+    if (typeof valor === 'number' && Number.isFinite(valor)) {
+      const year = Math.trunc(valor);
+      return year >= 1900 && year <= 3000 ? year : fallbackYear;
   }
 
   // Si viene como string, conviértelo a número
-  const anio = typeof valor === "string" ? parseInt(valor, 10) : valor;
+  // const anio = typeof valor === "string" ? parseInt(valor, 10) : valor;
+  const texto = typeof valor === 'string' ? valor.trim() : '';
 
-  if (isNaN(anio)) {
-    console.warn("Gestión no es un número válido:", valor);
-    return 0;
+  // if (isNaN(anio)) {
+  //   console.warn("Gestión no es un número válido:", valor);
+  //   return 0;
+    if (texto) {
+    const matchCuatroDigitos = texto.match(/\d{4}/);
+    if (matchCuatroDigitos) {
+      const year = Number(matchCuatroDigitos[0]);
+      if (Number.isFinite(year)) {
+        return year;
+      }
+    }
+
+    const parsedDate = new Date(texto);
+    if (!Number.isNaN(parsedDate.getTime())) {
+      return parsedDate.getFullYear();
+    }
+
+    const numeric = Number(texto);
+    if (Number.isFinite(numeric)) {
+      const year = Math.trunc(numeric);
+      if (year >= 1900 && year <= 3000) {
+        return year;
+      }
+    }
   }
 
-  return anio; // 👈 devuelve el año tal cual, sin cálculo
+  // return anio; // 👈 devuelve el año tal cual, sin cálculo
+  return fallbackYear;
 }
 
   promPruebas(): number {
@@ -2427,6 +2490,16 @@ for (const materia of this.pruebasFisicas) {
     continue;
   }
 
+    if (n.includes('gestion')) {
+    const gestionYear = this.Gestion(raw);
+    if (gestionYear != null) {
+      datosEFM[nombre] = gestionYear;
+    } else {
+      console.warn('No se pudo determinar la gestión a partir de:', raw);
+    }
+    continue;
+  }
+
   const valor = parseFloat(raw.replace(',', '.'));
 
   if (Number.isNaN(valor)) continue;
@@ -2460,13 +2533,13 @@ for (const materia of this.pruebasFisicas) {
   }else if (n.includes('talla')) {
     altura = valor
     datosEFM[nombre] = valor;
-  }
+  // }
   // else if (n.includes('contextura fisica')) {
   //   // requiereContextura = true;
   //   datosEFM[nombre] = this.calcularPuntajeContextura(altura!,peso!);
   // }
-  else if (n.includes('gestion')) {
-    datosEFM[nombre] = this.Gestion(valor);
+  // else if (n.includes('gestion')) {
+  //   datosEFM[nombre] = this.Gestion(valor);
   } else{
     datosEFM[nombre] = valor;
   }
@@ -2569,12 +2642,27 @@ async obtenerNotasFisico() {
       this.cantidadesRegistradas[`${nombre}_cant`] = datos[`${nombre}_cant`] ?? null;
     }
 
+    const gestionValor = datos['Gestion'] ?? datos['gestion'] ?? datos['Gesti\u00f3n'] ?? null;
+    const gestionNumero = Number(gestionValor);
+
+    if (Number.isFinite(gestionNumero)) {
+      this.anioSeleccionado = gestionNumero;
+      this.anioSeleccionadoDate = new Date(gestionNumero, 0, 1);
+      this.notasRegistradas['Gestion'] = gestionNumero;
+    } else {
+      this.anioSeleccionado = null;
+      this.anioSeleccionadoDate = null;
+      this.notasRegistradas['Gestion'] = null;
+    }
+
     console.log("Notas físicas obtenidas:", this.notasRegistradas);
     console.log("Cantidades físicas obtenidas:", this.cantidadesRegistradas);
     } catch (error) {
       console.error("Error al procesar notas físicas:", error);
       this.notasRegistradas = {};
       this.cantidadesRegistradas = {};
+      this.anioSeleccionado = null;
+      this.anioSeleccionadoDate = null;
     } finally {
       this.cargandoNotas2 = false;
     }

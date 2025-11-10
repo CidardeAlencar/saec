@@ -349,6 +349,33 @@ table.table th {
   margin-bottom: 20px;
 }
 
+.tittleNotas{
+  display: flex;
+  flex-basis: 100%;
+  justify-content: center; /* opcional, centra el contenido */
+  font-weight: bold; /* opcional */
+}
+.itemNotas{
+  display: flex;
+  flex-direction: column;
+  flex-basis: 80%;
+}
+.itemMaterias{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+
+}
+.campoEvaluacion {
+  flex: 1 1 180px;
+}
+
+.campoEvaluacion.final {
+  flex: 1 1 100%;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 10px;
+}
+
 .validar{
   display: flex;
   flex-direction: column;
