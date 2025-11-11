@@ -339,6 +339,7 @@ table.table th {
 
 .notas{
   display: flex;
+  flex-direction: column;
   flex-wrap: wrap;
   padding: 20px;
   justify-content: center;
@@ -447,5 +448,47 @@ table.table th {
     grid-template-columns: 1fr 1fr;
   }
 }
+.tittleNotas-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  background-color: #f0f4f7;
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.tittleNotas-container:hover {
+  background-color: #e3e9ee;
+}
+
+.tittleNotas {
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #263238;
+  margin: 0;
+}
+
+.arrow {
+  font-size: 1.2rem;
+  transition: transform 0.3s ease;
+  user-select: none;
+}
+
+.arrow.open {
+  transform: rotate(180deg);
+}
+
+.contenidoNotas {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 
 

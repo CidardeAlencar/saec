@@ -157,6 +157,8 @@ export class CargadoComponent implements OnInit, OnDestroy {
   datosEFM: Record<string, any> = {};
   vistaSeleccionada: string = 'academico';
   today: Date = new Date();
+  mostrarAcademica1: boolean = false;
+  mostrarMilitar1: boolean = false;
   options: Option[] = [
     { value: 'primerSemestre', viewValue: 'Primer Semestre' },
     { value: 'segundoSemestre', viewValue: 'Segundo Semestre' },
@@ -1536,22 +1538,25 @@ consejoCatalogo: MeritoItem[] = [
     { codigo: 'gestionAvanzado', nombre: 'Gestión Avanzado' }
   ];
 
-materiasPrimerSemestreMilitares = [
-  { codigo: 'FOR-FM-01-01', nombre: 'ORDEN CERRADO I', evaluaciones: ['Parcial'] },
-  { codigo: 'FOR-FM-01-02', nombre: 'TÉCNICA DE ARMAS', evaluaciones: ['Parcial'] },
-  { codigo: 'FOR-FM-01-03', nombre: 'TIRO I', evaluaciones: ['Parcial'] },
-  { codigo: 'FOR-FM-01-04', nombre: 'INSTRUCCIÓN TÁCTICA DIURNA', evaluaciones: ['Parcial'] },
-  { codigo: 'FOR-FM-01-05', nombre: 'INSTRUCCIÓN TÁCTICA NOCTURNA', evaluaciones: ['Parcial'] },
-  { codigo: 'FOR-FM-02-01', nombre: 'REGLAMENTACIÓN', evaluaciones: ['Parcial'] },
-  { codigo: 'FOR-FM-02-02', nombre: 'HISTORIA MILITAR', evaluaciones: ['Parcial 1', 'Parcial 2', 'Trabajo Práctico'] },
-  { codigo: 'FOR-FM-02-03', nombre: 'GEOGRAFÍA MILITAR', evaluaciones: ['Parcial'] },
-  { codigo: 'FOR-FT-01-01', nombre: 'ÁLGEBRA', evaluaciones: ['Parcial'] },
-  { codigo: 'FOR-FT-01-02', nombre: 'CÁLCULO', evaluaciones: ['Parcial'] },
-  { codigo: 'FOR-FT-01-03', nombre: 'FÍSICA', evaluaciones: ['Parcial'] },
-  { codigo: 'FOR-FT-01-04', nombre: 'TRIGONOMETRÍA', evaluaciones: ['Parcial'] },
-  { codigo: 'FOR-FC-01-01', nombre: 'LENGUAJE', evaluaciones: ['Parcial'] },
-  { codigo: 'FOR-FC-02-01', nombre: 'INGLÉS I', evaluaciones: ['Parcial'] }
-];
+  materiasPrimerSemestreMilitares = [
+    { codigo: 'FOR-FM-01-01', nombre: 'ORDEN CERRADO I', evaluaciones: ['Parcial'] },
+    { codigo: 'FOR-FM-01-02', nombre: 'TÉCNICA DE ARMAS', evaluaciones: ['Parcial'] },
+    { codigo: 'FOR-FM-01-03', nombre: 'TIRO I', evaluaciones: ['Parcial'] },
+    { codigo: 'FOR-FM-01-04', nombre: 'INSTRUCCIÓN TÁCTICA DIURNA', evaluaciones: ['Parcial'] },
+    { codigo: 'FOR-FM-01-05', nombre: 'INSTRUCCIÓN TÁCTICA NOCTURNA', evaluaciones: ['Parcial'] },
+    { codigo: 'FOR-FM-02-01', nombre: 'REGLAMENTACIÓN', evaluaciones: ['Parcial'] },
+    { codigo: 'FOR-FM-02-02', nombre: 'HISTORIA MILITAR', evaluaciones: ['Parcial 1', 'Parcial 2', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FM-02-03', nombre: 'GEOGRAFÍA MILITAR', evaluaciones: ['Parcial'] },
+  ];
+
+  materiasPrimerSemestreAcademicas = [
+    { codigo: 'FOR-FT-01-01', nombre: 'ÁLGEBRA', evaluaciones: ['Parcial 1', 'Parcial 2', 'Parcial 3', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FT-01-02', nombre: 'CÁLCULO', evaluaciones: ['Parcial 1', 'Parcial 2', 'Parcial 3', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FT-01-03', nombre: 'FÍSICA', evaluaciones: ['Parcial 1', 'Parcial 2', 'Parcial 3', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FT-01-04', nombre: 'TRIGONOMETRÍA', evaluaciones: ['Parcial 1', 'Parcial 2', 'Parcial 3', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FC-01-01', nombre: 'LENGUAJE', evaluaciones: ['Parcial 1', 'Parcial 2', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FC-02-01', nombre: 'INGLÉS I', evaluaciones: ['Parcial 1', 'Parcial 2', 'Trabajo Práctico'] }
+  ];
 
 
   notasRegistradas: { [codigo: string]: number | null } = {};
@@ -2381,6 +2386,121 @@ Gestion(
       showConfirmButton: false
     });
   }
+
+  async saveFormation() {
+    if (!this.estudiante?.id || !this.nivelSeleccionado) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Faltan datos',
+        text: 'Debes seleccionar un nivel antes de continuar.'
+      });
+      return;
+    }
+
+    const ci = this.estudiante.id;
+    const nivel = this.nivelSeleccionado;
+
+    const materias = [
+      ...this.materiasPrimerSemestreMilitares,
+      ...this.materiasPrimerSemestreAcademicas
+    ];
+
+    try {
+      for (const materia of materias) {
+        const data: any = {};
+        const valores: number[] = [];
+
+        materia.evaluaciones.forEach((evaluacion, index) => {
+          const inputId = this.getInputId(materia.codigo + '-' + index);
+          const inputEl = document.getElementById(inputId) as HTMLInputElement;
+
+          if (inputEl && inputEl.value.trim() !== '') {
+            const valor = parseFloat(inputEl.value);
+            if (!isNaN(valor)) {
+              data[evaluacion] = valor;
+              valores.push(valor);
+            }
+          }
+        });
+
+        const evaluaciones = materia.evaluaciones;
+        let notaFinal = 0;
+        let pesoTotal = 0; // acumulador del peso real de notas ingresadas
+
+        // 🎯 Cálculo acumulado según el tipo de materia
+        if (evaluaciones.length === 1) {
+          // Solo un parcial
+          if (valores[0] !== undefined) {
+            notaFinal = valores[0];
+            pesoTotal = 1;
+          }
+
+        } else if (evaluaciones.length === 3 && evaluaciones.includes('Trabajo Práctico')) {
+          // Dos parciales (45% + 45%) + trabajo práctico (10%)
+          const pesos = [0.45, 0.45, 0.10];
+          for (let i = 0; i < valores.length; i++) {
+            if (!isNaN(valores[i])) {
+              notaFinal += valores[i] * pesos[i];
+              pesoTotal += pesos[i];
+            }
+          }
+
+        } else if (evaluaciones.length === 4 && evaluaciones.includes('Trabajo Práctico')) {
+          // Tres parciales (25% + 25% + 40%) + trabajo práctico (10%)
+          const pesos = [0.25, 0.25, 0.40, 0.10];
+          for (let i = 0; i < valores.length; i++) {
+            if (!isNaN(valores[i])) {
+              notaFinal += valores[i] * pesos[i];
+              pesoTotal += pesos[i];
+            }
+          }
+        }
+
+        // ⚙️ Normalizamos si el estudiante no completó todas las notas
+        if (pesoTotal > 0) {
+          notaFinal = notaFinal / pesoTotal;
+        }
+
+        // Guardamos la nota final
+        if (!isNaN(notaFinal) && notaFinal >= 0) {
+          data['Nota Final'] = parseFloat(notaFinal.toFixed(2));
+        }
+
+        // 🔹 Mostramos visualmente el resultado (opcional)
+        const inputFinal = document.getElementById(materia.codigo + '-final') as HTMLInputElement;
+        if (inputFinal) inputFinal.value = notaFinal ? notaFinal.toFixed(2) : '';
+
+        // 🔹 Guardamos en Firebase
+        if (Object.keys(data).length > 0) {
+          const ref = doc(this.firestore, `estudiante/${ci}/${nivel}/notas/materias/${materia.codigo}`);
+          await setDoc(ref, data, { merge: true });
+          console.log(`✅ Guardado ${materia.nombre}:`, data);
+        } else {
+          console.warn(`⚠️ Sin notas para ${materia.nombre}`);
+        }
+      }
+
+      Swal.fire({
+        icon: 'success',
+        title: '¡Éxito!',
+        text: 'Notas guardadas correctamente.',
+        timer: 2000,
+        showConfirmButton: false
+      });
+
+      this.nivelSeleccionado = '';
+      this.puedeEditarTodo = false;
+
+    } catch (error) {
+      console.error('Error al guardar notas:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Ocurrió un error al guardar las notas.'
+      });
+    }
+  }
+
   calcularPromedioP(efm: any): number {
     return (
       (efm['Contextura Fisica'] * 0.09) +
@@ -2617,6 +2737,37 @@ for (const materia of this.pruebasFisicas) {
     }
   }
 
+  async obtenerNotasSemestrales() {
+    this.cargandoNotas = true;
+    try {
+      if (!this.estudiante?.id || !this.nivelSeleccionado) return;
+
+      const notas = await this.estudianteService.obtenerNotasSemestrales(
+        this.estudiante.id,
+        this.nivelSeleccionado
+      );
+
+      this.notasRegistradas = {};
+
+      // 🔹 Convertimos el formato de Firestore a un objeto plano para la UI
+      for (const codigo in notas) {
+        const materia = notas[codigo];
+        for (const key in materia) {
+          // ejemplo: "Parcial 1", "Parcial 2", "Nota Final"
+          const campoId = `${codigo}-${key}`; // solo si necesitas id único
+          this.notasRegistradas[campoId] = materia[key];
+        }
+      }
+
+      console.log('Notas semestrales cargadas:', this.notasRegistradas);
+    } catch (error) {
+      console.error('Error al obtener notas semestrales:', error);
+    } finally {
+      this.cargandoNotas = false;
+    }
+  }
+
+
 async obtenerNotasFisico() {
   this.cargandoNotas2 = true;
 
@@ -2711,8 +2862,12 @@ async obtenerNotasFisico() {
 }
 
   onNivelChange() {
-    if (this.estudiante?.id && this.nivelSeleccionado) {
-      this.obtenerNotas();
+    if (this.estudiante?.id) {
+      if(this.nivelSeleccionado && this.nivelSeleccionado !== 'avanzado' && this.nivelSeleccionado !== 'basico' ){
+        this.obtenerNotasSemestrales();
+      }else{
+        this.obtenerNotas();
+      }
     }
   }
 
@@ -3104,7 +3259,7 @@ validarRango(event: Event, materiaNombre: string, fase: 'input' | 'blur' = 'inpu
         this.listaRGP.sort((a, b) => (a.apPat ?? '').localeCompare(b.apPat ?? ''));
         console.log('Coincidencias:', this.listaRGP);
         this.printRGP();
-      } 
+      }
       if (params.type === 'disciplinario') {
         console.log('disciplinario');
         this.listaRGD  = await this.estudianteService.obtenerDatosGenralesD(params);
