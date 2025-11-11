@@ -338,6 +338,32 @@ private async leerItemsBase(ci: string, nivel: string, contenedor: 'MERITOS' | '
     }
   }
 
+  async obtenerNotasSemestrales(ci: string, nivel: string) {
+    try {
+      const notas: any = {};
+
+      // 📂 ruta base
+      const materiasRef = collection(this.firestore, `estudiante/${ci}/${nivel}/notas/materias`);
+      const snapshot = await getDocs(materiasRef);
+
+      for (const docSnap of snapshot.docs) {
+        const data = docSnap.data();
+        const codigo = docSnap.id; // el código de materia (ej. FOR-FM-01-01)
+
+        // construimos el objeto igual que el otro método
+        notas[codigo] = {
+          ...data, // contiene "Parcial 1", "Parcial 2", "Trabajo Práctico", "Nota Final"
+        };
+      }
+
+      console.log(`[${nivel}] Notas semestrales cargadas:`, notas);
+      return notas;
+    } catch (error) {
+      console.error('Error al obtener notas semestrales:', error);
+      return {};
+    }
+  }
+
   async registrarEstudiante(ci: string, data: any) {
     try {
       const estudianteRef = doc(this.firestore, `estudiante/${ci}`);
@@ -505,7 +531,7 @@ private async leerItemsBase(ci: string, nivel: string, contenedor: 'MERITOS' | '
     await Promise.all(tareas);
     return resultados;
   }
-  
+
   calcularEdad(fechaNacimiento: unknown): number | null {
     if (!fechaNacimiento) {
       return null;
