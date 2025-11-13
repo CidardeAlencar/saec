@@ -2408,9 +2408,12 @@ Gestion(
     try {
       for (const materia of materias) {
         const data: any = {};
-        const valores: number[] = [];
+        const evaluaciones = materia.evaluaciones;
 
-        materia.evaluaciones.forEach((evaluacion, index) => {
+        // 1️⃣ Recolectar notas ingresadas desde los inputs
+        let tieneNotasParciales = false;
+
+        evaluaciones.forEach((evaluacion, index) => {
           const inputId = this.getInputId(materia.codigo + '-' + index);
           const inputEl = document.getElementById(inputId) as HTMLInputElement;
 
@@ -2418,59 +2421,57 @@ Gestion(
             const valor = parseFloat(inputEl.value);
             if (!isNaN(valor)) {
               data[evaluacion] = valor;
-              valores.push(valor);
+              tieneNotasParciales = true;
             }
           }
         });
 
-        const evaluaciones = materia.evaluaciones;
+        // Si no hay ninguna nota para esta materia, NO recalculamos ni tocamos nada
+        if (!tieneNotasParciales) {
+          console.log(`⏭ No se recalcula ${materia.nombre} porque no tiene notas nuevas.`);
+          continue;
+        }
+
+        // 2️⃣ Calcular la nota final ACUMULADA según pesos fijos
         let notaFinal = 0;
-        let pesoTotal = 0; // acumulador del peso real de notas ingresadas
 
-        // 🎯 Cálculo acumulado según el tipo de materia
-        if (evaluaciones.length === 1) {
-          // Solo un parcial
-          if (valores[0] !== undefined) {
-            notaFinal = valores[0];
-            pesoTotal = 1;
+        for (const evaluacion in data) {
+          const valor = data[evaluacion];
+          let peso = 0;
+
+          if (evaluaciones.length === 1) {
+            // Solo un parcial = 100%
+            peso = 1;
+          }
+          else if (evaluaciones.length === 3 && evaluaciones.includes('Trabajo Práctico')) {
+            // 2 parciales + TP → 45% 45% 10%
+            if (evaluacion.includes('Parcial 1')) peso = 0.45;
+            else if (evaluacion.includes('Parcial 2')) peso = 0.45;
+            else if (evaluacion.includes('Trabajo Práctico')) peso = 0.10;
+          }
+          else if (evaluaciones.length === 4 && evaluaciones.includes('Trabajo Práctico')) {
+            // 3 parciales + TP → 25% 25% 40% 10%
+            if (evaluacion.includes('Parcial 1')) peso = 0.25;
+            else if (evaluacion.includes('Parcial 2')) peso = 0.25;
+            else if (evaluacion.includes('Parcial 3')) peso = 0.40;
+            else if (evaluacion.includes('Trabajo Práctico')) peso = 0.10;
           }
 
-        } else if (evaluaciones.length === 3 && evaluaciones.includes('Trabajo Práctico')) {
-          // Dos parciales (45% + 45%) + trabajo práctico (10%)
-          const pesos = [0.45, 0.45, 0.10];
-          for (let i = 0; i < valores.length; i++) {
-            if (!isNaN(valores[i])) {
-              notaFinal += valores[i] * pesos[i];
-              pesoTotal += pesos[i];
-            }
-          }
-
-        } else if (evaluaciones.length === 4 && evaluaciones.includes('Trabajo Práctico')) {
-          // Tres parciales (25% + 25% + 40%) + trabajo práctico (10%)
-          const pesos = [0.25, 0.25, 0.40, 0.10];
-          for (let i = 0; i < valores.length; i++) {
-            if (!isNaN(valores[i])) {
-              notaFinal += valores[i] * pesos[i];
-              pesoTotal += pesos[i];
-            }
-          }
+          notaFinal += valor * peso;
         }
 
-        // ⚙️ Normalizamos si el estudiante no completó todas las notas
-        if (pesoTotal > 0) {
-          notaFinal = notaFinal / pesoTotal;
-        }
-
-        // Guardamos la nota final
+        // 3️⃣ Guardar nota final acumulada (sin normalizar)
         if (!isNaN(notaFinal) && notaFinal >= 0) {
           data['Nota Final'] = parseFloat(notaFinal.toFixed(2));
         }
 
-        // 🔹 Mostramos visualmente el resultado (opcional)
+        // Mostrar visualmente la nota final en el input deshabilitado
         const inputFinal = document.getElementById(materia.codigo + '-final') as HTMLInputElement;
-        if (inputFinal) inputFinal.value = notaFinal ? notaFinal.toFixed(2) : '';
+        if (inputFinal) {
+          inputFinal.value = notaFinal ? notaFinal.toFixed(2) : '';
+        }
 
-        // 🔹 Guardamos en Firebase
+        // 4️⃣ Guardar en Firebase solo si hay algo que guardar
         if (Object.keys(data).length > 0) {
           const ref = doc(this.firestore, `estudiante/${ci}/${nivel}/notas/materias/${materia.codigo}`);
           await setDoc(ref, data, { merge: true });
@@ -2768,46 +2769,46 @@ for (const materia of this.pruebasFisicas) {
   }
 
 
-async obtenerNotasFisico() {
-  this.cargandoNotas2 = true;
+  async obtenerNotasFisico() {
+    this.cargandoNotas2 = true;
 
-  try {
-    if (!this.estudiante?.id || !this.nivelSeleccionado2) {
-      console.warn("Faltan datos para obtener notas físicas.");
-      return;
-    }
+    try {
+      if (!this.estudiante?.id || !this.nivelSeleccionado2) {
+        console.warn("Faltan datos para obtener notas físicas.");
+        return;
+      }
 
-    const datos = await this.estudianteService.obtenerNotasFisicas(
-      this.estudiante.id,
-      this.nivelSeleccionado2
-    );
+      const datos = await this.estudianteService.obtenerNotasFisicas(
+        this.estudiante.id,
+        this.nivelSeleccionado2
+      );
 
-    console.log(datos);
+      console.log(datos);
 
-    this.notasRegistradas = {};
-    this.cantidadesRegistradas = {};
+      this.notasRegistradas = {};
+      this.cantidadesRegistradas = {};
 
-    for (const prueba of this.pruebasFisicas) {
-      const nombre = prueba.nombre;
-      this.notasRegistradas[nombre] = datos[nombre] ?? null;
-      this.cantidadesRegistradas[`${nombre}_cant`] = datos[`${nombre}_cant`] ?? null;
-    }
+      for (const prueba of this.pruebasFisicas) {
+        const nombre = prueba.nombre;
+        this.notasRegistradas[nombre] = datos[nombre] ?? null;
+        this.cantidadesRegistradas[`${nombre}_cant`] = datos[`${nombre}_cant`] ?? null;
+      }
 
-    const gestionValor = datos['Gestion'] ?? datos['gestion'] ?? datos['Gesti\u00f3n'] ?? null;
-    const gestionNumero = Number(gestionValor);
+      const gestionValor = datos['Gestion'] ?? datos['gestion'] ?? datos['Gesti\u00f3n'] ?? null;
+      const gestionNumero = Number(gestionValor);
 
-    if (Number.isFinite(gestionNumero)) {
-      this.anioSeleccionado = gestionNumero;
-      this.anioSeleccionadoDate = new Date(gestionNumero, 0, 1);
-      this.notasRegistradas['Gestion'] = gestionNumero;
-    } else {
-      this.anioSeleccionado = null;
-      this.anioSeleccionadoDate = null;
-      this.notasRegistradas['Gestion'] = null;
-    }
+      if (Number.isFinite(gestionNumero)) {
+        this.anioSeleccionado = gestionNumero;
+        this.anioSeleccionadoDate = new Date(gestionNumero, 0, 1);
+        this.notasRegistradas['Gestion'] = gestionNumero;
+      } else {
+        this.anioSeleccionado = null;
+        this.anioSeleccionadoDate = null;
+        this.notasRegistradas['Gestion'] = null;
+      }
 
-    console.log("Notas físicas obtenidas:", this.notasRegistradas);
-    console.log("Cantidades físicas obtenidas:", this.cantidadesRegistradas);
+      console.log("Notas físicas obtenidas:", this.notasRegistradas);
+      console.log("Cantidades físicas obtenidas:", this.cantidadesRegistradas);
     } catch (error) {
       console.error("Error al procesar notas físicas:", error);
       this.notasRegistradas = {};
@@ -2819,47 +2820,47 @@ async obtenerNotasFisico() {
     }
   }
 
- async obtenerNotasDiciplina() {
-  this.cargandoNotas3 = true;
-  try {
-    if (!this.estudiante?.id || !this.nivelSeleccionado3) {
-      console.warn('Faltan datos para obtener notas de disciplina.');
-      return;
+  async obtenerNotasDiciplina() {
+    this.cargandoNotas3 = true;
+    try {
+      if (!this.estudiante?.id || !this.nivelSeleccionado3) {
+        console.warn('Faltan datos para obtener notas de disciplina.');
+        return;
+      }
+
+      const ci = this.estudiante.id;
+      const nivel = this.nivelSeleccionado3;
+
+      const datos: NotasDisciplina = await this.estudianteService.obtenerNotasDisciplina(ci, nivel);
+
+      // Listas
+      this.listaMeritos   = datos.meritos;
+      this.listaDemeritos = datos.demeritos;
+      this.listaConsejo   = datos.consejos;
+
+      // Totales
+      this.sumaMeritos   = datos.totalMeritos;
+      this.sumaDemeritos = datos.totalDemeritos;
+      this.sumaConsejo   = datos.totalConsejo;
+
+      // Preselección (si quieres)
+      this.notasRegistradas = { ...(this.notasRegistradas || {}) };
+      // this.notasRegistradas['Meritos']   = datos.ultimoMerito   ?? null;
+      // this.notasRegistradas['Demeritos'] = datos.ultimoDemerito ?? null;
+      // this.notasRegistradas['Consejo']   = datos.ultimoConsejo  ?? null;
+
+    } catch (e) {
+      console.error('Error al procesar notas de disciplina:', e);
+      this.listaMeritos = [];
+      this.listaDemeritos = [];
+      this.listaConsejo = [];
+      this.sumaMeritos = 0;
+      this.sumaDemeritos = 0;
+      this.sumaConsejo = 0;
+    } finally {
+      this.cargandoNotas3 = false;
     }
-
-    const ci = this.estudiante.id;
-    const nivel = this.nivelSeleccionado3;
-
-    const datos: NotasDisciplina = await this.estudianteService.obtenerNotasDisciplina(ci, nivel);
-
-    // Listas
-    this.listaMeritos   = datos.meritos;
-    this.listaDemeritos = datos.demeritos;
-    this.listaConsejo   = datos.consejos;
-
-    // Totales
-    this.sumaMeritos   = datos.totalMeritos;
-    this.sumaDemeritos = datos.totalDemeritos;
-    this.sumaConsejo   = datos.totalConsejo;
-
-    // Preselección (si quieres)
-    this.notasRegistradas = { ...(this.notasRegistradas || {}) };
-    // this.notasRegistradas['Meritos']   = datos.ultimoMerito   ?? null;
-    // this.notasRegistradas['Demeritos'] = datos.ultimoDemerito ?? null;
-    // this.notasRegistradas['Consejo']   = datos.ultimoConsejo  ?? null;
-
-  } catch (e) {
-    console.error('Error al procesar notas de disciplina:', e);
-    this.listaMeritos = [];
-    this.listaDemeritos = [];
-    this.listaConsejo = [];
-    this.sumaMeritos = 0;
-    this.sumaDemeritos = 0;
-    this.sumaConsejo = 0;
-  } finally {
-    this.cargandoNotas3 = false;
   }
-}
 
   onNivelChange() {
     if (this.estudiante?.id) {
