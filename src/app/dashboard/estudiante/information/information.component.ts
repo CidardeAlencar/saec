@@ -36,6 +36,20 @@ export class InformationComponent implements OnInit {
     { value: 'basico', viewValue: 'Básico' },
     { value: 'avanzado', viewValue: 'Avanzado' }
   ];
+  pruebasFisicas = [
+    { codigo: 'EFM', nombre: 'Flexiones' },
+    { codigo: 'EFM', nombre: 'Abdominales' },
+    { codigo: 'EFM', nombre: 'Flexiones en barra' },
+    { codigo: 'EFM', nombre: 'Marcha rapida' },
+    { codigo: 'EFM', nombre: 'Ascenso a la cuerda' },
+    { codigo: 'EFM', nombre: 'Cruce de obstaculos' },
+    { codigo: 'EFM', nombre: 'Aerobica' },
+    { codigo: 'EFM', nombre: 'Natacion estilo crol' },
+    { codigo: 'EFM', nombre: 'Peso' },
+    { codigo: 'EFM', nombre: 'Talla' },
+    { codigo: 'EFM', nombre: 'Contextura Fisica' },
+    { codigo: 'EFM', nombre: 'Gestion' }
+  ];
   materiasBasico = [
     { codigo: 'BAS-CMI-01-02', nombre: 'Correspondencia Militar' },
     { codigo: 'BAS-DCO-01-04', nombre: 'Documentación del Primero de Comp., Edron o Btr.' },
@@ -74,7 +88,25 @@ export class InformationComponent implements OnInit {
     { codigo: 'promedioDisciplina', nombre: 'Promedio disciplina' },
     { codigo: 'promedioFisico', nombre: 'Promedio fisico' }
   ];
+    materiasPrimerSemestreMilitares = [
+    { codigo: 'FOR-FM-01-01', nombre: 'ORDEN CERRADO I', evaluaciones: ['Parcial'] },
+    { codigo: 'FOR-FM-01-02', nombre: 'TÉCNICA DE ARMAS', evaluaciones: ['Parcial'] },
+    { codigo: 'FOR-FM-01-03', nombre: 'TIRO I', evaluaciones: ['Parcial'] },
+    { codigo: 'FOR-FM-01-04', nombre: 'INSTRUCCIÓN TÁCTICA DIURNA', evaluaciones: ['Parcial'] },
+    { codigo: 'FOR-FM-01-05', nombre: 'INSTRUCCIÓN TÁCTICA NOCTURNA', evaluaciones: ['Parcial'] },
+    { codigo: 'FOR-FM-02-01', nombre: 'REGLAMENTACIÓN', evaluaciones: ['Parcial'] },
+    { codigo: 'FOR-FM-02-02', nombre: 'HISTORIA MILITAR', evaluaciones: ['Parcial 1', 'Parcial 2', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FM-02-03', nombre: 'GEOGRAFÍA MILITAR', evaluaciones: ['Parcial'] },
+  ];
 
+  materiasPrimerSemestreAcademicas = [
+    { codigo: 'FOR-FT-01-01', nombre: 'ÁLGEBRA', evaluaciones: ['Parcial 1', 'Parcial 2', 'Parcial 3', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FT-01-02', nombre: 'CÁLCULO', evaluaciones: ['Parcial 1', 'Parcial 2', 'Parcial 3', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FT-01-03', nombre: 'FÍSICA', evaluaciones: ['Parcial 1', 'Parcial 2', 'Parcial 3', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FT-01-04', nombre: 'TRIGONOMETRÍA', evaluaciones: ['Parcial 1', 'Parcial 2', 'Parcial 3', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FC-01-01', nombre: 'LENGUAJE', evaluaciones: ['Parcial 1', 'Parcial 2', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FC-02-01', nombre: 'INGLÉS I', evaluaciones: ['Parcial 1', 'Parcial 2', 'Trabajo Práctico'] }
+  ];
 
   constructor(private estudianteService: EstudianteService) {}
 
@@ -89,11 +121,18 @@ export class InformationComponent implements OnInit {
   print(){
     window.print();
   }
-  onNivelChange() {
-    if (this.estudiante?.id && this.nivelSeleccionado) {
-      this.obtenerNotas();
+  async onNivelChange() {
+    if (this.estudiante?.id) {
+      this.notasRegistradas = {};
+      if(this.nivelSeleccionado && this.nivelSeleccionado !== 'avanzado' && this.nivelSeleccionado !== 'basico' ){
+        await this.obtenerNotasSemestrales();
+        await this.obtenerNotasFisico();
+      }else{
+        this.obtenerNotas();
+      }
     }
   }
+
   async obtenerNotas() {
     this.cargandoNotas = true;
     try {
@@ -103,6 +142,78 @@ export class InformationComponent implements OnInit {
       for (const codigo in notas) {
         this.notasRegistradas[codigo] = notas[codigo]?.nota ?? null;
       }
+    } finally {
+      this.cargandoNotas = false;
+    }
+  }
+
+  async obtenerNotasSemestrales() {
+    this.cargandoNotas = true;
+    try {
+      if (!this.estudiante?.id || !this.nivelSeleccionado) return;
+
+      const notas = await this.estudianteService.obtenerNotasSemestrales(
+        this.estudiante.id,
+        this.nivelSeleccionado
+      );
+
+      // this.notasRegistradas = {};
+
+      // 🔹 Convertimos el formato de Firestore a un objeto plano para la UI
+      for (const codigo in notas) {
+        const materia = notas[codigo];
+        for (const key in materia) {
+          // ejemplo: "Parcial 1", "Parcial 2", "Nota Final"
+          const campoId = `${codigo}-${key}`; // solo si necesitas id único
+          this.notasRegistradas[campoId] = materia[key];
+        }
+      }
+
+      console.log('Notas semestrales cargadas:', this.notasRegistradas);
+    } catch (error) {
+      console.error('Error al obtener notas semestrales:', error);
+    } finally {
+      this.cargandoNotas = false;
+    }
+  }
+
+  async obtenerNotasFisico() {
+    this.cargandoNotas = true;
+
+    try {
+      if (!this.estudiante?.id || !this.nivelSeleccionado) {
+        console.warn("Faltan datos para obtener notas físicas.");
+        return;
+      }
+
+      const datos = await this.estudianteService.obtenerNotasFisicas(
+        this.estudiante.id,
+        this.nivelSeleccionado
+      );
+
+      console.log(datos);
+
+      // this.notasRegistradas = {};
+      // this.cantidadesRegistradas = {};
+
+      for (const prueba of this.pruebasFisicas) {
+        const nombre = prueba.nombre;
+        this.notasRegistradas[nombre] = datos[nombre] ?? null;
+        // this.cantidadesRegistradas[`${nombre}_cant`] = datos[`${nombre}_cant`] ?? null;
+      }
+
+      const gestionValor = datos['Gestion'] ?? datos['gestion'] ?? datos['Gesti\u00f3n'] ?? null;
+      const gestionNumero = Number(gestionValor);
+
+
+      console.log("Notas físicas obtenidas:", this.notasRegistradas);
+      // console.log("Cantidades físicas obtenidas:", this.cantidadesRegistradas);
+    } catch (error) {
+      console.error("Error al procesar notas físicas:", error);
+      // this.notasRegistradas = {};
+      // this.cantidadesRegistradas = {};
+      // this.anioSeleccionado = null;
+      // this.anioSeleccionadoDate = null;
     } finally {
       this.cargandoNotas = false;
     }
