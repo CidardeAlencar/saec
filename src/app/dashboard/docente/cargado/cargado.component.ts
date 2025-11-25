@@ -1558,6 +1558,93 @@ consejoCatalogo: MeritoItem[] = [
     { codigo: 'FOR-FC-02-01', nombre: 'INGLÉS I', evaluaciones: ['Parcial 1', 'Parcial 2', 'Trabajo Práctico'] }
   ];
 
+  materiasSegundoSemestreMilitares = [
+    { codigo: 'FOR-FM-01-06', nombre: 'ORDEN CERRADO II', evaluaciones: ['Parcial 1'] },
+    { codigo: 'FOR-FM-01-07', nombre: 'TIRO II', evaluaciones: ['Parcial 1'] },
+    { codigo: 'FOR-FM-01-08', nombre: 'LECTURA DE CARTAS Y NAVEGACIÓN', evaluaciones: ['Parcial 1'] },
+    { codigo: 'FOR-FM-01-09', nombre: 'PRIMEROS AUXILIOS', evaluaciones: ['Parcial 1'] },
+    { codigo: 'FOR-FM-01-10', nombre: 'COMUNICACIONES', evaluaciones: ['Parcial 1'] },
+    { codigo: 'FOR-FM-01-11', nombre: 'PATRULLAJE I', evaluaciones: ['Parcial 1'] },
+    { codigo: 'FOR-FM-02-04', nombre: 'TÉCNICA Y CONFECCIÓN DE CALCOS', evaluaciones: ['Parcial 1'] },
+  ];
+
+  materiasSegundoSemestreAcademicas = [
+    { codigo: 'FOR-FT-02-01', nombre: 'DIBUJO TÉCNICO', evaluaciones: ['Parcial 1', 'Parcial 2', 'Parcial 3', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FT-02-02', nombre: 'TÉCNICA INSTRUMENTAL', evaluaciones: ['Parcial 1', 'Parcial 2', 'Parcial 3', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FT-02-03', nombre: 'CÁLCULO DE COMPENSACIÓN', evaluaciones: ['Parcial 1', 'Parcial 2', 'Parcial 3', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FT-03-01', nombre: 'TOPOGRAFÍA I', evaluaciones: ['Parcial 1', 'Parcial 2', 'Parcial 3', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FC-02-02', nombre: 'INGLES II', evaluaciones: ['Parcial 1', 'Parcial 2', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FC-03-01', nombre: 'DERECHOS HUMANOS', evaluaciones: ['Parcial 1', 'Parcial 2', 'Trabajo Práctico'] },
+  ];
+
+  materiasTercerSemestreMilitares = [
+    { codigo: 'FOR-FM-01-12', nombre: 'ORDEN CERRADO III (AMETRALLADORA)', evaluaciones: ['Parcial 1'] },
+    { codigo: 'FOR-FM-01-13', nombre: 'SERVICIO DE PIEZA (AMETRALLADORA)', evaluaciones: ['Parcial 1'] },
+    { codigo: 'FOR-FM-01-14', nombre: 'TÉCNICA DE ARMAS II (AMETRALLADORA)', evaluaciones: ['Parcial 1'] },
+    { codigo: 'FOR-FM-01-15', nombre: 'TIRO II (AMETRALLADORA)', evaluaciones: ['Parcial 1'] },
+    { codigo: 'FOR-FM-02-05', nombre: 'TÁCTICA GENERAL', evaluaciones: ['Parcial 1'] },
+  ];
+
+  materiasTercerSemestreAcademicas = [
+    { codigo: 'FOR-FT-03-02', nombre: 'CARTOGRAFÍA', evaluaciones: ['Parcial 1', 'Parcial 2', 'Parcial 3', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FT-03-03', nombre: 'GEODESIA GEOMÉTRICA', evaluaciones: ['Parcial 1', 'Parcial 2', 'Parcial 3', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FT-03-04', nombre: 'BASE DE DATOS', evaluaciones: ['Parcial 1', 'Parcial 2', 'Parcial 3', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FT-03-05', nombre: 'TOPOGRAFÍA II', evaluaciones: ['Parcial 1', 'Parcial 2', 'Parcial 3', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FC-02-03', nombre: 'INGLES III', evaluaciones: ['Parcial 1', 'Parcial 2', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FC-03-02', nombre: 'DERECHO INTERNACIONAL HUMANITARIO', evaluaciones: ['Parcial 1', 'Parcial 2', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FC-04-01', nombre: 'GESTIÓN DE RIESGO DE DESASTRES', evaluaciones: ['Parcial 1', 'Parcial 2', 'Trabajo Práctico'] },
+  ];
+
+  materiasCuartoSemestreMilitares = [
+    { codigo: 'FOR-FM-01-16', nombre: 'PATRULLAJE II', evaluaciones: ['Parcial 1'] },
+    { codigo: 'FOR-FM-02-06', nombre: 'ADMINISTRACIÓN DE LA INSTRUCCIÓN', evaluaciones: ['Parcial 1', 'Parcial 2', 'Trabajo Práctico'] },
+  ];
+
+  materiasCuartoSemestreAcademicas = [
+    { codigo: 'FOR-FT-03-06', nombre: 'CARTOGRAFÍA DIGITAL', evaluaciones: ['Parcial 1', 'Parcial 2', 'Parcial 3', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FT-03-07', nombre: 'GEODESIA ESPACIAL', evaluaciones: ['Parcial 1', 'Parcial 2', 'Parcial 3', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FT-03-08', nombre: 'FOTOGRAMETRÍA', evaluaciones: ['Parcial 1', 'Parcial 2', 'Parcial 3', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FT-03-09', nombre: 'TOPOGRAFÍA VIAL', evaluaciones: ['Parcial 1', 'Parcial 2', 'Parcial 3', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FC-02-04', nombre: 'INGLES IV', evaluaciones: ['Parcial 1', 'Parcial 2', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FC-03-03', nombre: 'ÉTICA Y LIDERAZGO', evaluaciones: ['Parcial 1', 'Parcial 2', 'Trabajo Práctico'] },
+  ];
+
+  materiasQuintoSemestreMilitares = [
+    { codigo: 'FOR-FM-01-17', nombre: 'CRUCE DE OBSTÁCULOS I', evaluaciones: ['Parcial 1'] },
+    { codigo: 'FOR-FM-01-18', nombre: 'TÉCNICA DE ARMAS V (PISTOLA)', evaluaciones: ['Parcial 1'] },
+    { codigo: 'FOR-FM-01-19', nombre: 'TIRO V (PISTOLA)', evaluaciones: ['Parcial 1'] },
+    { codigo: 'FOR-FM-02-07', nombre: 'PROCESO DE CONDUCCIÓN DE TROPAS', evaluaciones: ['Parcial 1'] },
+    { codigo: 'FOR-FM-02-08', nombre: 'MONOGRAFÍAS Y RECONOCIMIENTOS', evaluaciones: ['Parcial 1'] },
+  ];
+
+  materiasQuintoSemestreAcademicas = [
+    { codigo: 'FOR-FT-03-10', nombre: 'SISTEMA DE INFORMACIÓN GEOGRÁFICA I', evaluaciones: ['Parcial 1', 'Parcial 2', 'Parcial 3', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FT-03-11', nombre: 'CATASTRO Y AVALÚOS', evaluaciones: ['Parcial 1', 'Parcial 2', 'Parcial 3', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FT-03-12', nombre: 'TELEDETECCIÓN', evaluaciones: ['Parcial 1', 'Parcial 2', 'Parcial 3', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FC-02-05', nombre: 'INGLES V', evaluaciones: ['Parcial 1', 'Parcial 2', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FC-02-07', nombre: 'LENGUA ORIGINARIA I', evaluaciones: ['Parcial 1', 'Parcial 2', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FC-05-01', nombre: 'TITULACIÓN I', evaluaciones: ['Parcial 1', 'Parcial 2', 'Parcial 3', 'Trabajo Práctico'] },
+  ];
+
+  materiasSextoSemestreMilitares = [
+    { codigo: 'FOR-FM-01-20', nombre: 'CRUCE DE OBSTÁCULOS II', evaluaciones: ['Parcial 1'] },
+    { codigo: 'FOR-FM-01-21', nombre: 'TIRO PRÁCTICO', evaluaciones: ['Parcial 1'] },
+    { codigo: 'FOR-FM-01-22', nombre: 'PATRULLAJE III', evaluaciones: ['Parcial 1'] },
+    { codigo: 'FOR-FM-02-09', nombre: 'TÁCTICA DE INGENIERÍA', evaluaciones: ['Parcial 1'] },
+    { codigo: 'FOR-FM-02-10', nombre: 'ESTUDIO MILITAR DEL TERRENO', evaluaciones: ['Parcial 1'] },
+    { codigo: 'FOR-FM-02-11', nombre: 'TAREAS DE APOYO AL DESARROLLO Y ESTABILIDAD ESTATAL', evaluaciones: ['Parcial 1', 'Parcial 2', 'Trabajo Práctico'] },
+  ];
+
+  materiasSextoSemestreAcademicas = [
+    { codigo: 'FOR-FT-03-13', nombre: 'SISTEMA DE INFORMACIÓN GEOGRÁFICA II', evaluaciones: ['Parcial 1', 'Parcial 2', 'Parcial 3', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FT-03-14', nombre: 'GEODESIA FÍSICA', evaluaciones: ['Parcial 1', 'Parcial 2', 'Parcial 3', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FC-02-06', nombre: 'INGLES VI', evaluaciones: ['Parcial 1', 'Parcial 2', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FC-02-08', nombre: 'LENGUA ORIGINARIA II', evaluaciones: ['Parcial 1', 'Parcial 2', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FC-05-02', nombre: 'TITULACIÓN II', evaluaciones: ['Parcial 1', 'Parcial 2', 'Parcial 3', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FC-06-01', nombre: 'LEGISLACIÓN TOPOGRÁFICA', evaluaciones: ['Parcial 1', 'Parcial 2', 'Trabajo Práctico'] },
+    { codigo: 'FOR-FC-06-02', nombre: 'LEGISLACIÓN MILITAR', evaluaciones: ['Parcial 1', 'Parcial 2', 'Trabajo Práctico'] },
+  ];
+
 
   notasRegistradas: { [codigo: string]: number | null } = {};
   cantidadesRegistradas: { [codigo: string]: number | null } = {};
@@ -2402,7 +2489,17 @@ Gestion(
 
     const materias = [
       ...this.materiasPrimerSemestreMilitares,
-      ...this.materiasPrimerSemestreAcademicas
+      ...this.materiasPrimerSemestreAcademicas,
+      ...this.materiasSegundoSemestreMilitares,
+      ...this.materiasSegundoSemestreAcademicas,
+      ...this.materiasTercerSemestreMilitares,
+      ...this.materiasTercerSemestreAcademicas,
+      ...this.materiasCuartoSemestreMilitares,
+      ...this.materiasCuartoSemestreAcademicas,
+      ...this.materiasQuintoSemestreMilitares,
+      ...this.materiasQuintoSemestreAcademicas,
+      ...this.materiasSextoSemestreMilitares,
+      ...this.materiasSextoSemestreAcademicas
     ];
 
     try {

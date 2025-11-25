@@ -119,6 +119,7 @@
       </table>
     </div>
     <div class="notas" *ngIf="nivelSeleccionado === 'segundoSemestre' && !cargandoNotas">
+      <h3 class="tituloTabla">MATERIAS ACADÉMICAS</h3>
       <table class="mat-elevation-z8 table">
         <thead>
           <tr>
@@ -128,13 +129,14 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let materia of materiasPrimerSemestreAcademicas; let i = index">
+          <tr *ngFor="let materia of materiasSegundoSemestreAcademicas; let i = index">
             <td>{{ i + 1 }}</td>
             <td>{{ materia.nombre }}</td>
             <td>{{ notasRegistradas[materia.codigo + '-Nota Final'] ?? '—' }}</td>
           </tr>
         </tbody>
       </table>
+      <h3 class="tituloTabla">MATERIAS MILITARES</h3>
       <table class="mat-elevation-z8 table">
         <thead>
           <tr>
@@ -144,15 +146,33 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let materia of materiasPrimerSemestreMilitares; let i = index">
+          <tr *ngFor="let materia of materiasSegundoSemestreMilitares; let i = index">
             <td>{{ i + 1 }}</td>
             <td>{{ materia.nombre }}</td>
             <td>{{ notasRegistradas[materia.codigo + '-Nota Final'] ?? '—' }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3 class="tituloTabla">MATERIAS FISICAS</h3>
+      <table class="mat-elevation-z8 table">
+        <thead>
+          <tr>
+            <th style="text-align: left;">Nº</th>
+            <th style="text-align: left;">Unidad de Enseñanza</th>
+            <th style="text-align: left;">Nota</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let materia of pruebasFisicas.slice(0, 11); let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ materia.nombre }}</td>
+            <td>{{ notasRegistradas[materia.nombre] ?? '—' }}</td>
           </tr>
         </tbody>
       </table>
     </div>
     <div class="notas" *ngIf="nivelSeleccionado === 'tercerSemestre' && !cargandoNotas">
+      <h3 class="tituloTabla">MATERIAS ACADÉMICAS</h3>
       <table class="mat-elevation-z8 table">
         <thead>
           <tr>
@@ -162,13 +182,14 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let materia of materiasPrimerSemestreAcademicas; let i = index">
+          <tr *ngFor="let materia of materiasTercerSemestreAcademicas; let i = index">
             <td>{{ i + 1 }}</td>
             <td>{{ materia.nombre }}</td>
             <td>{{ notasRegistradas[materia.codigo + '-Nota Final'] ?? '—' }}</td>
           </tr>
         </tbody>
       </table>
+      <h3 class="tituloTabla">MATERIAS MILITARES</h3>
       <table class="mat-elevation-z8 table">
         <thead>
           <tr>
@@ -178,15 +199,33 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let materia of materiasPrimerSemestreMilitares; let i = index">
+          <tr *ngFor="let materia of materiasTercerSemestreMilitares; let i = index">
             <td>{{ i + 1 }}</td>
             <td>{{ materia.nombre }}</td>
             <td>{{ notasRegistradas[materia.codigo + '-Nota Final'] ?? '—' }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3 class="tituloTabla">MATERIAS FISICAS</h3>
+      <table class="mat-elevation-z8 table">
+        <thead>
+          <tr>
+            <th style="text-align: left;">Nº</th>
+            <th style="text-align: left;">Unidad de Enseñanza</th>
+            <th style="text-align: left;">Nota</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let materia of pruebasFisicas.slice(0, 11); let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ materia.nombre }}</td>
+            <td>{{ notasRegistradas[materia.nombre] ?? '—' }}</td>
           </tr>
         </tbody>
       </table>
     </div>
     <div class="notas" *ngIf="nivelSeleccionado === 'cuartoSemestre' && !cargandoNotas">
+      <h3 class="tituloTabla">MATERIAS ACADÉMICAS</h3>
       <table class="mat-elevation-z8 table">
         <thead>
           <tr>
@@ -196,13 +235,14 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let materia of materiasPrimerSemestreAcademicas; let i = index">
+          <tr *ngFor="let materia of materiasCuartoSemestreAcademicas; let i = index">
             <td>{{ i + 1 }}</td>
             <td>{{ materia.nombre }}</td>
             <td>{{ notasRegistradas[materia.codigo + '-Nota Final'] ?? '—' }}</td>
           </tr>
         </tbody>
       </table>
+      <h3 class="tituloTabla">MATERIAS MILITARES</h3>
       <table class="mat-elevation-z8 table">
         <thead>
           <tr>
@@ -212,15 +252,33 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let materia of materiasPrimerSemestreMilitares; let i = index">
+          <tr *ngFor="let materia of materiasCuartoSemestreMilitares; let i = index">
             <td>{{ i + 1 }}</td>
             <td>{{ materia.nombre }}</td>
             <td>{{ notasRegistradas[materia.codigo + '-Nota Final'] ?? '—' }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3 class="tituloTabla">MATERIAS FISICAS</h3>
+      <table class="mat-elevation-z8 table">
+        <thead>
+          <tr>
+            <th style="text-align: left;">Nº</th>
+            <th style="text-align: left;">Unidad de Enseñanza</th>
+            <th style="text-align: left;">Nota</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let materia of pruebasFisicas.slice(0, 11); let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ materia.nombre }}</td>
+            <td>{{ notasRegistradas[materia.nombre] ?? '—' }}</td>
           </tr>
         </tbody>
       </table>
     </div>
     <div class="notas" *ngIf="nivelSeleccionado === 'quintoSemestre' && !cargandoNotas">
+      <h3 class="tituloTabla">MATERIAS ACADÉMICAS</h3>
       <table class="mat-elevation-z8 table">
         <thead>
           <tr>
@@ -230,13 +288,14 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let materia of materiasPrimerSemestreAcademicas; let i = index">
+          <tr *ngFor="let materia of materiasQuintoSemestreAcademicas; let i = index">
             <td>{{ i + 1 }}</td>
             <td>{{ materia.nombre }}</td>
             <td>{{ notasRegistradas[materia.codigo + '-Nota Final'] ?? '—' }}</td>
           </tr>
         </tbody>
       </table>
+      <h3 class="tituloTabla">MATERIAS MILITARES</h3>
       <table class="mat-elevation-z8 table">
         <thead>
           <tr>
@@ -246,15 +305,33 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let materia of materiasPrimerSemestreMilitares; let i = index">
+          <tr *ngFor="let materia of materiasQuintoSemestreMilitares; let i = index">
             <td>{{ i + 1 }}</td>
             <td>{{ materia.nombre }}</td>
             <td>{{ notasRegistradas[materia.codigo + '-Nota Final'] ?? '—' }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3 class="tituloTabla">MATERIAS FISICAS</h3>
+      <table class="mat-elevation-z8 table">
+        <thead>
+          <tr>
+            <th style="text-align: left;">Nº</th>
+            <th style="text-align: left;">Unidad de Enseñanza</th>
+            <th style="text-align: left;">Nota</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let materia of pruebasFisicas.slice(0, 11); let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ materia.nombre }}</td>
+            <td>{{ notasRegistradas[materia.nombre] ?? '—' }}</td>
           </tr>
         </tbody>
       </table>
     </div>
     <div class="notas" *ngIf="nivelSeleccionado === 'sextoSemestre' && !cargandoNotas">
+      <h3 class="tituloTabla">MATERIAS ACADÉMICAS</h3>
       <table class="mat-elevation-z8 table">
         <thead>
           <tr>
@@ -264,13 +341,14 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let materia of materiasPrimerSemestreAcademicas; let i = index">
+          <tr *ngFor="let materia of materiasSextoSemestreAcademicas; let i = index">
             <td>{{ i + 1 }}</td>
             <td>{{ materia.nombre }}</td>
             <td>{{ notasRegistradas[materia.codigo + '-Nota Final'] ?? '—' }}</td>
           </tr>
         </tbody>
       </table>
+      <h3 class="tituloTabla">MATERIAS MILITARES</h3>
       <table class="mat-elevation-z8 table">
         <thead>
           <tr>
@@ -280,15 +358,31 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let materia of materiasPrimerSemestreMilitares; let i = index">
+          <tr *ngFor="let materia of materiasSextoSemestreMilitares; let i = index">
             <td>{{ i + 1 }}</td>
             <td>{{ materia.nombre }}</td>
             <td>{{ notasRegistradas[materia.codigo + '-Nota Final'] ?? '—' }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3 class="tituloTabla">MATERIAS FISICAS</h3>
+      <table class="mat-elevation-z8 table">
+        <thead>
+          <tr>
+            <th style="text-align: left;">Nº</th>
+            <th style="text-align: left;">Unidad de Enseñanza</th>
+            <th style="text-align: left;">Nota</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let materia of pruebasFisicas.slice(0, 11); let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>{{ materia.nombre }}</td>
+            <td>{{ notasRegistradas[materia.nombre] ?? '—' }}</td>
           </tr>
         </tbody>
       </table>
     </div>
-
   <div class="buttons">
     <button
       mat-raised-button
