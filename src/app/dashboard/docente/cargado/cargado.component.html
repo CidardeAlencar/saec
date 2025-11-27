@@ -707,19 +707,20 @@
                   <mat-label>{{ materia.nombre }}</mat-label>
 
                   <!-- Caso especial: GESTIÓN -->
-                   <!-- [value]="anioSeleccionado ? anioSeleccionado.toString() : ''" -->
+                  <!-- [value]="anioSeleccionado ? anioSeleccionado.toString() : ''" -->
                   <ng-container *ngIf="materia.nombre === 'Gestion'; else inputNormal">
                     <div style="display: flex;">
                       <input
                         [id]="'nota_' + materia.nombre.split(' ').join('_')"
                         matInput
                         [matDatepicker]="gestionYearPicker"
-                        [(ngModel)]="anioSeleccionado"
+                        [(ngModel)]="anioSeleccionadoDate"
                         [ngModelOptions]="{ standalone: true }"
                         placeholder="Seleccione un año"
                         readonly
                         (focus)="gestionYearPicker.open()"
                         (click)="gestionYearPicker.open()"
+                        [disabled]="notasRegistradas['Gestion'] != null"
                       />
                       <mat-datepicker
                         #gestionYearPicker

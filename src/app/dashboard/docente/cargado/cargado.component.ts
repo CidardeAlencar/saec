@@ -2891,18 +2891,45 @@ for (const materia of this.pruebasFisicas) {
         this.cantidadesRegistradas[`${nombre}_cant`] = datos[`${nombre}_cant`] ?? null;
       }
 
-      const gestionValor = datos['Gestion'] ?? datos['gestion'] ?? datos['Gesti\u00f3n'] ?? null;
-      const gestionNumero = Number(gestionValor);
+      // const gestionValor = datos['Gestion'] ?? datos['gestion'] ?? datos['Gesti\u00f3n'] ?? null;
+      const rawGestion =
+        datos["Gestion"] ??
+        datos["gestion"] ??
+        datos["Gesti\u00f3n"] ??
+        null;
 
-      if (Number.isFinite(gestionNumero)) {
-        this.anioSeleccionado = gestionNumero;
-        this.anioSeleccionadoDate = new Date(gestionNumero, 0, 1);
-        this.notasRegistradas['Gestion'] = gestionNumero;
-      } else {
+      // Normalizamos valores inválidos
+      if (
+        rawGestion === 0 ||
+        rawGestion === "0" ||
+        rawGestion === null ||
+        rawGestion === undefined ||
+        rawGestion === "" ||
+        isNaN(Number(rawGestion))
+      ) {
+        // NO HAY GESTIÓN → mantener vacío
         this.anioSeleccionado = null;
         this.anioSeleccionadoDate = null;
-        this.notasRegistradas['Gestion'] = null;
+        this.notasRegistradas["Gestion"] = null;
+      } else {
+        // Gestión válida
+        const year = Number(rawGestion);
+        this.anioSeleccionado = year;
+        this.anioSeleccionadoDate = new Date(year, 0, 1);
+        this.notasRegistradas["Gestion"] = year;
       }
+
+      // const gestionNumero = Number(gestionValor);
+
+      // if (Number.isFinite(gestionNumero)) {
+      //   this.anioSeleccionado = gestionNumero;
+      //   this.anioSeleccionadoDate = new Date(gestionNumero, 0, 1);
+      //   this.notasRegistradas['Gestion'] = gestionNumero;
+      // } else {
+      //   this.anioSeleccionado = null;
+      //   this.anioSeleccionadoDate = null;
+      //   this.notasRegistradas['Gestion'] = null;
+      // }
 
       console.log("Notas físicas obtenidas:", this.notasRegistradas);
       console.log("Cantidades físicas obtenidas:", this.cantidadesRegistradas);
