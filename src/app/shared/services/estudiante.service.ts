@@ -342,27 +342,43 @@ private async leerItemsBase(ci: string, nivel: string, contenedor: 'MERITOS' | '
     try {
       const notas: any = {};
 
-      // 📂 ruta base
-      const materiasRef = collection(this.firestore, `estudiante/${ci}/${nivel}/notas/materias`);
+      // 📂 1. LEER TODAS LAS MATERIAS
+      const materiasRef = collection(
+        this.firestore,
+        `estudiante/${ci}/${nivel}/notas/materias`
+      );
       const snapshot = await getDocs(materiasRef);
 
       for (const docSnap of snapshot.docs) {
         const data = docSnap.data();
-        const codigo = docSnap.id; // el código de materia (ej. FOR-FM-01-01)
+        const codigo = docSnap.id;
 
-        // construimos el objeto igual que el otro método
-        notas[codigo] = {
-          ...data, // contiene "Parcial 1", "Parcial 2", "Trabajo Práctico", "Nota Final"
-        };
+        notas[codigo] = { ...data };
       }
 
-      console.log(`[${nivel}] Notas semestrales cargadas:`, notas);
+      // 📂 2. LEER EL DOCUMENTO PRINCIPAL DE NOTAS (gestión)
+      const notasRef = doc(
+        this.firestore,
+        `estudiante/${ci}/${nivel}/notas`
+      );
+      const notasSnap = await getDoc(notasRef);
+
+      if (notasSnap.exists()) {
+        const data = notasSnap.data();
+
+        // Se agrega la gestión al objeto final
+        notas["__gestion"] = data["gestion"] ?? null;
+      }
+
+      console.log(`[${nivel}] Notas semestrales + gestión cargadas:`, notas);
       return notas;
+
     } catch (error) {
       console.error('Error al obtener notas semestrales:', error);
       return {};
     }
   }
+
 
   async registrarEstudiante(ci: string, data: any) {
     try {

@@ -136,6 +136,8 @@ const YEAR_ONLY_FORMATS = {
 })
 
 export class CargadoComponent implements OnInit, OnDestroy {
+  listaAcademica: any[] = [];
+  promedioAcademico: number = 0;
   listaMeritos: ItemBase[] = [];
   listaDemeritos: ItemBase[] = [];
   listaConsejo: ItemConsejoDoc[] = [];
@@ -147,6 +149,7 @@ export class CargadoComponent implements OnInit, OnDestroy {
   @ViewChild('pdfContentDiscipline', { static: false }) pdfContentDiscipline!: ElementRef;
   @ViewChild('pdfContentRGP', { static: false }) pdfContentRGP!: ElementRef;
   @ViewChild('pdfContentRGD', { static: false }) pdfContentRGD!: ElementRef;
+  @ViewChild('pdfContentAcademic') pdfContentAcademic!: ElementRef;
   generandoPDF = false;
   loadingRG = false;
   listaRGP: ReporteGeneralItem[] = [];
@@ -155,7 +158,23 @@ export class CargadoComponent implements OnInit, OnDestroy {
   readonly comandante = signal('');
   readonly responsable = signal('');
   datosEFM: Record<string, any> = {};
-  vistaSeleccionada: string = 'academico';
+  // vistaSeleccionada: string = 'academico';
+  private _vistaSeleccionada: string = 'academico';
+  get vistaSeleccionada() {
+    return this._vistaSeleccionada;
+  }
+
+  set vistaSeleccionada(value: string) {
+    this._vistaSeleccionada = value;
+
+    // 🔥 Cada vez que cambie la vista, limpiamos los niveles
+    this.nivelSeleccionado = '';
+    this.nivelSeleccionado2 = '';
+    this.nivelSeleccionado3 = '';
+    this.nivelSeleccionado4 = '';
+
+    console.log("Vista cambiada → limpiando niveles seleccionados");
+  }
   today: Date = new Date();
   mostrarAcademica1: boolean = false;
   mostrarMilitar1: boolean = false;
@@ -1660,6 +1679,12 @@ consejoCatalogo: MeritoItem[] = [
   cargandoNotas4: boolean = false;
   anioSeleccionado: number | null = null;
   anioSeleccionadoDate: Date | null = null;
+  anioGestionAcademica1: Date | null = null;
+  anioGestionAcademica2: Date | null = null;
+  anioGestionAcademica3: Date | null = null;
+  anioGestionAcademica4: Date | null = null;
+  anioGestionAcademica5: Date | null = null;
+  anioGestionAcademica6: Date | null = null;
   minYearDate = new Date(2025, 0, 1);
   editarNotas: boolean = false;
   codigo1Generado = '';
@@ -1735,6 +1760,33 @@ consejoCatalogo: MeritoItem[] = [
     }
   }
 
+  onYearSelectedAcademica(event: Date, datepicker: any, key: string) {
+    if (key === 'GestionAcademica1') {
+      this.anioGestionAcademica1 = event;
+    }
+
+    if (key === 'GestionAcademica2') {
+      this.anioGestionAcademica2 = event;
+    }
+
+    if (key === 'GestionAcademica3') {
+      this.anioGestionAcademica3 = event;
+    }
+
+    if (key === 'GestionAcademica4') {
+      this.anioGestionAcademica4 = event;
+    }
+
+    if (key === 'GestionAcademica5') {
+      this.anioGestionAcademica5 = event;
+    }
+
+    if (key === 'GestionAcademica6') {
+      this.anioGestionAcademica6 = event;
+    }
+
+    datepicker.close();
+  }
 
   onYearSelected(date: Date, dp: any) {
     // this.anioSeleccionado = date.getFullYear();
@@ -2502,6 +2554,107 @@ Gestion(
       ...this.materiasSextoSemestreAcademicas
     ];
 
+    if (this.nivelSeleccionado === 'primerSemestre') {
+
+      // const anio = this.notasRegistradas['GestionAcademica1'];
+      const anio = this.anioGestionAcademica1?.getFullYear();
+
+      if (anio) {
+        const refNotas = doc(this.firestore, `estudiante/${ci}/${nivel}/notas`);
+
+        await setDoc(refNotas, {
+          gestion: anio.toString()
+        }, { merge: true });
+
+        console.log("📌 Gestión académica guardada:", anio);
+      }
+    }
+    // Guardar gestión académica del segundo semestre
+    if (this.nivelSeleccionado === 'segundoSemestre') {
+
+      const anio = this.anioGestionAcademica2?.getFullYear();
+
+      if (anio) {
+        const refNotas = doc(this.firestore, `estudiante/${ci}/${nivel}/notas`);
+        await setDoc(refNotas, {
+          gestion: anio.toString()
+        }, { merge: true });
+
+        console.log("📌 Gestión académica (2do semestre) guardada:", anio);
+      }
+    }
+
+    if (this.nivelSeleccionado === 'tercerSemestre') {
+
+      const anio = this.anioGestionAcademica3?.getFullYear();
+
+      if (anio) {
+        const refNotas = doc(this.firestore, `estudiante/${ci}/${nivel}/notas`);
+        await setDoc(refNotas, {
+          gestion: anio.toString()
+        }, { merge: true });
+
+        console.log("📌 Gestión académica (3er semestre) guardada:", anio);
+      }
+    }
+
+    if (this.nivelSeleccionado === 'cuartoSemestre') {
+
+      const anio = this.anioGestionAcademica4?.getFullYear();
+
+      if (anio) {
+        const refNotas = doc(this.firestore, `estudiante/${ci}/${nivel}/notas`);
+        await setDoc(refNotas, {
+          gestion: anio.toString()
+        }, { merge: true });
+
+        console.log("📌 Gestión académica (3er semestre) guardada:", anio);
+      }
+    }
+
+    if (this.nivelSeleccionado === 'quintoSemestre') {
+
+      const anio = this.anioGestionAcademica5?.getFullYear();
+
+      if (anio) {
+        const refNotas = doc(this.firestore, `estudiante/${ci}/${nivel}/notas`);
+        await setDoc(refNotas, {
+          gestion: anio.toString()
+        }, { merge: true });
+
+        console.log("📌 Gestión académica (3er semestre) guardada:", anio);
+      }
+    }
+
+    if (this.nivelSeleccionado === 'quintoSemestre') {
+
+      const anio = this.anioGestionAcademica5?.getFullYear();
+
+      if (anio) {
+        const refNotas = doc(this.firestore, `estudiante/${ci}/${nivel}/notas`);
+        await setDoc(refNotas, {
+          gestion: anio.toString()
+        }, { merge: true });
+
+        console.log("📌 Gestión académica (3er semestre) guardada:", anio);
+      }
+    }
+
+    if (this.nivelSeleccionado === 'sextoSemestre') {
+
+      const anio = this.anioGestionAcademica6?.getFullYear();
+
+      if (anio) {
+        const refNotas = doc(this.firestore, `estudiante/${ci}/${nivel}/notas`);
+        await setDoc(refNotas, {
+          gestion: anio.toString()
+        }, { merge: true });
+
+        console.log("📌 Gestión académica (3er semestre) guardada:", anio);
+      }
+    }
+
+
     try {
       for (const materia of materias) {
         const data: any = {};
@@ -2837,33 +2990,145 @@ for (const materia of this.pruebasFisicas) {
 
   async obtenerNotasSemestrales() {
     this.cargandoNotas = true;
+
     try {
       if (!this.estudiante?.id || !this.nivelSeleccionado) return;
 
-      const notas = await this.estudianteService.obtenerNotasSemestrales(
+      const data = await this.estudianteService.obtenerNotasSemestrales(
         this.estudiante.id,
         this.nivelSeleccionado
       );
 
       this.notasRegistradas = {};
 
-      // 🔹 Convertimos el formato de Firestore a un objeto plano para la UI
-      for (const codigo in notas) {
-        const materia = notas[codigo];
+      // 1️⃣ Cargar materias
+      for (const codigo in data) {
+        if (codigo === "__gestion") continue;
+
+        const materia = data[codigo];
         for (const key in materia) {
-          // ejemplo: "Parcial 1", "Parcial 2", "Nota Final"
-          const campoId = `${codigo}-${key}`; // solo si necesitas id único
+          const campoId = `${codigo}-${key}`;
           this.notasRegistradas[campoId] = materia[key];
         }
       }
 
-      console.log('Notas semestrales cargadas:', this.notasRegistradas);
-    } catch (error) {
-      console.error('Error al obtener notas semestrales:', error);
+      // 2️⃣ Cargar la gestión
+      if (data["__gestion"]) {
+        if (this.nivelSeleccionado === 'primerSemestre') {
+          this.notasRegistradas['GestionAcademica1'] = data["__gestion"];
+          this.anioGestionAcademica1 = new Date(Number(data["__gestion"]), 0, 1);
+        }
+        if (this.nivelSeleccionado === 'segundoSemestre') {
+          this.notasRegistradas['GestionAcademica2'] = data["__gestion"];
+          this.anioGestionAcademica2 = new Date(Number(data["__gestion"]), 0, 1);
+        }
+        if (this.nivelSeleccionado === 'tercerSemestre') {
+          this.notasRegistradas['GestionAcademica3'] = data["__gestion"];
+          this.anioGestionAcademica3 = new Date(Number(data["__gestion"]), 0, 1);
+        }
+        if (this.nivelSeleccionado === 'cuartoSemestre') {
+          this.notasRegistradas['GestionAcademica4'] = data["__gestion"];
+          this.anioGestionAcademica4 = new Date(Number(data["__gestion"]), 0, 1);
+        }
+        if (this.nivelSeleccionado === 'quintoSemestre') {
+          this.notasRegistradas['GestionAcademica5'] = data["__gestion"];
+          this.anioGestionAcademica5 = new Date(Number(data["__gestion"]), 0, 1);
+        }
+        if (this.nivelSeleccionado === 'sextoSemestre') {
+          this.notasRegistradas['GestionAcademica6'] = data["__gestion"];
+          this.anioGestionAcademica6 = new Date(Number(data["__gestion"]), 0, 1);
+        }
+      }
+
+      // -------------------------------------------------------------
+      // 🔥 3️⃣ BLOQUE NUEVO — Preparar datos para IMPRESIÓN
+      // -------------------------------------------------------------
+
+      this.listaAcademica = [];
+      let materiasDelSemestre: any[] = [];
+
+      // Importa solo las materias del semestre actual
+      if (this.nivelSeleccionado === 'primerSemestre') {
+        materiasDelSemestre = [
+          ...this.materiasPrimerSemestreMilitares,
+          ...this.materiasPrimerSemestreAcademicas
+        ];
+      }
+      if (this.nivelSeleccionado === 'segundoSemestre') {
+        materiasDelSemestre = [
+          ...this.materiasSegundoSemestreMilitares,
+          ...this.materiasSegundoSemestreAcademicas
+        ];
+      }
+      if (this.nivelSeleccionado === 'tercerSemestre') {
+        materiasDelSemestre = [
+          ...this.materiasTercerSemestreMilitares,
+          ...this.materiasTercerSemestreAcademicas
+        ];
+      }
+      if (this.nivelSeleccionado === 'cuartoSemestre') {
+        materiasDelSemestre = [
+          ...this.materiasCuartoSemestreMilitares,
+          ...this.materiasCuartoSemestreAcademicas
+        ];
+      }
+      if (this.nivelSeleccionado === 'quintoSemestre') {
+        materiasDelSemestre = [
+          ...this.materiasQuintoSemestreMilitares,
+          ...this.materiasQuintoSemestreAcademicas
+        ];
+      }
+      if (this.nivelSeleccionado === 'sextoSemestre') {
+        materiasDelSemestre = [
+          ...this.materiasSextoSemestreMilitares,
+          ...this.materiasSextoSemestreAcademicas
+        ];
+      }
+
+      // Construir lista para la tabla de impresión
+      let suma = 0;
+      let count = 0;
+
+      for (const materia of materiasDelSemestre) {
+
+        const finalID = `${materia.codigo}-Nota Final`;
+
+        // Ignorar materias que NO tengan notas reales en Firestore
+        if (!(finalID in this.notasRegistradas)) {
+          console.warn("⛔ Materia no encontrada en Firestore:", materia.codigo);
+          continue;
+        }
+
+        const notaFinal = this.notasRegistradas[finalID];
+
+        let estado = "SIN NOTA";
+        if (notaFinal != null) {
+          estado = notaFinal >= 51 ? "APROBADO" : "REPROBADO";
+          suma += notaFinal;
+          count++;
+        }
+
+        this.listaAcademica.push({
+          nombre: materia.nombre,
+          notaFinal: notaFinal ?? "—",
+          estado
+        });
+      }
+
+
+      this.promedioAcademico = count > 0 ? (suma / count) : 0;
+
+      // -------------------------------------------------------------
+      // 🔥 FIN DEL BLOQUE NUEVO
+      // -------------------------------------------------------------
+
+    } catch (err) {
+      console.error(err);
     } finally {
       this.cargandoNotas = false;
     }
   }
+
 
 
   async obtenerNotasFisico() {
@@ -3636,6 +3901,80 @@ printRGD() {
     }, 500);
   }
 
+  async printAcademic() {
+
+    // 1️⃣ Obtiene las notas del semestre seleccionado (primer, segundo, etc.)
+    await this.obtenerNotasSemestrales();
+
+    // 2️⃣ Marcar que estamos generando PDF
+    this.today = new Date();
+    this.generandoPDF = true;
+
+    setTimeout(async () => {
+      try {
+        const content = this.pdfContentAcademic.nativeElement;
+
+        const canvas = await html2canvas(content, {
+          scale: 2,
+          backgroundColor: '#FFFFFF',
+          useCORS: true,
+          allowTaint: false,
+          logging: false
+        });
+
+        const pdf = new jsPDF('p', 'mm', 'letter');
+
+        // Tamaño carta
+        const pageWidth  = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+
+        // Márgenes
+        const margin = 10;
+        const usableW = pageWidth  - margin * 2;
+        const usableH = pageHeight - margin * 2;
+
+        // Equivalencia de píxeles de canvas por página PDF
+        const pxPerPage = Math.floor(canvas.width * (usableH / usableW));
+
+        const pageCanvas = document.createElement('canvas');
+        const pageCtx = pageCanvas.getContext('2d')!;
+        pageCanvas.width  = canvas.width;
+        pageCanvas.height = pxPerPage;
+
+        let rendered = 0;
+        let isFirst = true;
+
+        while (rendered < canvas.height) {
+
+          pageCtx.clearRect(0, 0, pageCanvas.width, pageCanvas.height);
+          pageCtx.drawImage(
+            canvas,
+            0, rendered, canvas.width, pxPerPage,
+            0, 0, pageCanvas.width, pageCanvas.height
+          );
+
+          const imgData = pageCanvas.toDataURL('image/png');
+
+          if (!isFirst) pdf.addPage();
+
+          pdf.addImage(imgData, 'PNG', margin, margin, usableW, usableH);
+
+          isFirst = false;
+          rendered += pxPerPage;
+        }
+
+        // Nombre del archivo
+        const file = `Reporte_Academico_${this.nivelSeleccionado}_${this.estudiante?.id}.pdf`;
+        pdf.save(file);
+
+      } catch (err) {
+        console.error('Error al generar PDF académico:', err);
+
+      } finally {
+        this.generandoPDF = false;
+      }
+    }, 500);
+  }
 
 
 }
