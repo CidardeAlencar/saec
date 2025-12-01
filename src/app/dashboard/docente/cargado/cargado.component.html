@@ -1684,6 +1684,69 @@
               <span><strong>COMANDANTE DE LA E.M.T.E. - E.P.S.S.T.</strong></span></p>
             </div>
           </div>
+          <!-- IMPRESION ACADEMICA GENERAL -->
+           <div #pdfContentRGA class="pdf-container" [hidden]="!generandoPDF">
+            <div class="title">
+              <div class="encabezado">
+                <span>COMANDO DE INSTITUTOS MILITARES</span>
+                <span>ESCUELA MILITAR DE TOPOGRAFÍA DEL EJÉRCITO</span>
+                <span>“TCNL. JUAN ORDANZA LARA”</span>
+                <span class="bolivia">BOLIVIA </span>
+              </div>
+                <div class="encabezado2">
+                <span>PROCESADO POR SAEC - EMTE</span>
+                <span>FECHA DE EMISION: {{ today | date:'dd/MM/yyyy' }}</span>
+                <span>HORA DE EMISION: {{ today | date:'HH:mm:ss' }}</span>
+                <span class="bolivia">PAGINA 1 - 1 </span>
+              </div>
+            </div>
+            <h2 class="center">REPORTE GENERAL DE NOTAS</h2>
+
+            <p><strong>PERIODO:</strong> {{anioSeleccionado}}</p>
+            <p><strong>LUGAR:</strong> Huarina</p>
+            <p><strong>RESPONSABLE:</strong> {{ responsable() || "No disponible" }}</p>
+            <table class="mat-elevation-z8 table">
+              <tr class="bold">
+                <th>Nro.</th>
+                <th>Grado</th>
+                <th>Apellidos</th>
+                <th>Nombres</th>
+                <th>Nota</th>
+                <th>Estado</th>
+              </tr>
+              <tr *ngFor="let item of listaRGA; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ item.grado }}</td>
+                <td>{{ item.apPat }} {{ item.apMat }}</td>
+                <td>{{ item.nombres }}</td>
+                <td>{{ item.notaFinal }}</td>
+                <td>{{ item.estado}}</td>
+              </tr>
+              <!-- <tr *ngIf="!listaConsejo?.length">
+                <td colspan="4" class="text-center">Sin registros</td>
+              </tr>
+              <tr>
+                <td colspan="3">TOTAL</td>
+                <td>{{ sumaConsejo }}</td>
+              </tr> -->
+            </table>
+            <div class="firmas">
+              <div class="primary">
+                <p class="ind">
+                <span>{{ responsable() || "No disponible" }}</span>
+                <span><strong>JEFE DE EFM. Y DEPORTES DE LA E.M.T.E. - E.P.S.S.T.</strong></span>
+                </p>
+                <p class="ind">
+                <span>{{ jefe() || "No disponible" }}</span>
+                <span><strong>2DO. CMTE. Y JEFE DE ESTUDIOS DE LA E.M.T.E. - E.P.S.S.T.</strong></span>
+                </p>
+              </div>
+              <p><strong>Vo.Bo.</strong></p>
+              <p class="ind">
+                <span>{{ comandante() || "No disponible" }}</span>
+              <span><strong>COMANDANTE DE LA E.M.T.E. - E.P.S.S.T.</strong></span></p>
+            </div>
+          </div>
         </div>
         <div *ngSwitchDefault>
           <h2>Seleccione una opción en el menú</h2>

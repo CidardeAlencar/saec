@@ -109,6 +109,20 @@ export interface ReporteDisciplinarioItem {
   consejo: DiscCategoria;
 }
 
+export interface ReporteAcademicoItem {
+  ci: string;
+  grado?: string | null;
+  apMat?: string | null;
+  apPat?: string | null;
+  nombres?: string | null;
+  genero?: string | null;
+  scope: string;
+  type: 'academico';
+  year: number;
+  notaFinal: string;
+  estado: string;
+}
+
 type Grado = "3ER_AM" | "2DO_AM" | "1ER_AM";
 type Genero = "Masculino" | "Femenino";
 
@@ -149,11 +163,13 @@ export class CargadoComponent implements OnInit, OnDestroy {
   @ViewChild('pdfContentDiscipline', { static: false }) pdfContentDiscipline!: ElementRef;
   @ViewChild('pdfContentRGP', { static: false }) pdfContentRGP!: ElementRef;
   @ViewChild('pdfContentRGD', { static: false }) pdfContentRGD!: ElementRef;
+  @ViewChild('pdfContentRGA', { static: false }) pdfContentRGA!: ElementRef;
   @ViewChild('pdfContentAcademic') pdfContentAcademic!: ElementRef;
   generandoPDF = false;
   loadingRG = false;
   listaRGP: ReporteGeneralItem[] = [];
   listaRGD: ReporteDisciplinarioItem[] = [];
+  listaRGA: ReporteAcademicoItem[] = [];
   readonly jefe = signal('');
   readonly comandante = signal('');
   readonly responsable = signal('');
@@ -3657,6 +3673,13 @@ validarRango(event: Event, materiaNombre: string, fase: 'input' | 'blur' = 'inpu
         console.log('Coincidencias:', this.listaRGD);
         this.printRGD();
       }
+      if (params.type === 'academico') {
+        console.log('academico');
+        this.listaRGA  = await this.estudianteService.obtenerDatosGenralesA(params);
+        this.listaRGA.sort((a, b) => (a.apPat ?? '').localeCompare(b.apPat ?? ''));
+        console.log('Coincidencias:', this.listaRGA);
+        this.printRGA();
+      }
     } catch (e) {
       console.error('Error en obtenerDatosGenrales:', e);
     } finally {
@@ -3795,6 +3818,71 @@ printRGD() {
       pdf.save('Reporte_General_Disciplina.pdf');
     } catch (err) {
       console.error('Error al generar PDF de Reporte General Disciplina:', err);
+    } finally {
+      this.generandoPDF = false;
+    }
+  }, 500);
+}
+
+printRGA() {
+  this.today = new Date();
+  this.generandoPDF = true;
+
+  setTimeout(async () => {
+    try {
+      const content = this.pdfContentRGA.nativeElement;
+
+      const canvas = await html2canvas(content, {
+        scale: 2,
+        backgroundColor: '#FFFFFF',
+        useCORS: true,
+        allowTaint: false,
+        logging: false
+      });
+
+      // 👉 orientación VERTICAL (portrait)
+      const pdf = new jsPDF('p', 'mm', 'letter');
+
+      const pageWidth  = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      const margin   = 10;
+      const usableW  = pageWidth  - margin * 2;
+      const usableH  = pageHeight - margin * 2;
+
+      const pxPerPage = Math.floor(canvas.width * (usableH / usableW));
+
+      const pageCanvas = document.createElement('canvas');
+      const pageCtx = pageCanvas.getContext('2d')!;
+      pageCanvas.width  = canvas.width;
+      pageCanvas.height = pxPerPage;
+
+      let rendered = 0;
+      let isFirstPage = true;
+
+      while (rendered < canvas.height) {
+        pageCtx.clearRect(0, 0, pageCanvas.width, pageCanvas.height);
+        pageCtx.drawImage(
+          canvas,
+          0, rendered, canvas.width, pxPerPage,
+          0, 0, pageCanvas.width, pageCanvas.height
+        );
+
+        const pageImgData = pageCanvas.toDataURL('image/png');
+
+        if (!isFirstPage) {
+          pdf.addPage('letter', 'p');
+        }
+
+        pdf.addImage(pageImgData, 'PNG', margin, margin, usableW, usableH);
+
+        isFirstPage = false;
+        rendered += pxPerPage;
+      }
+
+      pdf.save('Reporte_General_Academico.pdf');
+    } catch (err) {
+      console.error('Error al generar PDF de Reporte General Académico:', err);
     } finally {
       this.generandoPDF = false;
     }
