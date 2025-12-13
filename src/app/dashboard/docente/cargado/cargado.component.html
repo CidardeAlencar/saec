@@ -50,7 +50,7 @@
             <mat-form-field class="nivel">
               <mat-label>Seleccione el curso</mat-label>
               <mat-select [(ngModel)]="nivelSeleccionado" (selectionChange)="onNivelChange()">
-                <mat-option *ngFor="let option of options.slice(0, 6)" [value]="option.value">
+                <mat-option *ngFor="let option of options.slice(0, 8)" [value]="option.value">
                   {{ option.viewValue }}
                 </mat-option>
               </mat-select>
@@ -106,6 +106,37 @@
               </ng-container>
             </div>
             <div class="notas" *ngIf="nivelSeleccionado === 'primerSemestre' && !cargandoNotas">
+              <div class="itemNotas">
+                <p>Gestión Académica</p>
+
+                <div class="itemMaterias">
+                  <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Gestión</mat-label>
+
+                    <div style="display: flex; align-items: center;">
+                      <input
+                        matInput
+                        [matDatepicker]="gestionAcademicaPicker1"
+                        [(ngModel)]="anioGestionAcademica1"
+                        [ngModelOptions]="{ standalone: true }"
+                        placeholder="Seleccione un año"
+                        readonly
+                        (focus)="gestionAcademicaPicker1.open()"
+                        (click)="gestionAcademicaPicker1.open()"
+                        [disabled]="notasRegistradas['GestionAcademica1'] != null"
+                      />
+                      <mat-datepicker
+                        #gestionAcademicaPicker1
+                        startView="multi-year"
+                        (yearSelected)="onYearSelectedAcademica($event, gestionAcademicaPicker1, 'GestionAcademica1')"
+                        >
+                      </mat-datepicker>
+
+                      <mat-datepicker-toggle matSuffix [for]="gestionAcademicaPicker1"></mat-datepicker-toggle>
+                    </div>
+                  </mat-form-field>
+                </div>
+              </div>
               <div class="tittleNotas-container" (click)="mostrarMilitar1 = !mostrarMilitar1">
                 <p class="tittleNotas">FORMACIÓN MILITAR</p>
                 <span class="arrow" [class.open]="mostrarMilitar1">▼</span>
@@ -195,12 +226,43 @@
               </div>
             </div>
             <div class="notas" *ngIf="nivelSeleccionado === 'segundoSemestre' && !cargandoNotas">
+              <div class="itemNotas">
+                <p>Gestión Académica</p>
+
+                <div class="itemMaterias">
+                  <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Gestión</mat-label>
+
+                    <div style="display: flex; align-items: center;">
+                      <input
+                        matInput
+                        [matDatepicker]="gestionAcademicaPicker2"
+                        [(ngModel)]="anioGestionAcademica2"
+                        [ngModelOptions]="{ standalone: true }"
+                        placeholder="Seleccione un año"
+                        readonly
+                        (focus)="gestionAcademicaPicker2.open()"
+                        (click)="gestionAcademicaPicker2.open()"
+                        [disabled]="notasRegistradas['GestionAcademica2'] != null"
+                      />
+                      <mat-datepicker
+                        #gestionAcademicaPicker2
+                        startView="multi-year"
+                        (yearSelected)="onYearSelectedAcademica($event, gestionAcademicaPicker2, 'GestionAcademica2')"
+                        >
+                      </mat-datepicker>
+
+                      <mat-datepicker-toggle matSuffix [for]="gestionAcademicaPicker2"></mat-datepicker-toggle>
+                    </div>
+                  </mat-form-field>
+                </div>
+              </div>
               <div class="tittleNotas-container" (click)="mostrarMilitar1 = !mostrarMilitar1">
                 <p class="tittleNotas">FORMACIÓN MILITAR</p>
                 <span class="arrow" [class.open]="mostrarMilitar1">▼</span>
               </div>
               <div class="contenidoNotas" *ngIf="mostrarMilitar1">
-                <ng-container *ngFor="let materia of materiasPrimerSemestreMilitares">
+                <ng-container *ngFor="let materia of materiasSegundoSemestreMilitares">
                   <div class="itemNotas">
                     <p>{{ materia.nombre }} ({{ materia.codigo }})</p>
                     <div class="itemMaterias">
@@ -243,7 +305,7 @@
                 <span class="arrow" [class.open]="mostrarAcademica1">▼</span>
               </div>
               <div class="contenidoNotas" *ngIf="mostrarAcademica1">
-                <ng-container *ngFor="let materia of materiasPrimerSemestreAcademicas">
+                <ng-container *ngFor="let materia of materiasSegundoSemestreAcademicas">
                   <div class="itemNotas">
                     <p>{{ materia.nombre }} ({{ materia.codigo }})</p>
                     <div class="itemMaterias">
@@ -284,12 +346,43 @@
               </div>
             </div>
             <div class="notas" *ngIf="nivelSeleccionado === 'tercerSemestre' && !cargandoNotas">
+              <div class="itemNotas">
+                <p>Gestión Académica</p>
+
+                <div class="itemMaterias">
+                  <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Gestión</mat-label>
+
+                    <div style="display: flex; align-items: center;">
+                      <input
+                        matInput
+                        [matDatepicker]="gestionAcademicaPicker3"
+                        [(ngModel)]="anioGestionAcademica3"
+                        [ngModelOptions]="{ standalone: true }"
+                        placeholder="Seleccione un año"
+                        readonly
+                        (focus)="gestionAcademicaPicker3.open()"
+                        (click)="gestionAcademicaPicker3.open()"
+                        [disabled]="notasRegistradas['GestionAcademica3'] != null"
+                      />
+                      <mat-datepicker
+                        #gestionAcademicaPicker3
+                        startView="multi-year"
+                        (yearSelected)="onYearSelectedAcademica($event, gestionAcademicaPicker3, 'GestionAcademica3')"
+                        >
+                      </mat-datepicker>
+
+                      <mat-datepicker-toggle matSuffix [for]="gestionAcademicaPicker3"></mat-datepicker-toggle>
+                    </div>
+                  </mat-form-field>
+                </div>
+              </div>
               <div class="tittleNotas-container" (click)="mostrarMilitar1 = !mostrarMilitar1">
                 <p class="tittleNotas">FORMACIÓN MILITAR</p>
                 <span class="arrow" [class.open]="mostrarMilitar1">▼</span>
               </div>
               <div class="contenidoNotas" *ngIf="mostrarMilitar1">
-                <ng-container *ngFor="let materia of materiasPrimerSemestreMilitares">
+                <ng-container *ngFor="let materia of materiasTercerSemestreMilitares">
                   <div class="itemNotas">
                     <p>{{ materia.nombre }} ({{ materia.codigo }})</p>
                     <div class="itemMaterias">
@@ -332,7 +425,7 @@
                 <span class="arrow" [class.open]="mostrarAcademica1">▼</span>
               </div>
               <div class="contenidoNotas" *ngIf="mostrarAcademica1">
-                <ng-container *ngFor="let materia of materiasPrimerSemestreAcademicas">
+                <ng-container *ngFor="let materia of materiasTercerSemestreAcademicas">
                   <div class="itemNotas">
                     <p>{{ materia.nombre }} ({{ materia.codigo }})</p>
                     <div class="itemMaterias">
@@ -373,12 +466,43 @@
               </div>
             </div>
             <div class="notas" *ngIf="nivelSeleccionado === 'cuartoSemestre' && !cargandoNotas">
+              <div class="itemNotas">
+                <p>Gestión Académica</p>
+
+                <div class="itemMaterias">
+                  <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Gestión</mat-label>
+
+                    <div style="display: flex; align-items: center;">
+                      <input
+                        matInput
+                        [matDatepicker]="gestionAcademicaPicker4"
+                        [(ngModel)]="anioGestionAcademica4"
+                        [ngModelOptions]="{ standalone: true }"
+                        placeholder="Seleccione un año"
+                        readonly
+                        (focus)="gestionAcademicaPicker4.open()"
+                        (click)="gestionAcademicaPicker4.open()"
+                        [disabled]="notasRegistradas['GestionAcademica4'] != null"
+                      />
+                      <mat-datepicker
+                        #gestionAcademicaPicker4
+                        startView="multi-year"
+                        (yearSelected)="onYearSelectedAcademica($event, gestionAcademicaPicker4, 'GestionAcademica4')"
+                        >
+                      </mat-datepicker>
+
+                      <mat-datepicker-toggle matSuffix [for]="gestionAcademicaPicker4"></mat-datepicker-toggle>
+                    </div>
+                  </mat-form-field>
+                </div>
+              </div>
               <div class="tittleNotas-container" (click)="mostrarMilitar1 = !mostrarMilitar1">
                 <p class="tittleNotas">FORMACIÓN MILITAR</p>
                 <span class="arrow" [class.open]="mostrarMilitar1">▼</span>
               </div>
               <div class="contenidoNotas" *ngIf="mostrarMilitar1">
-                <ng-container *ngFor="let materia of materiasPrimerSemestreMilitares">
+                <ng-container *ngFor="let materia of materiasCuartoSemestreMilitares">
                   <div class="itemNotas">
                     <p>{{ materia.nombre }} ({{ materia.codigo }})</p>
                     <div class="itemMaterias">
@@ -421,7 +545,7 @@
                 <span class="arrow" [class.open]="mostrarAcademica1">▼</span>
               </div>
               <div class="contenidoNotas" *ngIf="mostrarAcademica1">
-                <ng-container *ngFor="let materia of materiasPrimerSemestreAcademicas">
+                <ng-container *ngFor="let materia of materiasCuartoSemestreAcademicas">
                   <div class="itemNotas">
                     <p>{{ materia.nombre }} ({{ materia.codigo }})</p>
                     <div class="itemMaterias">
@@ -462,12 +586,43 @@
               </div>
             </div>
             <div class="notas" *ngIf="nivelSeleccionado === 'quintoSemestre' && !cargandoNotas">
+              <div class="itemNotas">
+                <p>Gestión Académica</p>
+
+                <div class="itemMaterias">
+                  <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Gestión</mat-label>
+
+                    <div style="display: flex; align-items: center;">
+                      <input
+                        matInput
+                        [matDatepicker]="gestionAcademicaPicker5"
+                        [(ngModel)]="anioGestionAcademica5"
+                        [ngModelOptions]="{ standalone: true }"
+                        placeholder="Seleccione un año"
+                        readonly
+                        (focus)="gestionAcademicaPicker5.open()"
+                        (click)="gestionAcademicaPicker5.open()"
+                        [disabled]="notasRegistradas['GestionAcademica5'] != null"
+                      />
+                      <mat-datepicker
+                        #gestionAcademicaPicker5
+                        startView="multi-year"
+                        (yearSelected)="onYearSelectedAcademica($event, gestionAcademicaPicker5, 'GestionAcademica5')"
+                        >
+                      </mat-datepicker>
+
+                      <mat-datepicker-toggle matSuffix [for]="gestionAcademicaPicker5"></mat-datepicker-toggle>
+                    </div>
+                  </mat-form-field>
+                </div>
+              </div>
               <div class="tittleNotas-container" (click)="mostrarMilitar1 = !mostrarMilitar1">
                 <p class="tittleNotas">FORMACIÓN MILITAR</p>
                 <span class="arrow" [class.open]="mostrarMilitar1">▼</span>
               </div>
               <div class="contenidoNotas" *ngIf="mostrarMilitar1">
-                <ng-container *ngFor="let materia of materiasPrimerSemestreMilitares">
+                <ng-container *ngFor="let materia of materiasQuintoSemestreMilitares">
                   <div class="itemNotas">
                     <p>{{ materia.nombre }} ({{ materia.codigo }})</p>
                     <div class="itemMaterias">
@@ -510,7 +665,7 @@
                 <span class="arrow" [class.open]="mostrarAcademica1">▼</span>
               </div>
               <div class="contenidoNotas" *ngIf="mostrarAcademica1">
-                <ng-container *ngFor="let materia of materiasPrimerSemestreAcademicas">
+                <ng-container *ngFor="let materia of materiasQuintoSemestreAcademicas">
                   <div class="itemNotas">
                     <p>{{ materia.nombre }} ({{ materia.codigo }})</p>
                     <div class="itemMaterias">
@@ -551,12 +706,43 @@
               </div>
             </div>
             <div class="notas" *ngIf="nivelSeleccionado === 'sextoSemestre' && !cargandoNotas">
+              <div class="itemNotas">
+                <p>Gestión Académica</p>
+
+                <div class="itemMaterias">
+                  <mat-form-field appearance="outline" class="w-full">
+                    <mat-label>Gestión</mat-label>
+
+                    <div style="display: flex; align-items: center;">
+                      <input
+                        matInput
+                        [matDatepicker]="gestionAcademicaPicker6"
+                        [(ngModel)]="anioGestionAcademica6"
+                        [ngModelOptions]="{ standalone: true }"
+                        placeholder="Seleccione un año"
+                        readonly
+                        (focus)="gestionAcademicaPicker6.open()"
+                        (click)="gestionAcademicaPicker6.open()"
+                        [disabled]="notasRegistradas['GestionAcademica6'] != null"
+                      />
+                      <mat-datepicker
+                        #gestionAcademicaPicker6
+                        startView="multi-year"
+                        (yearSelected)="onYearSelectedAcademica($event, gestionAcademicaPicker6, 'GestionAcademica6')"
+                        >
+                      </mat-datepicker>
+
+                      <mat-datepicker-toggle matSuffix [for]="gestionAcademicaPicker6"></mat-datepicker-toggle>
+                    </div>
+                  </mat-form-field>
+                </div>
+              </div>
               <div class="tittleNotas-container" (click)="mostrarMilitar1 = !mostrarMilitar1">
                 <p class="tittleNotas">FORMACIÓN MILITAR</p>
                 <span class="arrow" [class.open]="mostrarMilitar1">▼</span>
               </div>
               <div class="contenidoNotas" *ngIf="mostrarMilitar1">
-                <ng-container *ngFor="let materia of materiasPrimerSemestreMilitares">
+                <ng-container *ngFor="let materia of materiasSextoSemestreMilitares">
                   <div class="itemNotas">
                     <p>{{ materia.nombre }} ({{ materia.codigo }})</p>
                     <div class="itemMaterias">
@@ -599,7 +785,7 @@
                 <span class="arrow" [class.open]="mostrarAcademica1">▼</span>
               </div>
               <div class="contenidoNotas" *ngIf="mostrarAcademica1">
-                <ng-container *ngFor="let materia of materiasPrimerSemestreAcademicas">
+                <ng-container *ngFor="let materia of materiasSextoSemestreAcademicas">
                   <div class="itemNotas">
                     <p>{{ materia.nombre }} ({{ materia.codigo }})</p>
                     <div class="itemMaterias">
@@ -647,13 +833,27 @@
                 GUARDAR
               </button>
               <button
+                *ngIf="nivelSeleccionado !== 'avanzado' && nivelSeleccionado !== 'basico'"
+                mat-raised-button
+                class="button-primary"
+                (click)="printAcademic()"
+                [disabled]="nivelSeleccionado === 'avanzado' || nivelSeleccionado === 'basico'">
+                IMPRIMIR
+              </button>
+              <button
+                mat-raised-button
+                class="button-primary"
+                (click)="openDialog()">
+                EDITAR FIRMAS
+              </button>
+              <!-- <button
                 mat-raised-button
                 class="button-primary"
                 (click)="edit()">
                 EDITAR
-              </button>
+              </button> -->
             </div>
-            <div class="validar" *ngIf="editarNotas">
+            <!-- <div class="validar" *ngIf="editarNotas">
               <mat-form-field>
                 <mat-label>Codigo 1</mat-label>
                 <input matInput [(ngModel)]="codigo1Ingresado">
@@ -665,6 +865,60 @@
               <button mat-raised-button class="button-primary" (click)="editEnable()">
                 VALIDAR
               </button>
+            </div> -->
+          </div>
+          <div #pdfContentAcademic class="pdf-container" [hidden]="!generandoPDF">
+            <div class="title">
+              <div class="encabezado">
+                <span>COMANDO DE INSTITUTOS MILITARES</span>
+                <span>ESCUELA MILITAR DE TOPOGRAFÍA DEL EJÉRCITO</span>
+                <span>“TCNL. JUAN ORDANZA LARA”</span>
+                <span class="bolivia">BOLIVIA </span>
+              </div>
+                <div class="encabezado2">
+                <span>PROCESADO POR SAEC - EMTE</span>
+                <span>FECHA DE EMISION: {{ today | date:'dd/MM/yyyy' }}</span>
+                <span>HORA DE EMISION: {{ today | date:'HH:mm:ss' }}</span>
+                <span class="bolivia">PAGINA 1 - 1 </span>
+              </div>
+            </div>
+            <h2 class="center">REPORTE INDIVIDUAL DE MERITOS Y DEMERITOS</h2>
+            <p><strong>NOMBRES Y APELLIDOS:</strong> {{ estudiante?.nombres }} {{ estudiante?.apPat }} {{ estudiante?.apMat }}</p>
+            <p><strong>GRADO, ARMA:</strong> {{ estudiante?.grado }}</p>
+            <p><strong>PERIODO:</strong> {{ estudiante?.gestion }}</p>
+
+            <p><strong>CUADRO DE CALIFICACIONES</strong></p>
+
+            <table class="mat-elevation-z8 table">
+              <tr class="bold">
+                <th>Nro.</th>
+                <th>UU.EE. ACDEMICOS - MILITARES</th>
+                <th>NOTA</th>
+                <th>ATRIBUTO</th>
+              </tr>
+              <tr *ngFor="let materias of listaAcademica; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ materias.nombre }}</td>
+                <td>{{ materias.notaFinal }}</td>
+                <td>{{ materias.estado }}</td>
+              </tr>
+              <tr *ngIf="!listaAcademica?.length">
+                <td colspan="4" class="text-center">Sin registros</td>
+              </tr>
+              <tr>
+                <td colspan="3">PROMEDIO TOTAL</td>
+                <td>{{ promedioAcademico | number:'1.2-2' }}</td>
+              </tr>
+            </table>
+            <div class="firmas">
+              <p class="ind">
+              <span>{{ jefe() || "No disponible" }}</span>
+              <span><strong>2DO. CMTE. Y JEFE DE ESTUDIOS DE LA E.M.T.E. - E.P.S.S.T.</strong></span>
+              </p>
+              <p><strong>Vo.Bo.</strong></p>
+              <p class="ind">
+                <span>{{ comandante() || "No disponible" }}</span>
+              <span><strong>COMANDANTE DE LA E.M.T.E. - E.P.S.S.T.</strong></span></p>
             </div>
           </div>
         </div>
@@ -707,19 +961,20 @@
                   <mat-label>{{ materia.nombre }}</mat-label>
 
                   <!-- Caso especial: GESTIÓN -->
-                   <!-- [value]="anioSeleccionado ? anioSeleccionado.toString() : ''" -->
+                  <!-- [value]="anioSeleccionado ? anioSeleccionado.toString() : ''" -->
                   <ng-container *ngIf="materia.nombre === 'Gestion'; else inputNormal">
                     <div style="display: flex;">
                       <input
                         [id]="'nota_' + materia.nombre.split(' ').join('_')"
                         matInput
                         [matDatepicker]="gestionYearPicker"
-                        [(ngModel)]="anioSeleccionado"
+                        [(ngModel)]="anioSeleccionadoDate"
                         [ngModelOptions]="{ standalone: true }"
                         placeholder="Seleccione un año"
                         readonly
                         (focus)="gestionYearPicker.open()"
                         (click)="gestionYearPicker.open()"
+                        [disabled]="notasRegistradas['Gestion'] != null"
                       />
                       <mat-datepicker
                         #gestionYearPicker
@@ -1403,6 +1658,69 @@
                 <td>{{ item.demeritos.totalValor + item.consejo.totalValor}}</td>
                 <td>{{ item.meritos.totalValor + item.demeritos.totalValor + item.consejo.totalValor}}</td>
                 <td>{{100 - Math.abs(item.meritos.totalValor + item.demeritos.totalValor + item.consejo.totalValor) }}</td>
+              </tr>
+              <!-- <tr *ngIf="!listaConsejo?.length">
+                <td colspan="4" class="text-center">Sin registros</td>
+              </tr>
+              <tr>
+                <td colspan="3">TOTAL</td>
+                <td>{{ sumaConsejo }}</td>
+              </tr> -->
+            </table>
+            <div class="firmas">
+              <div class="primary">
+                <p class="ind">
+                <span>{{ responsable() || "No disponible" }}</span>
+                <span><strong>JEFE DE EFM. Y DEPORTES DE LA E.M.T.E. - E.P.S.S.T.</strong></span>
+                </p>
+                <p class="ind">
+                <span>{{ jefe() || "No disponible" }}</span>
+                <span><strong>2DO. CMTE. Y JEFE DE ESTUDIOS DE LA E.M.T.E. - E.P.S.S.T.</strong></span>
+                </p>
+              </div>
+              <p><strong>Vo.Bo.</strong></p>
+              <p class="ind">
+                <span>{{ comandante() || "No disponible" }}</span>
+              <span><strong>COMANDANTE DE LA E.M.T.E. - E.P.S.S.T.</strong></span></p>
+            </div>
+          </div>
+          <!-- IMPRESION ACADEMICA GENERAL -->
+           <div #pdfContentRGA class="pdf-container" [hidden]="!generandoPDF">
+            <div class="title">
+              <div class="encabezado">
+                <span>COMANDO DE INSTITUTOS MILITARES</span>
+                <span>ESCUELA MILITAR DE TOPOGRAFÍA DEL EJÉRCITO</span>
+                <span>“TCNL. JUAN ORDANZA LARA”</span>
+                <span class="bolivia">BOLIVIA </span>
+              </div>
+                <div class="encabezado2">
+                <span>PROCESADO POR SAEC - EMTE</span>
+                <span>FECHA DE EMISION: {{ today | date:'dd/MM/yyyy' }}</span>
+                <span>HORA DE EMISION: {{ today | date:'HH:mm:ss' }}</span>
+                <span class="bolivia">PAGINA 1 - 1 </span>
+              </div>
+            </div>
+            <h2 class="center">REPORTE GENERAL DE NOTAS</h2>
+
+            <p><strong>PERIODO:</strong> {{anioSeleccionado}}</p>
+            <p><strong>LUGAR:</strong> Huarina</p>
+            <p><strong>RESPONSABLE:</strong> {{ responsable() || "No disponible" }}</p>
+            <table class="mat-elevation-z8 table">
+              <tr class="bold">
+                <th>Nro.</th>
+                <th>Grado</th>
+                <th>Apellidos</th>
+                <th>Nombres</th>
+                <th>Nota</th>
+                <th>Estado</th>
+              </tr>
+              <tr *ngFor="let item of listaRGA; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ item.grado }}</td>
+                <td>{{ item.apPat }} {{ item.apMat }}</td>
+                <td>{{ item.nombres }}</td>
+                <td>{{ item.notaFinal }}</td>
+                <td>{{ item.estado}}</td>
               </tr>
               <!-- <tr *ngIf="!listaConsejo?.length">
                 <td colspan="4" class="text-center">Sin registros</td>
