@@ -1,17 +1,23 @@
 .main{
-  background-color: var(--color-background-dark);
+  // background-color: var(--color-background-dark);
+  background-image: url('../../assets/background.jpeg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   .card{
     padding: 30px;
-    width: 600px;
+    width: 500px;
     max-width: 90vw;
     max-height: 90vh;
     border-radius: 50px;
     box-shadow: 15px 15px 20px 0px rgba(0,0,0,0.4);
-    background-color: var(--color-secondary);
+    // background-color: var(--color-secondary);
+    // background-color: rgba(var(--color-secondary), 0.3);
+    background-color: rgba(1, 137, 237, 0.5); /* 0.5 = 50% de opacidad */
     display: flex;
     justify-content: center;
     align-items: center;

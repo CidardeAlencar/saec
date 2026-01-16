@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { Auth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from '@angular/fire/auth';
 
 @Injectable({
@@ -8,14 +8,17 @@ export class AuthService {
 
   private isAuthenticated : boolean = false;
 
-  constructor(private auth: Auth) { }
+  constructor(private auth: Auth, private ngZone: NgZone) { }
 
   async loginFB(email: string, password: string) {
     return signInWithEmailAndPassword(this.auth, email, password);
   }
 
   async register(email: string, password: string) {
-    return createUserWithEmailAndPassword(this.auth, email, password);
+    // return createUserWithEmailAndPassword(this.auth, email, password);
+    return this.ngZone.run(() =>
+      createUserWithEmailAndPassword(this.auth, email, password)
+    );
   }
 
   async logoutFB() {

@@ -1,0 +1,424 @@
+.sidebar-container {
+  width: 220px;
+  background: #587471;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 20px 0;
+  min-height: calc(100vh - 60px);
+  // height: 100%;
+  transition: width 0.3s;
+}
+
+.sidebar-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white !important;
+  height: 100px;
+  text-align: center;
+  padding: 28px 16px;
+  font-size: 22px;
+  background: none;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  width: 100%;
+  border-radius: 0;
+  transition: background 0.2s;
+}
+
+.sidebar-btn-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.sidebar-btn-content mat-icon {
+  font-size: 36px;
+  margin-bottom: 8px;
+  overflow: visible;
+}
+
+.sidebar-btn-text {
+  font-size: 16px;
+  font-weight: 500;
+  transition: opacity 0.3s;
+  padding-top: 10px;
+}
+
+.sidebar-btn.active,
+.sidebar-btn:hover {
+  background: #46605d;
+}
+
+/* Responsive para móviles */
+@media (max-width: 600px) {
+  .sidebar-container {
+    width: 70px;
+    padding: 10px 0;
+  }
+
+  .sidebar-btn {
+    padding: 18px 0;
+    font-size: 0;
+  }
+
+  .sidebar-btn-content mat-icon {
+    font-size: 28px;
+    margin-bottom: 0;
+  }
+
+  .sidebar-btn-text {
+    display: none;
+  }
+}
+
+.main{
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  min-height: 100vh;
+  // background-color: var(--color-background-light);
+  // background-image: url('../../../assets/background.jpeg');
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), /* capa oscura */
+    url('../../../assets/background3.jpeg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100%;
+  box-sizing: border-box;
+}
+  .logo{
+    max-width: 70px;
+  }
+.table {
+  min-width: 80% !important;
+}
+.data{
+  background-color: #587471;
+  width: 100%;
+  // margin-bottom: 50px;
+  padding: 40px;
+  // font-weight: bold;
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  box-shadow: 5px 5px 10px gray;
+  // border-radius: 20px;
+  color: white;
+  display: flex;
+  align-items: center;
+  // padding-left: 10px;
+  justify-content: space-around;
+  font-size: 20px;
+  box-sizing: border-box;
+  span{
+    padding-left: 20px;
+
+  }
+  .logo{
+    max-width: 70px;
+    transform: scale(1.8);
+    transform-origin: center;
+  }
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    span {
+      padding-left: 0;
+      margin-top: 10px;
+    }
+    span:first-of-type {
+      margin-top: 30px; /* o el valor que quieras */
+    }
+  }
+}
+
+.pdf-container {
+  // text-align: center;
+  font-size: 24px;
+  font-family: 'Arial', sans-serif;
+  padding: 100px 100px 100px 150px;
+  // width: 816px;
+  // min-height: 1056px;
+  // padding: 40px;
+  // font-size: 12pt;
+  // background-color: white;
+  // color: black;
+  // margin: 0 auto;
+  // box-sizing: border-box;
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+  }
+
+  .table th, .table td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: center;
+  }
+
+.firmas {
+  margin-top: 150px;
+  padding: 0 50px;       // más consistente que solo padding-left
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .primary {
+    display: flex;       // 👉 necesario para que funcione space-between
+    justify-content: space-between;
+    width: 100%;         // asegura que ocupen todo el ancho
+    margin-bottom: 80px; // separación con el bloque Vo.Bo.
+
+    .ind {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 0;        // quité padding vertical grande para que no se estire de más
+    }
+  }
+
+  .ind {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 100px 0;
+  }
+}
+.firmas {
+  margin-top: 150px;
+  padding: 0 50px;       // más consistente que solo padding-left
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .primary {
+    display: flex;       // 👉 necesario para que funcione space-between
+    justify-content: space-between;
+    width: 100%;         // asegura que ocupen todo el ancho
+    margin-bottom: 80px; // separación con el bloque Vo.Bo.
+
+    .ind {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 0;        // quité padding vertical grande para que no se estire de más
+    }
+  }
+
+  .ind {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 100px 0;
+  }
+}
+
+  .title{
+    display: flex;
+    justify-content: space-between;
+    .encabezado {
+      display: flex;
+      // justify-content: start;
+      flex-direction: column;
+      align-items: center;
+      font-size: 18px;
+
+      .bolivia{
+        font-weight: bold;
+        text-decoration: underline;
+      }
+    }
+    .encabezado2 {
+      display: flex;
+      // justify-content: start;
+      flex-direction: column;
+      align-items: center;
+      font-size: 14px;
+
+      .bolivia{
+        font-weight: bold;
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .bold{
+    font-weight: bold;
+  }
+
+  .center{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .indent {
+    text-indent: 120px;
+  }
+
+  .certifica-texto {
+    font-size: 12px;
+  }
+
+  .fecha{
+    display: flex;
+    // align-items: end;
+    justify-content: end;
+  }
+
+  .justificado {
+    text-align: justify;
+  }
+
+}
+
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: #555;
+}
+
+table.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 16px;
+}
+
+table.table th,
+table.table td {
+  padding: 8px 12px;
+  text-align: center;
+  border: 2px solid #e0e0e0;
+  background-color: white;
+}
+
+table.table th {
+  background-color: white;
+  font-weight: bold;
+}
+
+.bold {
+  font-weight: bold;
+}
+.buttons{
+  margin-bottom: 20px;
+  display: flex;
+  // flex-direction: column;
+  .button-primary{
+    margin: 5px;
+  }
+}
+
+.nivel{
+  width: 300px;
+}
+.group{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+.notas{
+  display: flex;
+  flex-wrap: wrap;
+  padding: 20px;
+  justify-content: center;
+  gap: 10px;
+  background-color: #f7f9fa; // tono suave de fondo
+  border-radius: 10px;
+  width: 60%;
+  margin-bottom: 20px;
+}
+
+.validar{
+  display: flex;
+  flex-direction: column;
+}
+
+.form-field-meritos{
+  width: 100%;
+  max-width: 800px;
+}
+
+/* Opción de búsqueda fija arriba */
+.search-option {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--mat-select-panel-background-color, #fff);
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .5rem .75rem !important;
+  cursor: default;
+}
+
+/* Input dentro del panel */
+.search-input {
+  border: none;
+  outline: none;
+  font: inherit;
+  color: #555;
+  background: transparent;
+}
+
+// /* Ancho del panel SOLO para Consejo */
+// .panel-consejo {
+//   width: min(600px, 92vw) !important;
+//   max-width: 92vw !important;
+// }
+
+// /* Barra de búsqueda fija arriba del panel */
+// .panel-consejo .search-option {
+//   position: sticky;
+//   top: 0;
+//   z-index: 1;
+//   background: var(--mat-select-panel-background-color, #fff);
+//   display: flex;
+//   align-items: center;
+//   gap: .5rem;
+//   padding: .5rem .75rem !important;
+//   cursor: default;
+// }
+
+// /* Input de búsqueda dentro del panel */
+// .panel-consejo .search-input {
+//   width: 100%;
+//   border: none;
+//   outline: none;
+//   font: inherit;
+//   background: transparent;
+// }
+.consejo-ponderacion {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: .75rem;
+  margin-top: .5rem;
+}
+.w-100 { width: 100%; }
+@media (min-width: 768px) {
+  .consejo-ponderacion {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+

@@ -1,0 +1,939 @@
+
+<div class="main">
+  <div class="data">
+    <ng-container >
+      <img mat-card-image src="images/emte.png" alt="Escudo EMTE" class="logo">
+    </ng-container>
+    <ng-container>
+      <span><b>GRADO:</b> {{ estudiante.grado || "No definido" }}</span>
+      <span><b>GENERO:</b> {{ estudiante.genero || "No definido" }}</span>
+      <span><b>NOMBRES:</b> {{ estudiante.nombres || "No definido" }}</span>
+      <span><b>APELLIDOS:</b> {{ estudiante.apPat || "No definido" }} {{ estudiante.apMat || "No definido" }}</span>
+    </ng-container>
+  </div>
+  <div style="display: flex; width: 100%; min-height: 600px;">
+    <!-- Sidebar -->
+    <div class="sidebar-container">
+      <button mat-button class="sidebar-btn" [ngClass]="{active: vistaSeleccionada === 'academico'}" (click)="vistaSeleccionada = 'academico'">
+        <span class="sidebar-btn-content">
+          <mat-icon>school</mat-icon>
+          <span class="sidebar-btn-text">Académico</span>
+        </span>
+      </button>
+      <button mat-button class="sidebar-btn" [ngClass]="{active: vistaSeleccionada === 'fisico'}" (click)="vistaSeleccionada = 'fisico'">
+        <span class="sidebar-btn-content">
+          <mat-icon>fitness_center</mat-icon>
+          <span class="sidebar-btn-text">Físico</span>
+        </span>
+      </button>
+      <button mat-button class="sidebar-btn" [ngClass]="{active: vistaSeleccionada === 'disciplinario'}" (click)="vistaSeleccionada = 'disciplinario'">
+        <span class="sidebar-btn-content">
+          <mat-icon>gavel</mat-icon>
+          <span class="sidebar-btn-text">Disciplinario</span>
+        </span>
+      </button>
+      <button mat-button class="sidebar-btn"
+              [ngClass]="{active: vistaSeleccionada === 'generales'}"
+              (click)="vistaSeleccionada = 'generales'">
+        <span class="sidebar-btn-content">
+          <mat-icon>bar_chart</mat-icon> <!-- puedes cambiar el icono -->
+          <span class="sidebar-btn-text">Reportes Generales</span>
+        </span>
+      </button>
+    </div>
+    <!-- Contenido principal -->
+    <div style="flex: 1; padding: 30px 0;">
+      <ng-container [ngSwitch]="vistaSeleccionada">
+        <div *ngSwitchCase="'academico'">
+          <!-- ...existing code... -->
+          <div class="group">
+            <mat-form-field class="nivel">
+              <mat-label>Seleccione el curso</mat-label>
+              <mat-select [(ngModel)]="nivelSeleccionado" (selectionChange)="onNivelChange()">
+                <mat-option *ngFor="let option of options" [value]="option.value">
+                  {{ option.viewValue }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <div *ngIf="cargandoNotas" class="loader-container">
+              <mat-spinner diameter="40"></mat-spinner>
+              <p style="font-weight: bold;">Cargando notas...</p>
+            </div>
+            <!-- ...existing code for notas, buttons, validar... -->
+            <div class="notas" *ngIf="nivelSeleccionado === 'basico' && !cargandoNotas">
+              <ng-container *ngFor="let materia of materiasBasico">
+                <p>
+                  <mat-form-field appearance="outline">
+                    <mat-label>{{ materia.codigo }}</mat-label>
+                    <input
+                      [id]="getInputId(materia.codigo)"
+                      [value]="notasRegistradas[materia.codigo]"
+                      matInput
+                      type="number"
+                      min="0"
+                      max="100"
+                      placeholder="Ingresa la nota"
+                      [value]="notasRegistradas[materia.codigo] ?? ''"
+                      [disabled]="notasRegistradas[materia.codigo] != null && notasRegistradas[materia.codigo]! >= 0 && notasRegistradas[materia.codigo]! <= 100"
+                      (input)="validarRango($event, materia.nombre)">
+                    <mat-hint [id]="getHintId(materia.codigo)">
+                      {{ materia.nombre }}
+                    </mat-hint>
+                  </mat-form-field>
+                </p>
+              </ng-container>
+            </div>
+            <div class="notas" *ngIf="nivelSeleccionado === 'avanzado' && !cargandoNotas">
+              <ng-container *ngFor="let materia of materiasAvanzado">
+                <p>
+                  <mat-form-field appearance="outline">
+                    <mat-label>{{ materia.codigo }}</mat-label>
+                    <input
+                      [id]="getInputId(materia.codigo)"
+                      matInput
+                      type="number"
+                      min="0"
+                      max="100"
+                      placeholder="Ingresa la nota"
+                      [value]="notasRegistradas[materia.codigo] ?? ''"
+                      [disabled]="(notasRegistradas[materia.codigo] != null) && !puedeEditarTodo"
+                      (input)="debeValidarRango(materia.codigo) && validarRango($event, materia.nombre)">
+                    <mat-hint [id]="getHintId(materia.codigo)">
+                      {{ materia.nombre }}
+                    </mat-hint>
+                  </mat-form-field>
+                </p>
+              </ng-container>
+            </div>
+            <div class="notas" *ngIf="nivelSeleccionado === 'primerSemestre' && !cargandoNotas">
+              <ng-container *ngFor="let materia of materiasPrimerSemestre">
+                <p>
+                  <mat-form-field appearance="outline">
+                    <mat-label>{{ materia.codigo }}</mat-label>
+                    <input
+                      [id]="getInputId(materia.codigo)"
+                      matInput
+                      type="number"
+                      min="0"
+                      max="100"
+                      placeholder="Ingresa la nota"
+                      [value]="notasRegistradas[materia.codigo] ?? ''"
+                      [disabled]="(notasRegistradas[materia.codigo] != null) && !puedeEditarTodo"
+                      (input)="debeValidarRango(materia.codigo) && validarRango($event, materia.nombre)">
+                    <mat-hint [id]="getHintId(materia.codigo)">
+                      {{ materia.nombre }}
+                    </mat-hint>
+                  </mat-form-field>
+                </p>
+              </ng-container>
+            </div>
+            <div class="notas" *ngIf="nivelSeleccionado === 'segundoSemestre'">
+              <!-- ...existing code for segundoSemestre... -->
+              <p>
+                <mat-form-field appearance="outline">
+                  <mat-label>FOR-FC-02-02</mat-label>
+                  <input matInput type="number" min="0" max="100" placeholder="Ingresa la nota">
+                  <mat-hint>Formación Complementaria III</mat-hint>
+                </mat-form-field>
+              </p>
+              <!-- ...other materias... -->
+            </div>
+            <div class="buttons">
+              <button
+                mat-raised-button
+                class="button-primary"
+                (click)="save()">
+                GUARDAR
+              </button>
+              <button
+                mat-raised-button
+                class="button-primary"
+                (click)="edit()">
+                EDITAR
+              </button>
+            </div>
+            <div class="validar" *ngIf="editarNotas">
+              <mat-form-field>
+                <mat-label>Codigo 1</mat-label>
+                <input matInput [(ngModel)]="codigo1Ingresado">
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Codigo 2</mat-label>
+                <input matInput [(ngModel)]="codigo2Ingresado">
+              </mat-form-field>
+              <button mat-raised-button class="button-primary" (click)="editEnable()">
+                VALIDAR
+              </button>
+            </div>
+          </div>
+        </div>
+        <div *ngSwitchCase="'fisico'">
+          <div class="group">
+            <!-- <h2>Entrenamiento Fisico Militar</h2> -->
+            <mat-form-field class="nivel">
+              <mat-label>Seleccione el curso</mat-label>
+              <mat-select [(ngModel)]="nivelSeleccionado2" (selectionChange)="onNivelChangePhysicist()">
+                <mat-option *ngFor="let option of options.slice(0, 6)" [value]="option.value">
+                  {{ option.viewValue }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <div *ngIf="cargandoNotas2" class="loader-container">
+              <mat-spinner diameter="40"></mat-spinner>
+              <p style="font-weight: bold;">Cargando notas...</p>
+            </div>
+            <div class="notas" *ngIf="nivelSeleccionado2 != '' && !cargandoNotas2">
+              <!-- <ng-container *ngFor="let materia of pruebasFisicas">
+                  <mat-form-field appearance="outline">
+                    <mat-label>{{ materia.nombre }}</mat-label>
+                    <input
+                      [id]="'nota_' + materia.nombre.split(' ').join('_')"
+                      matInput
+                      [type]="materia.nombre === 'Marcha rapida' ? 'text' : 'number'"
+                      [placeholder]="materia.nombre === 'Marcha rapida' ? 'HH:mm:ss' : 'Ingresa el registro'"
+                      [placeholder]="getPlaceholder(materia)"
+
+                      [pattern]="materia.nombre === 'Marcha rapida'
+                        ? '^([0-1]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$'
+                        : null"
+                      [value]="notasRegistradas[materia.nombre] ?? ''"
+                      [disabled]="materia.nombre === 'Contextura Fisica' || (notasRegistradas[materia.nombre] != null && notasRegistradas[materia.nombre]! >= 0 && notasRegistradas[materia.nombre]! <= 3000) "
+                      >
+                  </mat-form-field>
+              </ng-container> -->
+              <ng-container *ngFor="let materia of pruebasFisicas">
+                <mat-form-field appearance="outline" class="w-full">
+                  <mat-label>{{ materia.nombre }}</mat-label>
+
+                  <!-- Caso especial: GESTIÓN -->
+                   <!-- [value]="anioSeleccionado ? anioSeleccionado.toString() : ''" -->
+                  <ng-container *ngIf="materia.nombre === 'Gestion'; else inputNormal">
+                    <div style="display: flex;">
+                      <input
+                        [id]="'nota_' + materia.nombre.split(' ').join('_')"
+                        matInput
+                        [matDatepicker]="gestionYearPicker"
+                        [(ngModel)]="anioSeleccionado"
+                        [ngModelOptions]="{ standalone: true }"
+                        placeholder="Seleccione un año"
+                        readonly
+                        (focus)="gestionYearPicker.open()"
+                        (click)="gestionYearPicker.open()"
+                      />
+                      <mat-datepicker
+                        #gestionYearPicker
+                        startView="multi-year"
+                        (yearSelected)="onYearSelected($event, gestionYearPicker)"
+                      ></mat-datepicker>
+                      <mat-datepicker-toggle matSuffix [for]="gestionYearPicker"></mat-datepicker-toggle>
+                    </div>
+                  </ng-container>
+                  <!-- Caso general: todos los demás inputs -->
+                  <ng-template #inputNormal>
+                    <input
+                      [id]="'nota_' + materia.nombre.split(' ').join('_')"
+                      matInput
+                      [type]="materia.nombre === 'Marcha rapida' ? 'text' : 'number'"
+                      [placeholder]="getPlaceholder(materia)"
+                      [pattern]="
+                        materia.nombre === 'Marcha rapida'
+                          ? '^([0-1]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$'
+                          : null
+                      "
+                      [value]="notasRegistradas[materia.nombre] ?? ''"
+                      [disabled]="
+                        materia.nombre === 'Contextura Fisica' ||
+                        (notasRegistradas[materia.nombre] != null &&
+                          notasRegistradas[materia.nombre]! >= 0 &&
+                          notasRegistradas[materia.nombre]! <= 3000)
+                      "
+                    />
+                  </ng-template>
+                </mat-form-field>
+              </ng-container>
+
+            </div>
+            <div class="buttons">
+              <button
+                mat-raised-button
+                class="button-primary"
+                (click)="savePhysicist()">
+                GUARDAR
+              </button>
+              <button
+                mat-raised-button
+                class="button-primary"
+                (click)="printEFM()"
+                [disabled]="!nivelSeleccionado2">
+                IMPRIMIR
+              </button>
+            <!-- <button
+              mat-raised-button
+              class="button-primary"
+              (click)="openDialog()">
+              EDITAR FIRMAS
+            </button> -->
+                <button
+                  mat-raised-button
+                  class="button-primary"
+                  (click)="openDialog()">
+                  EDITAR FIRMAS
+                </button>
+            </div>
+          </div>
+          <div #pdfContentEFM class="pdf-container" [hidden]="!generandoPDF">
+            <div class="title">
+              <div class="encabezado">
+                <span>COMANDO DE INSTITUTOS MILITARES</span>
+                <span>ESCUELA MILITAR DE TOPOGRAFÍA DEL EJÉRCITO</span>
+                <span>“TCNL. JUAN ORDANZA LARA”</span>
+                <span class="bolivia">BOLIVIA </span>
+              </div>
+                <div class="encabezado2">
+                <span>PROCESADO POR SAEC - EMTE</span>
+                <span>FECHA DE EMISION: {{ today | date:'dd/MM/yyyy' }}</span>
+                <span>HORA DE EMISION: {{ today | date:'HH:mm:ss' }}</span>
+                <span class="bolivia">PAGINA 1 - 1 </span>
+              </div>
+            </div>
+            <h2 class="center">REPORTE INDIVIDUAL DE EFM. Y DEPORTES</h2>
+            <p><strong>NOMBRES Y APELLIDOS:</strong> {{ estudiante?.nombres }} {{ estudiante?.apPat }} {{ estudiante?.apMat }}</p>
+            <p><strong>GRADO, ARMA:</strong> {{ estudiante?.grado }}</p>
+            <p><strong>PERIODO:</strong> {{ estudiante?.gestion }}</p>
+
+            <table class="mat-elevation-z8 table">
+              <tr class="bold">
+                <th colspan="2">PRUEBAS FISICAS</th>
+                <th>CANTIDAD</th>
+                <th>NOTA</th>
+              </tr>
+              <tr>
+                <td>Flexiones</td>
+                <td rowspan="8">95%</td>
+                <td>{{ cantidadesRegistradas['Flexiones_cant'] }}</td>
+                <td>{{ notasRegistradas['Flexiones'] }}</td>
+              </tr>
+              <tr>
+                <td>Abdominales</td>
+                <td>{{ cantidadesRegistradas['Abdominales_cant'] }}</td>
+                <td>{{ notasRegistradas['Abdominales'] }}</td>
+              </tr>
+              <tr>
+                <td>Flexiones en barra</td>
+                <td>{{ cantidadesRegistradas['Flexiones en barra_cant'] }}</td>
+                <td>{{ notasRegistradas['Flexiones en barra'] }}</td>
+              </tr>
+              <tr>
+                <td>Marcha rápida</td>
+                <td>{{ cantidadesRegistradas['Marcha rapida_cant'] }}</td>
+                <td>{{ notasRegistradas['Marcha rapida'] }}</td>
+              </tr>
+              <tr>
+                <td>Ascenso a la cuerda</td>
+                <td>{{ cantidadesRegistradas['Ascenso a la cuerda_cant'] }}</td>
+                <td>{{ notasRegistradas['Ascenso a la cuerda'] }}</td>
+              </tr>
+              <tr>
+                <td>Cruce de obstaculos</td>
+                <td>{{ cantidadesRegistradas['Cruce de obstaculos_cant'] }}</td>
+                <td>{{ notasRegistradas['Cruce de obstaculos'] }}</td>
+              </tr>
+              <tr>
+                <td>Aerobica</td>
+                <td>{{ cantidadesRegistradas['Aerobica_cant'] }}</td>
+                <td>{{ notasRegistradas['Aerobica'] }}</td>
+              </tr>
+              <tr>
+                <td>Natacion estilo crol</td>
+                <td>{{ cantidadesRegistradas['Natacion estilo crol_cant'] }}</td>
+                <td>{{ notasRegistradas['Natacion estilo crol'] }}</td>
+              </tr>
+              <tr>
+                <td colspan="2">PROMEDIO DE PRUEBAS</td>
+                <td colspan="2">{{promPruebas()}}</td>
+              </tr>
+              <tr>
+                <td>Talla y peso</td>
+                <td>5%</td>
+                <td colspan="2">{{ notasRegistradas['Contextura Fisica'] }}</td>
+              </tr>
+              <tr>
+                <td colspan="2">PROMEDIO GENERAL</td>
+                <td colspan="2">{{promPruebas()}}</td>
+              </tr>
+              <!-- agrega las demás pruebas -->
+            </table>
+            <div class="firmas">
+              <p class="ind">
+              <span>{{ jefe() || "No disponible" }}</span>
+              <span><strong>2DO. CMTE. Y JEFE DE ESTUDIOS DE LA E.M.T.E. - E.P.S.S.T.</strong></span>
+              </p>
+              <p><strong>Vo.Bo.</strong></p>
+              <p class="ind">
+                <span>{{ comandante() || "No disponible" }}</span>
+              <span><strong>COMANDANTE DE LA E.M.T.E. - E.P.S.S.T.</strong></span></p>
+            </div>
+          </div>
+
+        </div>
+        <div *ngSwitchCase="'disciplinario'">
+          <!-- <h2>Esta es la vista disciplinario</h2> -->
+          <div class="group">
+            <mat-form-field class="nivel">
+              <mat-label>Seleccione el curso</mat-label>
+              <!-- <mat-select [(ngModel)]="nivelSeleccionado3" (selectionChange)="onNivelChangeDiscipline()"> -->
+              <mat-select [(ngModel)]="nivelSeleccionado3">
+                <mat-option *ngFor="let option of options.slice(0, 6)" [value]="option.value">
+                  {{ option.viewValue }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <div *ngIf="cargandoNotas3" class="loader-container">
+              <mat-spinner diameter="40"></mat-spinner>
+              <p style="font-weight: bold;">Cargando notas...</p>
+            </div>
+            <div class="notas" *ngIf="nivelSeleccionado3 != '' && !cargandoNotas3">
+              <ng-container *ngFor="let materia of meritosDemeritos">
+                <mat-form-field appearance="outline" class="form-field-meritos">
+                  <mat-label>{{ materia.nombre }}</mat-label>
+                    <!-- Switch por tipo de campo -->
+                    <ng-container [ngSwitch]="materia.nombre">
+                      <!-- 1) Méritos como mat-select -->
+                      <ng-container *ngSwitchCase="'Meritos'">
+                        <mat-select
+                          panelClass="panel-meritos"
+                          [id]="'select_' + materia.nombre.split(' ').join('_')"
+                          [disabled]="deshabilitarCampo(materia)"
+                          [value]="notasRegistradas[materia.nombre] ?? null"
+                          (selectionChange)="onMeritoSeleccionado($event.value)"
+                          (openedChange)="onMeritosOpened($event)"
+                          placeholder="Seleccione un mérito"
+                        >
+                          <mat-option class="search-option" disabled>
+                            <mat-icon class="mr-2" aria-hidden="true">search</mat-icon>
+                            <input
+                              #meritosSearchInput
+                              type="text"
+                              [formControl]="meritosFilterControl"
+                              (keydown)="$event.stopPropagation()"
+                              placeholder="Buscar..."
+                              class="search-input"
+                              autocomplete="off"
+                            />
+                          </mat-option>
+                          <mat-option
+                            *ngFor="let opcion of filteredMeritosCatalogo$ | async"
+                            [value]="opcion.codigo"
+                          >
+                            {{ opcion.label }} ({{ opcion.valor }}) — {{ opcion.codigo }}
+                          </mat-option>
+                          <mat-option *ngIf="(filteredMeritosCatalogo$ | async)?.length === 0" disabled>
+                            Sin coincidencias
+                          </mat-option>
+                        </mat-select>
+                      </ng-container>
+                      <!-- 2) Deméritos como mat-select con buscador -->
+                      <ng-container *ngSwitchCase="'Demeritos'">
+                        <mat-select
+                          panelClass="panel-demeritos"
+                          [id]="'select_' + materia.nombre.split(' ').join('_')"
+                          [disabled]="deshabilitarCampo(materia)"
+                          [value]="notasRegistradas[materia.nombre] ?? null"
+                          (selectionChange)="onDemeritoSeleccionado($event.value)"
+                          (openedChange)="onDemeritosOpened($event)"
+                          placeholder="Seleccione un demérito"
+                        >
+                          <mat-option class="search-option" disabled>
+                            <mat-icon class="mr-2" aria-hidden="true">search</mat-icon>
+                            <input
+                              #demeritosSearchInput
+                              type="text"
+                              [formControl]="demeritosFilterControl"
+                              (keydown)="$event.stopPropagation()"
+                              placeholder="Buscar por código o descripción..."
+                              class="search-input"
+                              autocomplete="off"
+                            />
+                          </mat-option>
+                          <mat-option
+                            *ngFor="let opcion of filteredDemeritosCatalogo$ | async"
+                            [value]="opcion.codigo"
+                          >
+                            {{ opcion.label }} ({{ opcion.valor }}) — {{ opcion.codigo }}
+                          </mat-option>
+                          <mat-option *ngIf="(filteredDemeritosCatalogo$ | async)?.length === 0" disabled>
+                            Sin coincidencias
+                          </mat-option>
+                        </mat-select>
+                      </ng-container>
+                      <!-- 3) Consejo como mat-select con buscador -->
+                      <ng-container *ngSwitchCase="'Consejo'">
+                        <mat-select
+                          panelClass="panel-consejo"
+                          [id]="'select_' + materia.nombre.split(' ').join('_')"
+                          [disabled]="deshabilitarCampo(materia)"
+                          [value]="notasRegistradas[materia.nombre] ?? null"
+                          (selectionChange)="onConsejoSeleccionado($event.value)"
+                          (openedChange)="onConsejosOpened($event)"
+                          placeholder="Seleccione un consejo"
+                        >
+                          <!-- Barra de búsqueda dentro del panel -->
+                          <mat-option class="search-option" disabled>
+                            <mat-icon class="mr-2" aria-hidden="true">search</mat-icon>
+                            <input
+                              #consejoSearchInput
+                              type="text"
+                              [formControl]="consejoFilterControl"
+                              (keydown)="$event.stopPropagation()"
+                              placeholder="Buscar por código o descripción..."
+                              class="search-input"
+                              autocomplete="off"
+                            />
+                          </mat-option>
+
+                          <!-- Opciones filtradas -->
+                          <mat-option
+                            *ngFor="let opcion of filteredConsejoCatalogo$ | async"
+                            [value]="opcion.codigo"
+                          >
+                            {{ opcion.label }} ({{ opcion.valor }}) — {{ opcion.codigo }}
+                          </mat-option>
+
+                          <!-- Sin resultados -->
+                          <mat-option *ngIf="(filteredConsejoCatalogo$ | async)?.length === 0" disabled>
+                            Sin coincidencias
+                          </mat-option>
+                        </mat-select>
+                        <div class="consejo-ponderacion" *ngIf="consejoSeleccionado">
+                          <mat-form-field appearance="outline" class="w-100">
+                            <mat-label>Valor del consejo</mat-label>
+                            <input
+                              matInput
+                              type="number"
+                              min="-30"
+                              max="-7"
+                              [formControl]="valorConsejoControl"
+                              placeholder="Ingrese la ponderación decidida por el consejo"
+                              (click)="$event.stopPropagation()"
+                            />
+                            <mat-hint>Valor minimo -7 maximo -30</mat-hint>
+                          </mat-form-field>
+
+                          <!-- <mat-form-field appearance="outline" class="w-100">
+                            <mat-label>Observación (opcional)</mat-label>
+                            <textarea
+                              matInput
+                              rows="2"
+                              [formControl]="obsConsejoControl"
+                              placeholder="Motivo o nota del consejo"
+                            ></textarea>
+                          </mat-form-field> -->
+                        </div>
+                      </ng-container>
+
+
+                    </ng-container>
+                </mat-form-field>
+              </ng-container>
+            </div>
+            <div class="buttons">
+              <button
+                mat-raised-button
+                class="button-primary"
+                (click)="saveDiscipline()">
+                GUARDAR
+              </button>
+              <button
+                mat-raised-button
+                class="button-primary"
+                (click)="printDiscipline()"
+                [disabled]="!nivelSeleccionado3">
+                IMPRIMIR
+              </button>
+            <!-- <button
+              mat-raised-button
+              class="button-primary"
+              (click)="openDialog()">
+              EDITAR FIRMAS
+            </button> -->
+                <button
+                  mat-raised-button
+                  class="button-primary"
+                  (click)="openDialog()">
+                  EDITAR FIRMAS
+                </button>
+            </div>
+          </div>
+          <div #pdfContentDiscipline class="pdf-container" [hidden]="!generandoPDF">
+            <div class="title">
+              <div class="encabezado">
+                <span>COMANDO DE INSTITUTOS MILITARES</span>
+                <span>ESCUELA MILITAR DE TOPOGRAFÍA DEL EJÉRCITO</span>
+                <span>“TCNL. JUAN ORDANZA LARA”</span>
+                <span class="bolivia">BOLIVIA </span>
+              </div>
+                <div class="encabezado2">
+                <span>PROCESADO POR SAEC - EMTE</span>
+                <span>FECHA DE EMISION: {{ today | date:'dd/MM/yyyy' }}</span>
+                <span>HORA DE EMISION: {{ today | date:'HH:mm:ss' }}</span>
+                <span class="bolivia">PAGINA 1 - 1 </span>
+              </div>
+            </div>
+            <h2 class="center">REPORTE INDIVIDUAL DE MERITOS Y DEMERITOS</h2>
+            <p><strong>NOMBRES Y APELLIDOS:</strong> {{ estudiante?.nombres }} {{ estudiante?.apPat }} {{ estudiante?.apMat }}</p>
+            <p><strong>GRADO, ARMA:</strong> {{ estudiante?.grado }}</p>
+            <p><strong>PERIODO:</strong> {{ estudiante?.gestion }}</p>
+
+            <p><strong>DEMÉRITOS REGISTRADOS (FALTAS DISCIPLINARIAS)</strong></p>
+
+            <table class="mat-elevation-z8 table">
+              <tr class="bold">
+                <th>Nro.</th>
+                <th>DETALLE FALTA</th>
+                <th>FECHA</th>
+                <th>PUNTAJE</th>
+              </tr>
+              <tr *ngFor="let dem of listaDemeritos; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ dem.label }}</td>
+                <td>{{ dem.creadoEn | date:'dd/MM/yyyy HH:mm' }}</td>
+                <td>{{ dem.valor }}</td>
+              </tr>
+              <tr *ngIf="!listaDemeritos?.length">
+                <td colspan="4" class="text-center">Sin registros</td>
+              </tr>
+              <tr>
+                <td colspan="3">TOTAL</td>
+                <td>{{ sumaDemeritos }}</td>
+              </tr>
+            </table>
+            <p><strong>DEMERITOS REGISTRADOS (CONSEJO ACADÉMICO - SANCIONES)</strong></p>
+            <table class="mat-elevation-z8 table">
+              <tr class="bold">
+                <th>Nro.</th>
+                <th>DETALLE FALTA</th>
+                <th>FECHA</th>
+                <th>PUNTAJE</th>
+              </tr>
+              <tr *ngFor="let con of listaConsejo; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ con.label }}</td>
+                <td>{{ con.creadoEn | date:'dd/MM/yyyy HH:mm' }}</td>
+                <td>{{ con.valorConsejo }}</td>
+              </tr>
+              <tr *ngIf="!listaConsejo?.length">
+                <td colspan="4" class="text-center">Sin registros</td>
+              </tr>
+              <tr>
+                <td colspan="3">TOTAL</td>
+                <td>{{ sumaConsejo }}</td>
+              </tr>
+            </table>
+            <p><strong>MÉRITOS REGISTRADOS</strong></p>
+                        <table class="mat-elevation-z8 table">
+              <tr class="bold">
+                <th>Nro.</th>
+                <th>DETALLE FALTA</th>
+                <th>FECHA</th>
+                <th>PUNTAJE</th>
+              </tr>
+              <tr *ngFor="let mer of listaMeritos; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ mer.label }}</td>
+                <td>{{ mer.creadoEn | date:'dd/MM/yyyy HH:mm' }}</td>
+                <td>{{ mer.valor }}</td>
+              </tr>
+              <tr *ngIf="!listaMeritos?.length">
+                <td colspan="4" class="text-center">Sin registros</td>
+              </tr>
+              <tr>
+                <td colspan="3">TOTAL</td>
+                <td>{{ sumaMeritos }}</td>
+              </tr>
+            </table>
+            <div class="firmas">
+              <p class="ind">
+              <span>{{ jefe() || "No disponible" }}</span>
+              <span><strong>2DO. CMTE. Y JEFE DE ESTUDIOS DE LA E.M.T.E. - E.P.S.S.T.</strong></span>
+              </p>
+              <p><strong>Vo.Bo.</strong></p>
+              <p class="ind">
+                <span>{{ comandante() || "No disponible" }}</span>
+              <span><strong>COMANDANTE DE LA E.M.T.E. - E.P.S.S.T.</strong></span></p>
+            </div>
+          </div>
+        </div>
+        <div *ngSwitchCase="'generales'">
+          <div class="group">
+            <mat-form-field class="nivel">
+              <mat-label>Seleccione el curso</mat-label>
+              <mat-select [(ngModel)]="nivelSeleccionado4" (selectionChange)="onNivelChangePhysicist()">
+                <mat-option *ngFor="let option of options.slice(0, 6)" [value]="option.value">
+                  {{ option.viewValue }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field class="nivel">
+              <mat-label>Seleccione la gestion (año)</mat-label>
+                <input
+                  matInput
+                  [value]="anioSeleccionado ? anioSeleccionado.toString() : ''"
+                  placeholder="Seleccione un año"
+                  readonly
+                  (click)="picker.open()"
+                />
+
+                <input
+                  matInput
+                  [matDatepicker]="picker"
+                  [min]="minYearDate"
+                  style="position:absolute;opacity:0;width:0;height:0;pointer-events:none;"
+                  tabindex="-1"
+                  aria-hidden="true"
+                />
+
+                <mat-datepicker
+                  #picker
+                  startView="multi-year"
+                  (yearSelected)="onYearSelected($event, picker)"
+                ></mat-datepicker>
+
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            </mat-form-field>
+
+            <mat-form-field class="nivel">
+              <mat-label>Seleccione tipo de reporte</mat-label>
+              <mat-select [(ngModel)]="reporteSeleccionado">
+                <mat-option *ngFor="let option of optionsReport" [value]="option.value">
+                  {{ option.viewValue }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <div class="buttons">
+              <button
+                mat-raised-button
+                class="button-primary"
+                (click)="printRG()"
+                [disabled]="!nivelSeleccionado4 || !reporteSeleccionado || !anioSeleccionado">
+                GENERAR REPORTE
+              </button>
+              <button
+                mat-raised-button
+                class="button-primary"
+                (click)="openDialog()">
+                EDITAR FIRMAS
+              </button>
+            </div>
+          </div>
+          <div #pdfContentRGP class="pdf-container" [hidden]="!generandoPDF">
+            <div class="title">
+              <div class="encabezado">
+                <span>COMANDO DE INSTITUTOS MILITARES</span>
+                <span>ESCUELA MILITAR DE TOPOGRAFÍA DEL EJÉRCITO</span>
+                <span>“TCNL. JUAN ORDANZA LARA”</span>
+                <span class="bolivia">BOLIVIA </span>
+              </div>
+                <div class="encabezado2">
+                <span>PROCESADO POR SAEC - EMTE</span>
+                <span>FECHA DE EMISION: {{ today | date:'dd/MM/yyyy' }}</span>
+                <span>HORA DE EMISION: {{ today | date:'HH:mm:ss' }}</span>
+                <span class="bolivia">PAGINA 1 - 1 </span>
+              </div>
+            </div>
+            <h2 class="center">REPORTE GENERAL DE EFM. Y DEPORTES</h2>
+
+            <p><strong>PERIODO:</strong> {{anioSeleccionado}}</p>
+            <p><strong>LUGAR:</strong> Huarina</p>
+            <p><strong>RESPONSABLE:</strong> {{ responsable() || "No disponible" }}</p>
+            <table class="mat-elevation-z8 table">
+              <tr class="bold">
+                <th rowspan="2">Nro.</th>
+                <th rowspan="2">Grado</th>
+                <th rowspan="2">Apellidos</th>
+                <th rowspan="2">Nombres</th>
+                <th rowspan="2">Edad</th>
+                <th rowspan="2">Genero</th>
+                <th colspan="5">RELACION PESO TALLA 5%</th>
+                <th colspan="3">FLEXIONES EN SUELO 5%</th>
+                <th colspan="3">ABDOMINALES 5%</th>
+                <th colspan="3">FLEXIONES EN BARRA 10%</th>
+                <th colspan="3">AIROBICA 10%</th>
+                <th colspan="3">ASCENSO CUERDAS 5%</th>
+                <th colspan="3">JARDIN DE OBSTACULOS 15%</th>
+                <th colspan="3">MARCHA RAPIDA 20%</th>
+                <th colspan="3">NATACION 25%</th>
+                <th rowspan="2">PROMEDIO FINAL</th>
+                <th rowspan="2">CRITERIO</th>
+              </tr>
+              <tr class='Bold'>
+                <th>TALLA</th>
+                <th>PESO</th>
+                <th>PORCENTAJE</th>
+                <th>NOTA</th>
+                <th style="background-color: lime;">5%</th>
+                <th>CANT.</th>
+                <th>NOTA</th>
+                <th style="background-color: lime;">5%</th>
+                <th>CANT.</th>
+                <th>NOTA</th>
+                <th style="background-color: lime;">5%</th>
+                <th>CANT.</th>
+                <th>NOTA</th>
+                <th style="background-color: lime;">10%</th>
+                <th>TIEMPO</th>
+                <th>NOTA</th>
+                <th style="background-color: lime;">10%</th>
+                <th>TIEMPO</th>
+                <th>NOTA</th>
+                <th style="background-color: lime;">5%</th>
+                <th>TIEMPO</th>
+                <th>NOTA</th>
+                <th style="background-color: lime;">15%</th>
+                <th>TIEMPO</th>
+                <th>NOTA</th>
+                <th style="background-color: lime;">20%</th>
+                <th>TIEMPO</th>
+                <th>NOTA</th>
+                <th style="background-color: lime;">25%</th>
+              </tr>
+              <tr *ngFor="let item of listaRGP; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ item.grado }}</td>
+                <td>{{ item.apPat }} {{ item.apMat }}</td>
+                <td>{{ item.nombres }}</td>
+                <!-- <td> Edad </td> -->
+                <td>{{ item.edad ?? 'N/D' }}</td>
+                <td>{{ item.genero }}</td>
+                <td>{{ item.efm.Talla }}</td>
+                <td>{{ item.efm.Peso }}</td>
+                <td>{{ item.efm['Contextura Fisica'] === '100' ? 'NORMAL' : 'NO CUMPLE' }}</td>
+                <td>{{ item.efm['Contextura Fisica'] }}</td>
+                <td style="background-color: lime;">{{ (item.efm['Contextura Fisica'] * 0.05) | number:'1.0-2' }}</td>
+                <td>{{ item.efm.Flexiones_cant}}</td>
+                <td>{{ item.efm.Flexiones}}</td>
+                <td style="background-color: lime;">{{ item.efm.Flexiones * 0.05 | number:'1.0-2'}}</td>
+                <td>{{ item.efm.Abdominales_cant}}</td>
+                <td>{{ item.efm.Abdominales}}</td>
+                <td style="background-color: lime;">{{ item.efm.Abdominales * 0.05 | number:'1.0-2'}}</td>
+                <td>{{ item.efm['Flexiones en barra_cant']}}</td>
+                <td>{{ item.efm['Flexiones en barra']}}</td>
+                <td style="background-color: lime;">{{ item.efm['Flexiones en barra'] * 0.1 | number:'1.0-2'}}</td>
+                <td>{{ item.efm.Aerobica_cant}}</td>
+                <td>{{ item.efm.Aerobica}}</td>
+                <td style="background-color: lime;">{{ item.efm.Aerobica * 0.1 | number:'1.0-2'}}</td>
+                <td>{{ item.efm['Ascenso a la cuerda_cant']}}</td>
+                <td>{{ item.efm['Ascenso a la cuerda']}}</td>
+                <td style="background-color: lime;">{{ item.efm['Ascenso a la cuerda'] * 0.05 | number:'1.0-2'}}</td>
+                <td>{{ item.efm['Cruce de obstaculos_cant']}}</td>
+                <td>{{ item.efm['Cruce de obstaculos']}}</td>
+                <td style="background-color: lime;">{{ item.efm['Cruce de obstaculos'] * 0.15 | number:'1.0-2'}}</td>
+                <td>{{ item.efm['Marcha rapida_cant']}}</td>
+                <td>{{ item.efm['Marcha rapida']}}</td>
+                <td style="background-color: lime;">{{ item.efm['Marcha rapida'] * 0.2 | number:'1.0-2'}}</td>
+                <td>{{ item.efm['Natacion estilo crol_cant']}}</td>
+                <td>{{ item.efm['Natacion estilo crol']}}</td>
+                <td style="background-color: lime;">{{ item.efm['Natacion estilo crol'] * 0.25 | number:'1.0-2'}}</td>
+                <td style="background-color: orange;">{{calcularPromedioP(item.efm) | number:'1.2-2'}}</td>
+                <td>{{calcularPromedioP(item.efm) > 51 ? 'APROBADO' : 'REPROBADO'}}</td>
+              </tr>
+              <!-- <tr *ngIf="!listaConsejo?.length">
+                <td colspan="4" class="text-center">Sin registros</td>
+              </tr>
+              <tr>
+                <td colspan="3">TOTAL</td>
+                <td>{{ sumaConsejo }}</td>
+              </tr> -->
+            </table>
+            <div class="firmas">
+              <div class="primary">
+                <p class="ind">
+                <span>{{ responsable() || "No disponible" }}</span>
+                <span><strong>JEFE DE EFM. Y DEPORTES DE LA E.M.T.E. - E.P.S.S.T.</strong></span>
+                </p>
+                <p class="ind">
+                <span>{{ jefe() || "No disponible" }}</span>
+                <span><strong>2DO. CMTE. Y JEFE DE ESTUDIOS DE LA E.M.T.E. - E.P.S.S.T.</strong></span>
+                </p>
+              </div>
+              <p><strong>Vo.Bo.</strong></p>
+              <p class="ind">
+                <span>{{ comandante() || "No disponible" }}</span>
+              <span><strong>COMANDANTE DE LA E.M.T.E. - E.P.S.S.T.</strong></span></p>
+            </div>
+          </div>
+          <!-- IMPRESION DICIPLINA GENERAL -->
+           <div #pdfContentRGD class="pdf-container" [hidden]="!generandoPDF">
+            <div class="title">
+              <div class="encabezado">
+                <span>COMANDO DE INSTITUTOS MILITARES</span>
+                <span>ESCUELA MILITAR DE TOPOGRAFÍA DEL EJÉRCITO</span>
+                <span>“TCNL. JUAN ORDANZA LARA”</span>
+                <span class="bolivia">BOLIVIA </span>
+              </div>
+                <div class="encabezado2">
+                <span>PROCESADO POR SAEC - EMTE</span>
+                <span>FECHA DE EMISION: {{ today | date:'dd/MM/yyyy' }}</span>
+                <span>HORA DE EMISION: {{ today | date:'HH:mm:ss' }}</span>
+                <span class="bolivia">PAGINA 1 - 1 </span>
+              </div>
+            </div>
+            <h2 class="center">REPORTE GENERAL DE DISCIPLINA</h2>
+
+            <p><strong>PERIODO:</strong> {{anioSeleccionado}}</p>
+            <p><strong>LUGAR:</strong> Huarina</p>
+            <p><strong>RESPONSABLE:</strong> {{ responsable() || "No disponible" }}</p>
+            <table class="mat-elevation-z8 table">
+              <tr class="bold">
+                <th>Nro.</th>
+                <th>Grado</th>
+                <th>Apellidos</th>
+                <th>Nombres</th>
+                <th>MER.</th>
+                <th>DEM.</th>
+                <th>TOTAL</th>
+                <th>NOTA</th>
+              </tr>
+              <tr *ngFor="let item of listaRGD; let i = index">
+                <td>{{ i + 1 }}</td>
+                <td>{{ item.grado }}</td>
+                <td>{{ item.apPat }} {{ item.apMat }}</td>
+                <td>{{ item.nombres }}</td>
+                <td>{{ item.meritos.totalValor }}</td>
+                <td>{{ item.demeritos.totalValor + item.consejo.totalValor}}</td>
+                <td>{{ item.meritos.totalValor + item.demeritos.totalValor + item.consejo.totalValor}}</td>
+                <td>{{100 - Math.abs(item.meritos.totalValor + item.demeritos.totalValor + item.consejo.totalValor) }}</td>
+              </tr>
+              <!-- <tr *ngIf="!listaConsejo?.length">
+                <td colspan="4" class="text-center">Sin registros</td>
+              </tr>
+              <tr>
+                <td colspan="3">TOTAL</td>
+                <td>{{ sumaConsejo }}</td>
+              </tr> -->
+            </table>
+            <div class="firmas">
+              <div class="primary">
+                <p class="ind"> 
+                <span>{{ responsable() || "No disponible" }}</span>
+                <span><strong>JEFE DE EFM. Y DEPORTES DE LA E.M.T.E. - E.P.S.S.T.</strong></span>
+                </p>
+                <p class="ind">
+                <span>{{ jefe() || "No disponible" }}</span>
+                <span><strong>2DO. CMTE. Y JEFE DE ESTUDIOS DE LA E.M.T.E. - E.P.S.S.T.</strong></span>
+                </p>
+              </div>
+              <p><strong>Vo.Bo.</strong></p>
+              <p class="ind">
+                <span>{{ comandante() || "No disponible" }}</span>
+              <span><strong>COMANDANTE DE LA E.M.T.E. - E.P.S.S.T.</strong></span></p>
+            </div>
+          </div>
+        </div>
+        <div *ngSwitchDefault>
+          <h2>Seleccione una opción en el menú</h2>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
